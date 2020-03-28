@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>TODO supply a title</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="../xGridV2.js" type="text/javascript"></script>
+    <link rel="stylesheet" href="../xGridV2.css">
+    <style>
+        body {
+            background: #083952;
+            color: #f8f8f8;
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <div id="myGrid"></div>
+
+    <br>
+    <br>
+    <br>
+
+    <button onclick="grid.load();grid.source(json)">source</button>
+    <button onclick="grid.load();grid.sourceAdd(json)">Add Source</button>
+    <button onclick="grid.focus(2)">focus linha 2</button>
+    <button onclick="grid.focus()">focus</button>
+    <button onclick="grid.insertLine({
+        name: 'DEUS DEUS DEUS',
+        login: 'Meire <br>Legal',
+        cpf: '444',
+        old: 40,
+        tel: '845-453',
+        qto: 13,
+        cidade: 'SIA'
+    }, 'TOP')">insertLine</button>
+    <br>
+    <br>
+    <br>
+
+    <div class="campos">
+        <span>nome</span>
+        <input type="text" name="name">
+        <span>cpf</span>
+        <input type="text" name="cpf">
+        <span>idade</span>
+        <input type="text" name="old">
+        <span>casado</span>
+        <input type="checkbox" name="casado"><span>Sim</span>
+        <span>img</span>
+        <img src="" alt="teste" name="img" height="50" />
+        <br>
+        <span>sexo</span>
+        <input type="radio" name="genero" value="M" /> Man
+        <input type="radio" name="genero" value="F" /> Woman
+        <span>select</span>
+        <select name="qto">
+            <option value="13">Treze</option>
+            <option value="98">Dezessei</option>
+            <option value="8">oito</option>
+            <option value="21">Vinte e dois</option>
+            <option value="33">Trinta e Três</option>
+        </select>
+
+        <span>link</span>
+        <a href="" name=cidade></a>
+    </div>
+    <!-- <div class="campos">
+        <span>tel</span>
+        <input type="text" name="tel">
+
+    </div> -->
+
+
+    <br>
+    <div id="theGrid"></div>
+
+    <script>
+        var json = [{
+            name: '#################################',
+            login: 'Meire <br>Legal',
+            cpf: '444',
+            old: 40,
+            tel: '845-453',
+            qto: 13,
+            cidade: 'SIA',
+            casado: 1
+        }, {
+            name: 'Kallebe Alves',
+            login: 'Kallebe',
+            cpf: '654654',
+            old: 16,
+            tel: '888-345',
+            qto: 98,
+            cidade: 'Recando da Emas',
+            casado: 0
+
+        }, {
+            name: 'Alves Xico',
+            login: 'Alves',
+            cpf: '11577',
+            old: 37,
+            tel: '466-664',
+            qto: 8,
+            cidade: 'Taguatinga',
+            casado: 0
+        }, {
+            name: 'Sousa Alves',
+            login: 'Sousa',
+            cpf: '874465',
+            old: 22,
+            tel: '858-999',
+            qto: 21,
+            cidade: 'Setor O',
+            casado: 0
+        }, {
+            name: 'Kalline Rocha',
+            login: 'Kalline',
+            cpf: '1111',
+            old: 11,
+            tel: '787-995',
+            qto: 11,
+            cidade: 'Gura',
+            casado: 1
+        }, {
+            name: 'Francisco Alves',
+            login: 'Francisco',
+            cpf: '778.583.951-48',
+            old: 37,
+            tel: '999-999',
+            qto: 7,
+            cidade: 'Brasilia',
+            casado: 1
+        }, {
+            name: 'Meire Clecia',
+            login: 'Meire <br>Legal',
+            cpf: '222',
+            old: 40,
+            tel: '845-453',
+            qto: 13,
+            cidade: 'SIA',
+            casado: 1
+        }, {
+            name: 'Kallebe Alves',
+            login: 'Kallebe',
+            cpf: '654654',
+            old: 16,
+            tel: '888-345',
+            qto: 98,
+            cidade: 'Recando da Emas',
+            casado: 1
+        }, {
+            name: 'Alves Xico',
+            login: 'Alves',
+            cpf: '11577',
+            old: 37,
+            tel: '466-664',
+            qto: 8,
+            cidade: 'Taguatinga',
+            casado: 1
+        }, {
+            name: 'Sousa Alves',
+            login: 'Sousa',
+            cpf: '874465',
+            old: 22,
+            tel: '858-999',
+            qto: 21,
+            cidade: 'Setor O',
+            casado: 1
+        }, {
+            name: 'Kalline Rocha',
+            login: 'Kalline',
+            cpf: '1111',
+            old: 11,
+            tel: '787-995',
+            qto: 11,
+            cidade: 'Gura',
+            casado: 1
+        }, {
+            name: 'Francisco Alves',
+            login: 'Francisco',
+            cpf: '778.583.951-48',
+            old: 37,
+            tel: '999-999',
+            qto: 7,
+            cidade: 'Brasilia',
+            casado: 1
+        }, {
+            name: 'Meire Clecia',
+            login: 'Meire <br>Legal',
+            cpf: '222',
+            old: 40,
+            tel: '845-453',
+            qto: 13,
+            cidade: 'SIA',
+            casado: 1
+        }, {
+            name: 'Kallebe Alves',
+            login: 'Kallebe',
+            cpf: '654654',
+            old: 16,
+            tel: '888-345',
+            qto: 98,
+            cidade: 'Recando da Emas',
+            casado: 1
+        }, {
+            name: 'Alves Xico',
+            login: 'Alves',
+            cpf: '11577',
+            old: 37,
+            tel: '466-664',
+            qto: 8,
+            cidade: 'Taguatinga',
+            casado: 1
+        }, {
+            name: 'Sousa Alves',
+            login: 'Sousa',
+            cpf: '874465',
+            old: 22,
+            tel: '858-999',
+            qto: 21,
+            cidade: 'Setor O',
+            casado: 1
+        }, {
+            name: 'Kalline Rocha',
+            login: 'Kalline',
+            cpf: '1111',
+            old: 11,
+            tel: '787-995',
+            qto: 11,
+            cidade: 'Gura',
+            casado: 1
+        }, {
+            name: 'Francisco Alves',
+            login: 'Francisco',
+            cpf: '778.583.951-48',
+            old: 37,
+            tel: '999-999',
+            qto: 7,
+            cidade: 'Brasilia',
+            casado: 1
+        }];
+        var json = [{
+            name: '#################################',
+            login: 'Meire <br>Legal',
+            cpf: '444',
+            old: 40,
+            tel: '845-453',
+            qto: 13,
+            cidade: 'SIA',
+            casado: 1,
+            img: 'https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcQt_OgCNxpF6e4nfAWcjZF9LQ11XKLg55c4B65Xf4I1sV1vQ5ii',
+            genero: 'F'
+        }, {
+            name: 'Kallebe Alves',
+            login: 'Kallebe',
+            cpf: '654654',
+            old: 16,
+            tel: '888-345',
+            qto: 98,
+            cidade: 'Recando da Emas',
+            casado: 0,
+            img: 'https://img.icons8.com/cotton/2x/small-axe.png',
+            genero: 'M'
+        }, {
+            name: 'Alves Xico',
+            login: 'Alves',
+            cpf: '11577',
+            old: 37,
+            tel: '466-664',
+            qto: 8,
+            cidade: 'Taguatinga',
+            casado: 0,
+            img: 'https://images.vexels.com/media/users/3/145135/isolated/lists/76608161d143a7d27f20cdcc336bc09c-sun-sharp-rays-big-and-small-icon.png',
+            genero: 'F',
+        }, {
+            name: 'Sousa Alves',
+            login: 'Sousa',
+            cpf: '874465',
+            old: 22,
+            tel: '858-999',
+            qto: 21,
+            cidade: 'Setor O',
+            casado: 1,
+            img: 'https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcRt9CN_qbCoonWIms6Q1peJXSsXaRFeuPHVIYicUnatXZF0ge95',
+            genero: 'M'
+        }];
+
+        function reveter(value) {
+            return value.split('').reverse('').join('')
+        }
+
+        let grid = new xGrid.create({
+            el: '#myGrid',
+            height: 300,
+            count: true,
+            Setfocus: 1,
+            // theme: 'x-darkBC',
+            onSelectLine: (r) => {
+
+            },
+            onKeyDown: {
+                13: (ln, e) => {
+                    console.log(ln);
+                    console.log('o Enter ta funcionado')
+                },
+                'ctrl+13': (e) => {
+                    console.log('ctrl+enter pressionado')
+                },
+            },
+            enter: () => {
+                console.log('estou no enter funcção');
+            },
+            columns: {
+                'Alves': {
+                    dataField: 'name',
+                    width: '40%',
+                    render: reveter,
+                    style: 'text-align: right',
+                },
+                'cpf': {
+                    dataField: 'cpf',
+                    width: '40%'
+                },
+                'tel': {
+                    dataField: 'tel',
+                    // width: '40%',
+                    compare: 'junta',
+                    render: reveter
+                },
+                'cidade': {
+                    dataField: 'cidade',
+                    width: '10%'
+                }
+            },
+            compare: {
+                junta: (r) => {
+                    return r.value + ' ' + r.old
+                }
+            }
+
+        })
+
+        const theGrid = new xGrid.create({
+            el: '#theGrid',
+            height: 300,
+            count: true,
+            setfocus: 1,
+            theme: 'x-darkBC',
+            onSelectLine: (r) => {
+
+            },
+            onKeyDown: {
+                13: (ln, e) => {
+                    console.log(ln);
+                    console.log('o Enter ta funcionado')
+                },
+                'ctrl+13': (e) => {
+                    console.log('ctrl+enter pressionado')
+                },
+            },
+            enter: () => {
+                console.log('estou no enter funcção');
+            },
+            columns: {
+                'Alves': {
+                    dataField: 'name',
+                    width: '40%',
+                    render: reveter,
+                    style: 'text-align: right',
+                },
+                'cpf': {
+                    dataField: 'cpf',
+                    width: '40%'
+                },
+                'tel': {
+                    dataField: 'tel',
+                    // width: '40%',
+                    compare: 'junta',
+                    render: reveter
+                },
+                'cidade': {
+                    dataField: 'cidade',
+                    width: '10%'
+                }
+            },
+            compare: {
+                junta: (r) => {
+                    return r.value + ' ' + r.old
+                }
+            },
+            sideBySide: {
+                el: '.campos',
+                render: {
+                    cpf: reveter
+                },
+                compare: {
+                    name: 'junta'
+                }
+            }
+        })
+
+
+        theGrid.source(json)
+    </script>
+
+    sideBySide: { id: "#pnCampos", fields: { BATE_PONTO: {compare: 'batePonto'}, SENHA: {compare: 'temSenha'}, }, compare: { batePonto: { dataField: [], call: function (r) { if (r.value === "S") { return 1; } else { return 0; } } }, temSenha: { datField:
+    [], call: function (r) { } } }, frame: { id: "#pnBotoes", btnInsert: btnInsert, btnEdit: btnEdit, btnDelete: btnDelete, btnSave: btnSave, btnCancel: btnCancel }, duplicity: { class: "Funcionario", table: "FUNCIONARIO", dataField: ['CPF', 'RG', 'LOGIN']
+    } },
+
+
+
+
+</body>
+
+</html>

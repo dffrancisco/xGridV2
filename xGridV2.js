@@ -1,0 +1,944 @@
+// export default (function() {
+let xGrid = (function() {
+    const version = 4.0;
+
+    function create(param) {
+
+        let argDefault = {
+            source: [],
+            filter: {
+                filterBegin: false,
+                concat: {
+                    fields: false,
+                    condicional: 'OR'
+                },
+                fieldByField: {
+                    condicional: 'OR'
+                }
+            },
+            columns: {},
+            onSelectLine: false,
+            compare: {},
+            heightLine: '',
+            height: 'default',
+            width: 'default',
+            setfocus: false,
+            render: {},
+            theme: 'x-gray',
+            query: {},
+            afterSearch: false,
+            sideBySide: false,
+            click: false,
+            dblClick: false,
+            enter: false,
+            duplicity: false,
+            frame: false,
+            complete: false,
+            keyDown: false,
+            count: false,
+            title: true
+        };
+
+        param = Object.assign({}, param);
+        if (param.filter) {
+            param.filter.concat = Object.assign(argDefalt.filter.concat, param.filter.concat)
+            param.filter.fieldByField = Object.assign(argDefalt.filter.fieldByField, param.filter.fieldByField)
+        }
+
+        let ax = {
+            arg: {},
+            idElment: '',
+            element: '',
+            gridTitle: '',
+            gridContent: '',
+            elementSideBySide: {},
+            widthAll: 0,
+            columnsAutoCreate: [],
+            tabindex: 0,
+            sourceSelect: false,
+            indexSelect: false,
+            gridDisable: null,
+            divLoad: null,
+            constructor() {
+                this.element = document.querySelector(this.arg.el)
+                this.idElment = this.element.id
+                this.element.classList.add("xGrid-main");
+                this.element.classList.add(this.arg.theme);
+
+                if (this.arg.height != 'default') this.element.style.height = `${this.arg.height}px`
+
+                this.element.appendChild(this.createTitle())
+                this.element.appendChild(this.setContent())
+
+                this.onKeyDown();
+
+                if (this.arg.sideBySide) {
+                    if (this.arg.sideBySide.el) {
+                        document.querySelectorAll(this.arg.sideBySide.el).forEach((el) => {
+                            el.querySelectorAll('[name]').forEach((field) => {
+                                this.elementSideBySide[field.name] = field
+                            })
+                        })
+                    }
+
+                    // console.log(this.elementSideBySide.querySelector('[name="cpf"]'));
+                    //theGrid.getAx().elementSideBySide[1].previousSibling.previousElementSibling.innerText
+                    //theGrid.getAx().elementSideBySide[0].getAttribute("name");
+
+                }
+
+            },
+            createTitle() {
+                this.gridTitle = document.createElement("div")
+                this.gridTitle.classList.add('xGrid-title')
+                this.gridTitle.classList.add('xGrid-row')
+
+                if (Object.keys(this.arg.columns).length > 0) {
+                    this.checkWidthColuns();
+                    this.widthAll = Object.values(this.arg.columns).reduce((total, b) => total + parseInt(b.width), 0);
+                    this.setColumnsTitle(this.arg.columns);
+                } else
+                    this.setColumnsTitle([{ dataField: '-', width: '100%' }]);
+
+                return this.gridTitle;
+            },
+            setTitle(source) {
+
+                if (Object.keys(this.arg.columns).length == 0) {
+                    while (this.gridTitle.firstChild) this.gridTitle.removeChild(this.gridTitle.firstChild)
+                    this.columnsAutoCreate = [];
+                    this.autoColumns(source)
+                    this.widthAll = Object.values(this.columnsAutoCreate).reduce((total, b) => total + parseInt(b.width), 0);
+                    this.setColumnsTitle(this.columnsAutoCreate);
+                }
+
+            },
+            setColumnsTitle(columns) {
+
+                for (let i in columns) {
+                    let col = document.createElement("div")
+                    let span = document.createElement("span")
+                    let label = document.createElement("label")
+
+                    col.setAttribute('name', columns[i].dataField)
+                    col.classList.add('xGrid-col')
+                    col.style.width = columns[i].width
+
+
+                    span.innerHTML = columns[i].dataField != '_count_' ? columns[i].dataField : '&nbsp;'
+                        // span.innerHTML = columns[i].dataField
+
+                    col.appendChild(span)
+                    col.appendChild(label)
+
+                    this.gridTitle.appendChild(col)
+                }
+
+                if (this.widthAll > 100) {
+                    this.gridTitle.lastChild.style.paddingRight = '3px'
+                }
+                // this.gridTitle.appendChild(templete)
+
+            },
+            setContent() {
+                this.gridContent = document.createElement("div")
+                this.gridContent.classList.add('xGrid-content')
+
+                // this.gridContent.style.width = `${this.widthAll}%`
+
+
+                return this.gridContent;
+            },
+            source(source) {
+
+                this.onEvent.removeEventListenerAndRemoveElement()
+
+                // while (this.gridContent.firstChild) this.gridContent.removeChild(this.gridContent.firstChild)
+
+                this.arg.source = [];
+
+                this.setTitle(source)
+
+                this.tabindex = 0
+                this.gridContent.scrollTop = 0
+
+                this.createLine(source)
+
+                if (this.widthAll > 100) {
+                    this.element.style.overflow = 'auto'
+                    this.element.scrollTop = 0
+                    this.element.scrollLeft = 0
+                    this.gridContent.style.overflowY = 'unset';
+                    this.gridContent.style.width = `${this.widthAll}%`
+                    this.gridTitle.style.width = `${this.widthAll}%`
+                }
+
+                if (this.arg.setfocus)
+                    this.focus(this.arg.setfocus - 1)
+
+            },
+            checkWidthColuns() {
+                let valPercente = 0;
+                let qtoColumn = 0;
+
+                if (this.arg.count) {
+                    let obj = {};
+                    obj['_count_'] = { dataField: '_count_', width: '4%' }
+                    this.arg.columns = Object.assign(obj, this.arg.columns)
+                }
+
+
+                for (let i in this.arg.columns) {
+                    // if (this.arg.count)
+                    //     this.arg.columns.push({ dataField: '_count_', width: '4%' });
+
+                    // console.log(this.arg.columns);
+                    if (this.arg.columns[i].width == undefined)
+                        qtoColumn++;
+                    let wd = this.arg.columns[i].width != undefined ? parseInt(this.arg.columns[i].width) : 0;
+                    valPercente += parseInt(wd);
+                    // console.log(valPercente);
+                }
+
+                if (qtoColumn != 0)
+                    for (let i in this.arg.columns) {
+                        if (this.arg.columns[i].width == undefined)
+                        // this.arg.columns[i].width = ((100 - valPercente) / qtoColumn).toFixed(2) + '%';
+                            this.arg.columns[i].width = ((100 - valPercente) / qtoColumn) + '%';
+                    }
+
+            },
+            autoColumns(source) {
+                if (this.arg.count)
+                    this.columnsAutoCreate.push({ dataField: '_count_', width: '4%' });
+
+                if (source[0] != undefined) {
+                    let wid = 100 / Object.keys(source[0]).length;
+                    for (let i in source[0]) {
+                        wid = wid < 15 ? 20 : wid
+                            // this.arg.columns.push({ dataField: i, width: wid + '%' });
+                        this.columnsAutoCreate.push({ dataField: i, width: wid + '%' });
+                    }
+                }
+
+            },
+            setCompare(col, source) {
+
+                if (col.compare) {
+                    let _source = {...source }
+                        // source.value = source[col.dataField]
+                    _source.value = _source[col.dataField]
+                    let value = this.arg.compare[col.compare](_source)
+
+                    if (value == undefined)
+                        return false
+                    else
+                        return this.arg.compare[col.compare](_source)
+                }
+            },
+            createLine(source, order) {
+                if (order == undefined)
+                    order = 'BOTTOM'
+
+                let col;
+                if (Object.keys(this.arg.columns).length > 0)
+                    col = this.arg.columns
+                else
+                    col = this.columnsAutoCreate
+
+                for (let i in source) {
+                    this.arg.source[this.tabindex] = source[i]
+                    let div = document.createElement('div');
+                    div.classList.add('xGrid-row')
+                    div.setAttribute('tabindex', this.tabindex)
+                    this.tabindex++
+
+                        if (this.arg.count)
+                            source[i]._count_ = this.tabindex
+
+                    for (let c in col) {
+
+                        // if (this.arg.count) {
+                        //     console.log(col[c].dataField);
+
+                        let value = source[i][col[c].dataField]
+
+                        let compare = this.setCompare(col[c], source[i])
+                        if (compare) value = compare
+
+                        if (col[c].render != undefined)
+                            value = col[c].render(value)
+
+                        if (col[c].style != undefined) {
+                            value = '<span style="width:100%; ' + col[c].style + ' ">' + value + '</span>'
+                        }
+
+                        if (this.arg.count)
+                            if (col[c].dataField == '_count_')
+                                value = '<span style="width:100%;text-align: center;opacity: 0.5; ">' + value + '</span>'
+
+
+                        let divCol = document.createElement('div');
+                        divCol.classList.add('xGrid-col')
+                        divCol.style.width = col[c].width
+                        divCol.setAttribute('name', col[c].dataField)
+                        divCol.innerHTML = value
+                        div.appendChild(divCol)
+                    }
+
+
+                    if (order.toUpperCase() == 'TOP')
+                        this.gridContent.insertBefore(div, this.gridContent.firstChild)
+
+                    if (order.toUpperCase() == 'BOTTOM')
+                        this.gridContent.appendChild(div)
+
+                    this.onEvent.setEventListener(div)
+
+                    if (this.arg.count)
+                        delete source[i]._count_
+
+                }
+
+                this.closeLoad()
+            },
+            onEvent: {
+                _control: false,
+                divDisable: [],
+                keyup(e) {
+                    if (e.keyCode == 17) {
+                        ax.onEvent._control = false
+                    }
+                },
+                keydown(e) {
+                    // seta para cima
+                    if (e.keyCode == 38) {
+
+                        if (ax.widthAll <= 100) {
+                            if (ax.gridContent.scrollTop > 0)
+                                ax.gridContent.scrollTop = ax.gridContent.scrollTop - 1;
+                        } else {
+                            let scroll = ax.element.scrollTop
+                            if (scroll > 0) {
+                                let rowHeight = e.target.offsetHeight
+                                ax.element.scrollTop = (scroll - rowHeight);
+                            }
+                        }
+
+
+                        if (e.target.previousSibling)
+                            e.target.previousSibling.focus()
+
+
+                        if (e.preventDefault)
+                            e.preventDefault();
+                        if (e.stopPropagation)
+                            e.stopPropagation();
+                    }
+
+                    // seta para baixo
+                    if (e.keyCode == 40) {
+
+                        if (ax.widthAll <= 100)
+                            ax.gridContent.scrollTop = ax.gridContent.scrollTop + 1
+                        else
+                            ax.element.scrollTop = ax.element.scrollTop + 1
+
+
+                        if (e.target.nextSibling)
+                            e.target.nextSibling.focus()
+
+                        e.preventDefault();
+                        e.stopPropagation();
+                    }
+
+                    // page up
+                    if (e.keyCode == 33) {
+
+                        try {
+                            e.target.previousSibling.previousSibling.previousSibling.previousSibling.focus()
+                        } catch (error) {
+
+                        }
+
+                        if (e.preventDefault)
+                            e.preventDefault();
+                        if (e.stopPropagation)
+                            e.stopPropagation();
+                    }
+
+                    // page Down
+                    if (e.keyCode == 34) {
+                        try {
+                            e.target.nextSibling.nextSibling.nextSibling.nextSibling.focus()
+                        } catch (error) {
+
+                        }
+
+                        if (e.preventDefault)
+                            e.preventDefault();
+                        if (e.stopPropagation)
+                            e.stopPropagation();
+                    }
+
+                    // key and last line
+                    if (e.keyCode == 35) {
+                        ax.gridContent.querySelector('[tabindex="' + (ax.tabindex - 1) + '"]').focus()
+                        e.preventDefault();
+                        e.stopPropagation();
+                    }
+
+                    // key home 1ª line
+                    if (e.keyCode == 36) {
+                        ax.gridContent.querySelector('[tabindex="0"]').focus()
+                        e.preventDefault();
+                        e.stopPropagation();
+                    }
+
+
+                    // control pressionado
+                    if (e.keyCode == 17)
+                        ax.onEvent._control = true
+
+                },
+                focusin(e) {
+
+                    // let el = ax.element.querySelector('.xGrid-content');
+                    let el = ax.gridContent
+                    let select = el.querySelectorAll('.xGrid-Selected')
+                    let selectOut = el.querySelectorAll('.xGrid-SelectedFocusOut')
+
+                    if (ax.onEvent._control == false) {
+                        select.forEach(r => r.classList.remove("xGrid-Selected"))
+                        selectOut.forEach(r => r.classList.remove("xGrid-SelectedFocusOut"))
+
+                        ax.indexSelect = e.currentTarget.getAttribute('tabindex')
+                        ax.sourceSelect = ax.arg.source[ax.indexSelect]
+
+
+
+                        ax.setElementSideBySide()
+
+
+                    } else {
+                        ax.indexSelect = e.currentTarget.getAttribute('tabindex')
+                        ax.sourceSelect[ax.indexSelect] = ax.arg.source[ax.indexSelect]
+                    }
+
+                    e.target.classList.add('xGrid-Selected')
+
+                    ax.onSelectLine()
+
+
+
+                },
+                focusout(e) {
+                    if (ax.onEvent._control == false) {
+                        let select = ax.gridContent.querySelectorAll('.xGrid-Selected')
+                        select.forEach((r) => {
+                            r.classList.remove("xGrid-Selected");
+                            r.classList.add("xGrid-SelectedFocusOut");
+                        })
+                    }
+                },
+                setEventListener(el) {
+                    el.addEventListener('focusin', this.focusin)
+                    el.addEventListener('keydown', this.keydown)
+                    el.addEventListener('focusout', this.focusout)
+                    el.addEventListener('keyup', this.keyup)
+                },
+                removeEventListenerAndRemoveElement() {
+                    Object.values(ax.gridContent.querySelectorAll('.xGrid-row')).map((el) => {
+                        el.removeEventListener('focusin', this.focusin)
+                        el.removeEventListener('keydown', this.keydown)
+                        el.removeEventListener('focusout', this.focusout)
+                        el.removeEventListener('keyup', this.keyup)
+                        el.remove()
+                    })
+                },
+                removeEventListener() {
+                    Object.values(ax.gridContent.querySelectorAll('.xGrid-row')).map((el) => {
+                        el.removeEventListener('focusin', this.focusin)
+                        el.removeEventListener('keydown', this.keydown)
+                        el.removeEventListener('focusout', this.focusout)
+                        el.removeEventListener('keyup', this.keyup)
+                    })
+                },
+                removeEventListenerElement(el) {
+                    el.removeEventListener('focusin', this.focusin)
+                    el.removeEventListener('keydown', this.keydown)
+                    el.removeEventListener('focusout', this.focusout)
+                    el.removeEventListener('keyup', this.keyup)
+                },
+                setEventListenerAll() {
+                    this.removeEventListener();
+                    Object.values(ax.gridContent.querySelectorAll('.xGrid-row')).map((el) => {
+                        el.addEventListener('focusin', this.focusin)
+                        el.addEventListener('keydown', this.keydown)
+                        el.addEventListener('focusout', this.focusout)
+                        el.addEventListener('keyup', this.keyup)
+                    })
+                }
+            },
+            dataSource(field, value) {
+
+                if (typeof field == 'string') {
+
+                    if (field != undefined && value != undefined) {
+                        let cell = this.gridContent.querySelector('[tabindex="' + this.indexSelect + '"]').querySelector('[name="' + field + '"]')
+                        let columns = Object.keys(this.arg.columns).length > 0 ? this.arg.columns : this.columnsAutoCreate;
+
+                        for (let i in columns) {
+                            if (columns[i].dataField == field) {
+                                ax.sourceSelect[field] = value;
+
+                                let compare = this.setCompare(columns[i], ax.sourceSelect)
+                                if (compare) value = compare
+
+
+                                if (columns[i].render != undefined)
+                                    value = columns[i].render(value)
+
+                                if (columns[i].style != undefined)
+                                    value = '<span style="width:100%; ' + columns[i].style + ' ">' + value + '</span>'
+                            }
+                        }
+
+                        cell.innerHTML = value
+                    }
+                    /*get o valor do field solicitado*/
+                    if (field != undefined && value == undefined)
+                        return ax.sourceSelect[field];
+                }
+
+                if (typeof field == 'object') {
+                    let columns = Object.keys(this.arg.columns).length > 0 ? this.arg.columns : this.columnsAutoCreate;
+                    let linha = this.gridContent.querySelector('[tabindex="' + this.indexSelect + '"]')
+                    let cell;
+                    for (let x in field) {
+                        let _field = x
+                        let _value = field[x]
+                        cell = linha.querySelector('[name="' + _field + '"]')
+
+                        for (let i in columns) {
+                            if (columns[i].dataField == _field) {
+                                ax.sourceSelect[_field] = _value;
+
+                                let compare = this.setCompare(columns[i], ax.sourceSelect)
+                                if (compare) _value = compare
+
+
+                                if (columns[i].render != undefined)
+                                    _value = columns[i].render(_value)
+
+                                if (columns[i].style != undefined)
+                                    _value = '<span style="width:100%; ' + columns[i].style + ' ">' + _value + '</span>'
+                            }
+                        }
+                        cell.innerHTML = _value
+                    }
+                }
+
+                return ax.sourceSelect
+
+            },
+            focus(numLine) {
+
+                if (this.gridDisable)
+                    return false
+
+                if (Object.keys(this.sourceSelect).length > 0) {
+                    if (numLine == undefined) {
+                        this.gridContent.querySelector('[tabindex="' + this.indexSelect + '"]').focus()
+
+                    } else {
+                        this.gridContent.querySelector('[tabindex="' + numLine + '"]').focus()
+                    }
+                } else {
+                    if (numLine == undefined) {
+                        this.gridContent.querySelector('[tabindex="0"]').focus()
+                    } else {
+                        this.gridContent.querySelector('[tabindex="' + numLine + '"]').focus()
+                    }
+
+                }
+
+            },
+            disable(call) {
+                this.onEvent.divDisable[0] = document.createElement('div')
+                this.onEvent.divDisable[1] = document.createElement('div')
+                this.onEvent.divDisable[0].classList.add('xGrid-disable')
+                this.onEvent.divDisable[1].classList.add('xGrid-disable')
+
+                this.onEvent.removeEventListener()
+
+                if (this.widthAll > 100)
+                    this.element.style.overflow = 'hidden'
+
+                this.gridContent.insertBefore(this.onEvent.divDisable[0], this.gridContent.firstChild)
+                this.gridTitle.insertBefore(this.onEvent.divDisable[1], this.gridTitle.firstChild)
+
+                this.gridDisable = true
+
+                call && call()
+
+            },
+            enable(call) {
+                this.onEvent.divDisable[0].remove()
+                this.onEvent.divDisable[1].remove()
+
+                this.onEvent.setEventListenerAll()
+
+                if (this.widthAll > 100)
+                    this.element.style.overflow = 'auto'
+
+                this.gridDisable = false
+
+                call && call()
+            },
+            clear(call) {
+                this.onEvent.removeEventListenerAndRemoveElement()
+                call && call()
+            },
+            load(text, call) {
+
+                if (text == undefined)
+                    text = 'Carregando . . .';
+                this.divLoad = document.createElement('div')
+                this.divLoad.classList.add('xGrid-load')
+                this.divLoad.innerHTML = '<i class="fa fa-spinner fa-pulse fa-fw fa-lg"></i> ' + text;
+
+                this.element.insertBefore(this.divLoad, this.element.firstChild)
+
+                call && call()
+            },
+            closeLoad(call) {
+                if (this.divLoad)
+                    this.divLoad.remove()
+                call && call()
+            },
+            getIndex() {
+                return this.indexSelect
+            },
+            deleteLine(index) {
+
+                // forDeleteSearch = true;
+
+                index = index == undefined ? this.indexSelect : index;
+
+                if (!index)
+                    return
+
+                let del = this.arg.source[index]
+                delete this.arg.source[index];
+                let indexOld = index;
+                let target = this.gridContent.querySelector('[tabindex="' + index + '"]');
+
+                if (target.nextSibling)
+                    target.nextSibling.focus()
+                else
+                if (target.previousSibling)
+                    target.previousSibling.focus()
+
+                this.onEvent.removeEventListenerElement(target)
+
+                target.classList.add('xGrid-deleteLine');
+                setTimeout(() => {
+                    target.remove()
+                }, 500);
+
+
+                // if (element.find('.xGrid-content .xGrid-row').length == 1)
+                //     if (arg.sideBySide != false)
+                //         clearDataSource();
+
+                return del;
+            },
+            insertLine(param, order, call) {
+
+                if (param[0] == undefined) {
+                    param = [param];
+                }
+
+                this.createLine(param, order)
+
+                this.focus(this.tabindex - 1)
+
+                if (call != undefined)
+                    call();
+
+                return param;
+
+            },
+            sumDataField(dataField) {
+                return Object.values(this.arg.source).reduce((sum, field) => sum + parseFloat(field[dataField]), 0);
+            },
+            onKeyDown() {
+                this.element.addEventListener('keydown', (e) => {
+
+                    let ctrlKey = e.ctrlKey ? "ctrl+" : "";
+                    let shiftKey = e.shiftKey ? "shift+" : "";
+                    let altKey = e.altKey ? "alt+" : "";
+                    let key = ctrlKey + shiftKey + altKey + e.keyCode;
+
+
+                    if (key == 13) {
+                        if (this.arg.enter)
+                            this.arg.enter(this.sourceSelect, e)
+                    }
+
+                    if (this.arg.onKeyDown[key])
+                        this.arg.onKeyDown[key](this.sourceSelect, e)
+
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                })
+            },
+            onSelectLine() {
+                if (this.arg.onSelectLine)
+                // if (Object.keys(this.sourceSelect).length)
+                    this.arg.onSelectLine(this.sourceSelect)
+            },
+            getElementSideBySideJson(toUpperCase = false, empty = true) {
+                let date_regex = /^[0-3]?[0-9][- /.][0-3]?[0-9][- /.](?:[0-9]{2})?[0-9]{2}$/;
+                let json = {}
+                for (let name in this.elementSideBySide) {
+
+
+                    let value = this.elementSideBySide[name].value
+                    let type = this.elementSideBySide[name].getAttribute("type")
+
+                    /*se for href não faz nada passa direto*/
+                    if (type == undefined) {
+                        if (this.elementSideBySide[name].localName == 'a')
+                            continue
+
+                        if (this.elementSideBySide[name].localName == 'img')
+                            continue
+                    }
+
+                    if (empty)
+                        if (value == '')
+                            continue
+
+                        /*se o conteudo da variavel for numerico ele retorna false*/
+                        /*para igular os valores no edit esta 1,00 no lineDataSourse esta 1.00*/
+                    if (!isNaN(parseFloat(value))) {
+                        if (value.indexOf(",") != -1)
+                            value = value.replace(/\./g, '').replace(/\,/g, '.');
+                    }
+
+                    /*tratamento para data*/
+                    if (date_regex.test(value))
+                        value = value.split(/[- /.]/).reverse().join('-').trim()
+
+                    if (typeof value == 'string')
+                        value = toUpperCase ? value.toUpperCase().trim() : value.trim();
+
+
+                    if (type == 'checkbox') {
+                        value = this.elementSideBySide[name].checked ? '1' : '0';
+                    }
+
+                    // if (type == undefined) {
+                    //     if (this.elementSideBySide[name].localName == 'img')
+                    //         value = this.elementSideBySide[name].src
+
+                    // if (this.elementSideBySide[name].localName == 'a')
+                    //     value = this.elementSideBySide[name].href
+
+                    //}
+
+                    json[name] = value
+
+                }
+
+                return json
+            },
+            setElementSideBySide() {
+                if (this.arg.sideBySide) {
+
+                    if (this.arg.sideBySide.el)
+                        for (let i in this.elementSideBySide) {
+                            let value = this.sourceSelect[i];
+                            let type = this.elementSideBySide[i].type
+
+                            if (this.arg.sideBySide.render)
+                                if (this.arg.sideBySide.render[i])
+                                    try {
+                                        value = this.arg.sideBySide.render[i](value)
+                                    } catch (error) {
+                                        throw 'erro see your function render'
+                                    }
+
+                            if (this.arg.sideBySide.compare)
+                                if (this.arg.compare[this.arg.sideBySide.compare[i]]) {
+                                    try {
+                                        let _source = {...this.sourceSelect }
+                                        _source.value = value
+                                        value = this.arg.compare[this.arg.sideBySide.compare[i]](_source)
+                                    } catch (error) {
+                                        throw 'erro see your function compare'
+                                    }
+                                }
+
+                            switch (type) {
+                                case undefined:
+                                    var typeEle = this.elementSideBySide[i].localName;
+                                    if (typeEle == 'img') {
+                                        this.elementSideBySide[i].src = value
+                                    } else
+                                        this.elementSideBySide[i].innerHTML = value
+                                    break;
+                                case 'text':
+                                case 'password':
+                                case 'textarea':
+                                case 'number':
+                                case 'tel':
+                                case 'date':
+                                case 'time':
+                                case 'range':
+                                case 'hidden':
+                                    ax.elementSideBySide[i].value = value
+                                    break;
+                                case 'radio':
+                                    console.log(ax.elementSideBySide[i], 'tem que ver o radio button')
+                                        // ax.elementSideBySide[i].querySelector('[value="' + value + '"]')
+                                        // elementSideBySide.find('[name="' + field + '"][value="' + value + '"]').prop('checked', true);
+                                    break;
+                                case 'select-one':
+                                    ax.elementSideBySide[i].value = value
+                                    break;
+                                case 'checkbox':
+                                    ax.elementSideBySide[i].checked = (value == '1' ? true : false)
+                                    break;
+                                case '':
+                                    { //href
+                                        ax.elementSideBySide[i].href = value
+                                        ax.elementSideBySide[i].innerHTML = value
+                                        break;
+                                    }
+                            }
+                        }
+                }
+            },
+            getDifTwoJson(toUpperCase = false, empty = true) {
+                let diff = { old: {}, new: {} }
+                let fieldsSideBySide = this.getElementSideBySideJson(toUpperCase, empty)
+
+                for (let i in fieldsSideBySide) {
+                    if (fieldsSideBySide[i] != this.sourceSelect[i]) {
+                        diff.old[i] = this.sourceSelect[i]
+                        diff.new[i] = fieldsSideBySide[i];
+                    }
+                }
+
+
+                return diff
+
+            },
+            clearElementSideBySide() {
+                if (this.arg.sideBySide)
+
+                    if (this.arg.sideBySide.el)
+                    for (let i in this.elementSideBySide) {
+                        let type = this.elementSideBySide[i].type
+
+                        switch (type) {
+                            case undefined:
+                                var typeEle = this.elementSideBySide[i].localName;
+                                if (typeEle == 'img') {
+                                    this.elementSideBySide[i].src = ''
+                                } else
+                                    this.elementSideBySide[i].innerHTML = ''
+                                break;
+                            case 'text':
+                            case 'password':
+                            case 'textarea':
+                            case 'number':
+                            case 'tel':
+                            case 'date':
+                            case 'time':
+                            case 'range':
+                            case 'hidden':
+                                ax.elementSideBySide[i].value = ''
+                                break;
+                            case 'radio':
+                                console.log(ax.elementSideBySide[i], 'tem que ver o radio button')
+                                    // ax.elementSideBySide[i].querySelector('[value="' + value + '"]')
+                                    // elementSideBySide.find('[name="' + field + '"][value="' + value + '"]').prop('checked', true);
+                                break;
+                            case 'select-one':
+                                ax.elementSideBySide[i].value = ''
+                                break;
+                            case 'checkbox':
+                                ax.elementSideBySide[i].checked = false
+                                break;
+                            case '':
+                                { //href
+                                    ax.elementSideBySide[i].href = ''
+                                    ax.elementSideBySide[i].innerHTML = ''
+                                    break;
+                                }
+                        }
+                    }
+            },
+
+        }
+
+        ax.arg = Object.assign(argDefault, param);
+
+        ax.constructor();
+
+        // console.log(ax.arg);
+
+        this.getAx = () => ax;
+
+        this.source = (source) => ax.source(source)
+
+        this.sourceAdd = (source) => ax.createLine(source)
+
+        this.dataSource = (field, value) => ax.dataSource(field, value)
+
+        this.data = () => ax.arg.source
+
+        this.getColumns = () => Object.keys(ax.arg.columns).length > 0 ? ax.arg.columns : ax.columnsAutoCreate
+
+        this.focus = (numLine) => ax.focus(numLine)
+
+        this.disable = (call) => ax.disable(call)
+
+        this.enable = (call) => ax.enable(call)
+
+        this.clear = (call) => ax.clear(call)
+
+        this.load = (call) => ax.load(call)
+
+        this.closeLoad = (call) => ax.closeLoad(call)
+
+        this.getIndex = () => ax.getIndex()
+
+        this.deleteLine = (index) => ax.deleteLine(index)
+
+        this.insertLine = (param, order, call) => ax.insertLine(param, order, call)
+
+        this.sumDataField = (dataField) => ax.sumDataField(dataField)
+
+        this.compare = ax.arg.compare
+
+        this.getElementSideBySideJson = (toUpperCase, empty) => ax.getElementSideBySideJson(toUpperCase, empty)
+
+        this.getDifTwoJson = (toUpperCase) => ax.getDifTwoJson(toUpperCase)
+
+        this.clearElementSideBySide = () => ax.clearElementSideBySide()
+
+
+
+    }
+
+
+    return {
+        create: create
+    }
+})();
