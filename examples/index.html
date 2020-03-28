@@ -21,8 +21,6 @@
     <div id="myGrid"></div>
 
     <br>
-    <br>
-    <br>
 
     <button onclick="grid.load();grid.source(json)">source</button>
     <button onclick="grid.load();grid.sourceAdd(json)">Add Source</button>
@@ -39,7 +37,7 @@
     }, 'TOP')">insertLine</button>
     <br>
     <br>
-    <br>
+    <hr>
 
     <div class="campos">
         <span>nome</span>
@@ -56,6 +54,7 @@
         <span>sexo</span>
         <input type="radio" name="genero" value="M" /> Man
         <input type="radio" name="genero" value="F" /> Woman
+        <input type="radio" name="genero" value="D" /> Woman
         <span>select</span>
         <select name="qto">
             <option value="13">Treze</option>
@@ -406,10 +405,6 @@
 
         theGrid.source(json)
     </script>
-
-    sideBySide: { id: "#pnCampos", fields: { BATE_PONTO: {compare: 'batePonto'}, SENHA: {compare: 'temSenha'}, }, compare: { batePonto: { dataField: [], call: function (r) { if (r.value === "S") { return 1; } else { return 0; } } }, temSenha: { datField:
-    [], call: function (r) { } } }, frame: { id: "#pnBotoes", btnInsert: btnInsert, btnEdit: btnEdit, btnDelete: btnDelete, btnSave: btnSave, btnCancel: btnCancel }, duplicity: { class: "Funcionario", table: "FUNCIONARIO", dataField: ['CPF', 'RG', 'LOGIN']
-    } },
 
 
 

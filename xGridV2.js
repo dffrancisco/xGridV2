@@ -74,14 +74,27 @@ let xGrid = (function() {
 
                 if (this.arg.sideBySide) {
                     if (this.arg.sideBySide.el) {
+                        let qto = 0;
                         document.querySelectorAll(this.arg.sideBySide.el).forEach((el) => {
                             el.querySelectorAll('[name]').forEach((field) => {
-                                this.elementSideBySide[field.name] = field
+
+                                if (this.elementSideBySide[field.name]) {
+                                    // console.log(this.elementSideBySide[field.name]);
+                                    if (qto == 0) {
+                                        let _el_ = this.elementSideBySide[field.name]
+                                        this.elementSideBySide[field.name] = []
+                                        this.elementSideBySide[field.name].type = 'radio'
+                                        this.elementSideBySide[field.name][qto] = _el_
+                                    }
+                                    qto++
+                                    this.elementSideBySide[field.name][qto] = field
+                                } else
+                                    this.elementSideBySide[field.name] = field
                             })
                         })
                     }
 
-                    // console.log(this.elementSideBySide.querySelector('[name="cpf"]'));
+                    //vou usar isso no duplicite
                     //theGrid.getAx().elementSideBySide[1].previousSibling.previousElementSibling.innerText
                     //theGrid.getAx().elementSideBySide[0].getAttribute("name");
 
@@ -705,18 +718,17 @@ let xGrid = (function() {
                 let json = {}
                 for (let name in this.elementSideBySide) {
 
-
                     let value = this.elementSideBySide[name].value
-                    let type = this.elementSideBySide[name].getAttribute("type")
+                    let type = this.elementSideBySide[name].type
 
                     /*se for href não faz nada passa direto*/
-                    if (type == undefined) {
-                        if (this.elementSideBySide[name].localName == 'a')
-                            continue
-
+                    if (type == undefined)
                         if (this.elementSideBySide[name].localName == 'img')
                             continue
-                    }
+
+                    if (type == '')
+                        if (this.elementSideBySide[name].localName == 'a')
+                            continue
 
                     if (empty)
                         if (value == '')
@@ -737,18 +749,17 @@ let xGrid = (function() {
                         value = toUpperCase ? value.toUpperCase().trim() : value.trim();
 
 
-                    if (type == 'checkbox') {
+                    if (type == 'checkbox')
                         value = this.elementSideBySide[name].checked ? '1' : '0';
+
+                    if (type == 'radio') {
+                        for (let r in this.elementSideBySide[name]) {
+                            if (this.elementSideBySide[name][r].checked) {
+                                value = this.elementSideBySide[name][r].value
+                                break
+                            }
+                        }
                     }
-
-                    // if (type == undefined) {
-                    //     if (this.elementSideBySide[name].localName == 'img')
-                    //         value = this.elementSideBySide[name].src
-
-                    // if (this.elementSideBySide[name].localName == 'a')
-                    //     value = this.elementSideBySide[name].href
-
-                    //}
 
                     json[name] = value
 
@@ -803,9 +814,14 @@ let xGrid = (function() {
                                     ax.elementSideBySide[i].value = value
                                     break;
                                 case 'radio':
-                                    console.log(ax.elementSideBySide[i], 'tem que ver o radio button')
-                                        // ax.elementSideBySide[i].querySelector('[value="' + value + '"]')
-                                        // elementSideBySide.find('[name="' + field + '"][value="' + value + '"]').prop('checked', true);
+                                    let radios = {...ax.elementSideBySide[i] }
+                                    delete radios.type
+                                    for (let r in radios) {
+                                        if (radios[r].value == value) {
+                                            radios[r].checked = true
+                                            break
+                                        }
+                                    }
                                     break;
                                 case 'select-one':
                                     ax.elementSideBySide[i].value = value
