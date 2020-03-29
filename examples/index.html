@@ -5,12 +5,16 @@
     <title>TODO supply a title</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- <script src="https://raw.githubusercontent.com/jgallen23/jquery-builder/0.7.0/dist/1.11.1/jquery-css-deprecated-dimensions-effects-event-alias-offset-wrap.min.js" type="text/javascript"></script> -->
     <script src="../xGridV2.js" type="text/javascript"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <link rel="stylesheet" href="../xGridV2.css">
     <style>
         body {
-            background: #083952;
+            /* background: #083952; */
             color: #f8f8f8;
+            font: 12px/1.3 'Lucida Sans Unicode', 'Trebuchet MS', Arial, Helvetica;
+            background: #546e7a;
         }
     </style>
 
@@ -41,20 +45,21 @@
 
     <div class="campos">
         <span>nome</span>
-        <input type="text" name="name">
+        <input type="text" name="DESC_PRODUTO">
         <span>cpf</span>
         <input type="text" name="cpf">
         <span>idade</span>
         <input type="text" name="old">
         <span>casado</span>
         <input type="checkbox" name="casado"><span>Sim</span>
-        <span>img</span>
-        <img src="" alt="teste" name="img" height="50" />
+        <!-- <span>img</span>
+        <img src="" alt="teste" name="img" height="15" /> -->
         <br>
         <span>sexo</span>
         <input type="radio" name="genero" value="M" /> Man
         <input type="radio" name="genero" value="F" /> Woman
         <input type="radio" name="genero" value="D" /> Woman
+
         <span>select</span>
         <select name="qto">
             <option value="13">Treze</option>
@@ -76,6 +81,9 @@
 
     <br>
     <div id="theGrid"></div>
+    <button onclick="ajaxJS()">GetProduto AjaxJS</button>
+    <button onclick="ajaxAxios()">GetProduto Axios</button>
+    <button onclick="ajaxAxiosAppend()">GetProduto Append Axios</button>
 
     <script>
         var json = [{
@@ -250,7 +258,7 @@
             tel: '845-453',
             qto: 13,
             cidade: 'SIA',
-            casado: 1,
+            casado: true,
             img: 'https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcQt_OgCNxpF6e4nfAWcjZF9LQ11XKLg55c4B65Xf4I1sV1vQ5ii',
             genero: 'F'
         }, {
@@ -346,8 +354,10 @@
         const theGrid = new xGrid.create({
             el: '#theGrid',
             height: 300,
-            count: true,
-            setfocus: 1,
+            width: 800,
+            // count: true,
+            heightLine: 50,
+            // setfocus: 1,
             theme: 'x-darkBC',
             onSelectLine: (r) => {
 
@@ -365,27 +375,65 @@
                 console.log('estou no enter funcção');
             },
             columns: {
-                'Alves': {
-                    dataField: 'name',
-                    width: '40%',
-                    render: reveter,
-                    style: 'text-align: right',
-                },
-                'cpf': {
-                    dataField: 'cpf',
-                    width: '40%'
-                },
-                'tel': {
-                    dataField: 'tel',
-                    // width: '40%',
-                    compare: 'junta',
-                    render: reveter
-                },
-                'cidade': {
-                    dataField: 'cidade',
+                'Marca': {
+                    dataField: 'MARCA',
                     width: '10%'
+                },
+                'FT': {
+                    dataField: 'FOTO',
+                    width: '3%',
+                    style: 'text-align: center',
+                },
+                'Descrição Produto': {
+                    dataField: 'DESC_PRODUTO',
+                },
+                'C.G': {
+                    dataField: 'CURVA_ABC_G',
+                    width: '3%',
+                    style: 'text-align: center'
+                },
+                'UN': {
+                    dataField: 'UNIDADE',
+                    width: '4%',
+                    style: 'text-align: center'
+                },
+                'Carro': {
+                    dataField: 'CARRO',
+                    width: '15%',
+                },
+                'Qto': {
+                    dataField: 'QUANTIDADE',
+                    width: '5%',
+                    style: 'text-align: center',
+                },
+                'Preço': {
+                    dataField: 'VALOR_VENDA',
+                    width: '8%',
+                    style: 'text-align: right'
                 }
             },
+
+            // 'Alves': {
+            //     dataField: 'name',
+            //     // width: '40%',
+            //     render: reveter,
+            //     style: 'text-align: right',
+            // },
+            // 'cpf': {
+            //     dataField: 'cpf',
+            //     width: '17%'
+            // },
+            // 'tel': {
+            //     dataField: 'tel',
+            //     width: '15%',
+            //     compare: 'junta',
+            //     render: reveter
+            // },
+            // 'cidade': {
+            //     dataField: 'cidade',
+            //     width: '20%'
+            // }
+            //},
             compare: {
                 junta: (r) => {
                     return r.value + ' ' + r.old
@@ -399,11 +447,155 @@
                 compare: {
                     name: 'junta'
                 }
+            },
+            query: {
+                //    endScroll: 0.3,
+                then(maxItens) {
+                    ajaxAxiosAppend(maxItens)
+                    console.log(maxItens);
+                }
             }
         })
 
 
-        theGrid.source(json)
+        // theGrid.source(json)
+
+        /*
+        **ajax**
+        $.ajax({
+            data: {
+                ax: 'itensOrcamento',
+                'numOrcamento': numOrcamento,
+                'data': data
+            },
+            beforeSend: function () {
+              
+            },
+            success: function (r) {
+               
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+              
+            }
+        });
+        
+        **axios**
+        axios.post('/user', {
+            firstName: 'Fred',
+            lastName: 'Flintstone'
+        })
+        .then(function (response) {
+            console.log(response);
+        })
+        .catch(function (error) {
+            console.log(error);
+        });
+
+
+        **requere native js***
+        let xhr = new XMLHttpRequest();
+            let formData = new FormData();
+            formData.append('id_sociedade', '')
+            formData.append('call', 'getProdutos')
+            formData.append('param[maxItem]', '30')
+            formData.append('param[id_carro]', '9999')
+            formData.append('param[get]', 'getProdutosNewLoc')
+            formData.append('param[desc_produto]', 'FAROL')
+            formData.append('param[vercao]', 'false')
+            formData.append('param[skip]', '0')
+
+            xhr.open('POST', 'http://reallatas.myftp.org:2424/balcao/servidor/per.balcao.php');
+            xhr.onload = function() {
+                // console.table(JSON.parse(xhr.response));
+                theGrid.source(JSON.parse(xhr.response))
+            }
+
+
+            xhr.send(formData);
+        
+        
+        */
+
+
+        function scrolled(o) {
+            //visible height + pixel scrolled = total height
+            if (o.offsetHeight + o.scrollTop == o.scrollHeight) {
+                alert("End");
+            }
+        }
+
+
+        let formData = new FormData();
+        formData.append('id_sociedade', '')
+        formData.append('call', 'getProdutos')
+        formData.append('param[maxItem]', '30')
+        formData.append('param[id_carro]', '9999')
+        formData.append('param[get]', 'getProdutosNewLoc')
+        formData.append('param[desc_produto]', 'FAROL GOL LD N')
+        formData.append('param[vercao]', 'false')
+        formData.append('param[skip]', '0')
+        let count = 0;
+
+
+        function ajaxJS() {
+            theGrid.load()
+            let xhr = new XMLHttpRequest();
+
+            xhr.open('POST', 'http://reallatas.myftp.org:2424/balcao/servidor/per.balcao.php');
+            xhr.onload = function() {
+                // console.table(JSON.parse(xhr.response));
+                count += Object.keys(JSON.parse(xhr.response)).length
+                theGrid.source(JSON.parse(xhr.response))
+            }
+
+
+            xhr.send(formData);
+        }
+
+
+        function ajaxAxios() {
+            axios({
+                    method: 'post',
+                    url: 'http://reallatas.myftp.org:2424/balcao/servidor/per.balcao.php',
+                    data: formData,
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    }
+                })
+                .then(function(response) {
+                    //handle success
+                    theGrid.source(response.data)
+                    count += Object.keys(response.data).length
+                    console.log(response.data);
+                })
+                .catch(function(response) {
+                    //handle error
+                    console.log(response);
+                });
+        }
+
+        function ajaxAxiosAppend(contador) {
+            formData.delete('param[skip]')
+            formData.append('param[skip]', contador)
+            axios({
+                    method: 'post',
+                    url: 'http://reallatas.myftp.org:2424/balcao/servidor/per.balcao.php',
+                    data: formData,
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    }
+                })
+                .then(function(response) {
+                    //handle success
+                    theGrid.sourceAdd(response.data)
+                        // count += Object.keys(response.data).length
+                        // console.log(response.data);
+                })
+                .catch(function(response) {
+                    //handle error
+                    console.log(response);
+                });
+        }
     </script>
 
 

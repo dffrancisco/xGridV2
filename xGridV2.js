@@ -2,6 +2,9 @@
 let xGrid = (function() {
     const version = 4.0;
 
+    // configuração de icones global
+    // ajaxSetup global
+
     function create(param) {
 
         let argDefault = {
@@ -25,7 +28,10 @@ let xGrid = (function() {
             setfocus: false,
             render: {},
             theme: 'x-gray',
-            query: {},
+            query: {
+                endScroll: 0.1,
+                then: false
+            },
             afterSearch: false,
             sideBySide: false,
             click: false,
@@ -44,6 +50,8 @@ let xGrid = (function() {
             param.filter.concat = Object.assign(argDefalt.filter.concat, param.filter.concat)
             param.filter.fieldByField = Object.assign(argDefalt.filter.fieldByField, param.filter.fieldByField)
         }
+        if (param.query)
+            param.query = Object.assign(argDefault.query, param.query)
 
         let ax = {
             arg: {},
@@ -59,6 +67,7 @@ let xGrid = (function() {
             indexSelect: false,
             gridDisable: null,
             divLoad: null,
+            controlScroll: true,
             constructor() {
                 this.element = document.querySelector(this.arg.el)
                 this.idElment = this.element.id
@@ -66,20 +75,20 @@ let xGrid = (function() {
                 this.element.classList.add(this.arg.theme);
 
                 if (this.arg.height != 'default') this.element.style.height = `${this.arg.height}px`
+                if (this.arg.width != 'default') this.element.style.width = `${this.arg.width}px`
 
                 this.element.appendChild(this.createTitle())
                 this.element.appendChild(this.setContent())
 
                 this.onKeyDown();
 
+                // lê os fields do html
                 if (this.arg.sideBySide) {
                     if (this.arg.sideBySide.el) {
                         let qto = 0;
                         document.querySelectorAll(this.arg.sideBySide.el).forEach((el) => {
                             el.querySelectorAll('[name]').forEach((field) => {
-
                                 if (this.elementSideBySide[field.name]) {
-                                    // console.log(this.elementSideBySide[field.name]);
                                     if (qto == 0) {
                                         let _el_ = this.elementSideBySide[field.name]
                                         this.elementSideBySide[field.name] = []
@@ -111,7 +120,7 @@ let xGrid = (function() {
                     this.widthAll = Object.values(this.arg.columns).reduce((total, b) => total + parseInt(b.width), 0);
                     this.setColumnsTitle(this.arg.columns);
                 } else
-                    this.setColumnsTitle([{ dataField: '-', width: '100%' }]);
+                    this.setColumnsTitle({ '-': { dataField: '-', width: '100%' } });
 
                 return this.gridTitle;
             },
@@ -128,18 +137,22 @@ let xGrid = (function() {
             },
             setColumnsTitle(columns) {
 
-                for (let i in columns) {
+                for (let id in columns) {
                     let col = document.createElement("div")
                     let span = document.createElement("span")
                     let label = document.createElement("label")
 
-                    col.setAttribute('name', columns[i].dataField)
+                    col.setAttribute('name', columns[id].dataField)
                     col.classList.add('xGrid-col')
-                    col.style.width = columns[i].width
+                    col.style.width = columns[id].width
 
-
-                    span.innerHTML = columns[i].dataField != '_count_' ? columns[i].dataField : '&nbsp;'
-                        // span.innerHTML = columns[i].dataField
+                    if (columns[id].dataField == '_count_')
+                        span.innerHTML = '&nbsp;'
+                    else
+                    if (this.widthAll > 100)
+                        span.innerHTML = columns[id].dataField
+                    else
+                        span.innerHTML = id
 
                     col.appendChild(span)
                     col.appendChild(label)
@@ -158,6 +171,9 @@ let xGrid = (function() {
                 this.gridContent.classList.add('xGrid-content')
 
                 // this.gridContent.style.width = `${this.widthAll}%`
+
+                if (this.arg.query.then)
+                    this.gridContent.addEventListener('scroll', this.eventListenerScroll)
 
 
                 return this.gridContent;
@@ -184,6 +200,8 @@ let xGrid = (function() {
                     this.gridContent.style.overflowY = 'unset';
                     this.gridContent.style.width = `${this.widthAll}%`
                     this.gridTitle.style.width = `${this.widthAll}%`
+                    if (this.arg.query.then)
+                        this.element.addEventListener('scroll', this.eventListenerScroll)
                 }
 
                 if (this.arg.setfocus)
@@ -313,7 +331,10 @@ let xGrid = (function() {
 
                 }
 
+                if (Object.keys(source).length > 0)
+                    this.controlScroll = true
                 this.closeLoad()
+                this.loadMore(false)
             },
             onEvent: {
                 _control: false,
@@ -555,6 +576,17 @@ let xGrid = (function() {
                 return ax.sourceSelect
 
             },
+            eventListenerScroll(e) {
+                let target = e.currentTarget
+                let h = target.scrollHeight - (target.scrollHeight * ax.arg.query.endScroll)
+
+                if (ax.controlScroll)
+                    if ((target.offsetHeight + target.scrollTop >= h)) {
+                        ax.loadMore()
+                        ax.arg.query.then(ax.tabindex)
+                        ax.controlScroll = false
+                    }
+            },
             focus(numLine) {
 
                 if (this.gridDisable)
@@ -612,6 +644,18 @@ let xGrid = (function() {
             clear(call) {
                 this.onEvent.removeEventListenerAndRemoveElement()
                 call && call()
+            },
+            loadMore(open = true) {
+                if (open) {
+                    this.divLoadMore = document.createElement('div')
+                    this.divLoadMore.classList.add('xGrid-load-search')
+                    this.divLoadMore.innerHTML = '<i class="fa fa-spinner fa-pulse fa-fw fa-lg"></i> Carregando'
+
+                    this.element.insertBefore(this.divLoadMore, this.element.firstChild)
+                } else {
+                    if (this.divLoadMore)
+                        this.divLoadMore.remove()
+                }
             },
             load(text, call) {
 
@@ -776,7 +820,7 @@ let xGrid = (function() {
                             let type = this.elementSideBySide[i].type
 
                             if (this.arg.sideBySide.render)
-                                if (this.arg.sideBySide.render[i])
+                                if (this.arg.render[this.arg.sideBySide.render[i]])
                                     try {
                                         value = this.arg.sideBySide.render[i](value)
                                     } catch (error) {
@@ -948,8 +992,6 @@ let xGrid = (function() {
         this.getDifTwoJson = (toUpperCase) => ax.getDifTwoJson(toUpperCase)
 
         this.clearElementSideBySide = () => ax.clearElementSideBySide()
-
-
 
     }
 
