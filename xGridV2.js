@@ -1,5 +1,5 @@
 // export default (function() {
-let xGrid = (function() {
+let xGrid = (function () {
     const version = 4.0;
 
     // configuração de icones global
@@ -30,7 +30,7 @@ let xGrid = (function() {
             theme: 'x-gray',
             query: {
                 endScroll: 0.1,
-                then: false
+                execute: false,
             },
             afterSearch: false,
             sideBySide: false,
@@ -68,6 +68,7 @@ let xGrid = (function() {
             gridDisable: null,
             divLoad: null,
             controlScroll: true,
+            paramQuery: false,
             constructor() {
                 this.element = document.querySelector(this.arg.el)
                 this.idElment = this.element.id
@@ -149,10 +150,10 @@ let xGrid = (function() {
                     if (columns[id].dataField == '_count_')
                         span.innerHTML = '&nbsp;'
                     else
-                    if (this.widthAll > 100)
-                        span.innerHTML = columns[id].dataField
-                    else
-                        span.innerHTML = id
+                        if (this.widthAll > 100)
+                            span.innerHTML = columns[id].dataField
+                        else
+                            span.innerHTML = id
 
                     col.appendChild(span)
                     col.appendChild(label)
@@ -172,7 +173,7 @@ let xGrid = (function() {
 
                 // this.gridContent.style.width = `${this.widthAll}%`
 
-                if (this.arg.query.then)
+                if (this.arg.query.execute)
                     this.gridContent.addEventListener('scroll', this.eventListenerScroll)
 
 
@@ -200,7 +201,7 @@ let xGrid = (function() {
                     this.gridContent.style.overflowY = 'unset';
                     this.gridContent.style.width = `${this.widthAll}%`
                     this.gridTitle.style.width = `${this.widthAll}%`
-                    if (this.arg.query.then)
+                    if (this.arg.query.execute)
                         this.element.addEventListener('scroll', this.eventListenerScroll)
                 }
 
@@ -234,7 +235,7 @@ let xGrid = (function() {
                 if (qtoColumn != 0)
                     for (let i in this.arg.columns) {
                         if (this.arg.columns[i].width == undefined)
-                        // this.arg.columns[i].width = ((100 - valPercente) / qtoColumn).toFixed(2) + '%';
+                            // this.arg.columns[i].width = ((100 - valPercente) / qtoColumn).toFixed(2) + '%';
                             this.arg.columns[i].width = ((100 - valPercente) / qtoColumn) + '%';
                     }
 
@@ -244,10 +245,13 @@ let xGrid = (function() {
                     this.columnsAutoCreate.push({ dataField: '_count_', width: '4%' });
 
                 if (source[0] != undefined) {
+
                     let wid = 100 / Object.keys(source[0]).length;
                     for (let i in source[0]) {
+                        // console.log(source[0][i].length);
+                        // wid = source[0][i].length > 4 ? source[0][i].length : 4
                         wid = wid < 15 ? 20 : wid
-                            // this.arg.columns.push({ dataField: i, width: wid + '%' });
+                        // this.arg.columns.push({ dataField: i, width: wid + '%' });
                         this.columnsAutoCreate.push({ dataField: i, width: wid + '%' });
                     }
                 }
@@ -256,8 +260,8 @@ let xGrid = (function() {
             setCompare(col, source) {
 
                 if (col.compare) {
-                    let _source = {...source }
-                        // source.value = source[col.dataField]
+                    let _source = { ...source }
+                    // source.value = source[col.dataField]
                     _source.value = _source[col.dataField]
                     let value = this.arg.compare[col.compare](_source)
 
@@ -284,8 +288,8 @@ let xGrid = (function() {
                     div.setAttribute('tabindex', this.tabindex)
                     this.tabindex++
 
-                        if (this.arg.count)
-                            source[i]._count_ = this.tabindex
+                    if (this.arg.count)
+                        source[i]._count_ = this.tabindex
 
                     for (let c in col) {
 
@@ -583,7 +587,7 @@ let xGrid = (function() {
                 if (ax.controlScroll)
                     if ((target.offsetHeight + target.scrollTop >= h)) {
                         ax.loadMore()
-                        ax.arg.query.then(ax.tabindex)
+                        ax.arg.query.execute(ax.tabindex, ax.paramQuery)
                         ax.controlScroll = false
                     }
             },
@@ -694,8 +698,8 @@ let xGrid = (function() {
                 if (target.nextSibling)
                     target.nextSibling.focus()
                 else
-                if (target.previousSibling)
-                    target.previousSibling.focus()
+                    if (target.previousSibling)
+                        target.previousSibling.focus()
 
                 this.onEvent.removeEventListenerElement(target)
 
@@ -754,7 +758,6 @@ let xGrid = (function() {
             },
             onSelectLine() {
                 if (this.arg.onSelectLine)
-                // if (Object.keys(this.sourceSelect).length)
                     this.arg.onSelectLine(this.sourceSelect)
             },
             getElementSideBySideJson(toUpperCase = false, empty = true) {
@@ -765,7 +768,6 @@ let xGrid = (function() {
                     let value = this.elementSideBySide[name].value
                     let type = this.elementSideBySide[name].type
 
-                    /*se for href não faz nada passa direto*/
                     if (type == undefined)
                         if (this.elementSideBySide[name].localName == 'img')
                             continue
@@ -778,8 +780,8 @@ let xGrid = (function() {
                         if (value == '')
                             continue
 
-                        /*se o conteudo da variavel for numerico ele retorna false*/
-                        /*para igular os valores no edit esta 1,00 no lineDataSourse esta 1.00*/
+                    /*se o conteudo da variavel for numerico ele retorna false*/
+                    /*para igular os valores no edit esta 1,00 no sourceSelect esta 1.00*/
                     if (!isNaN(parseFloat(value))) {
                         if (value.indexOf(",") != -1)
                             value = value.replace(/\./g, '').replace(/\,/g, '.');
@@ -830,7 +832,7 @@ let xGrid = (function() {
                             if (this.arg.sideBySide.compare)
                                 if (this.arg.compare[this.arg.sideBySide.compare[i]]) {
                                     try {
-                                        let _source = {...this.sourceSelect }
+                                        let _source = { ...this.sourceSelect }
                                         _source.value = value
                                         value = this.arg.compare[this.arg.sideBySide.compare[i]](_source)
                                     } catch (error) {
@@ -858,7 +860,7 @@ let xGrid = (function() {
                                     ax.elementSideBySide[i].value = value
                                     break;
                                 case 'radio':
-                                    let radios = {...ax.elementSideBySide[i] }
+                                    let radios = { ...ax.elementSideBySide[i] }
                                     delete radios.type
                                     for (let r in radios) {
                                         if (radios[r].value == value) {
@@ -894,7 +896,6 @@ let xGrid = (function() {
                     }
                 }
 
-
                 return diff
 
             },
@@ -902,49 +903,62 @@ let xGrid = (function() {
                 if (this.arg.sideBySide)
 
                     if (this.arg.sideBySide.el)
-                    for (let i in this.elementSideBySide) {
-                        let type = this.elementSideBySide[i].type
+                        for (let i in this.elementSideBySide) {
+                            let type = this.elementSideBySide[i].type
 
-                        switch (type) {
-                            case undefined:
-                                var typeEle = this.elementSideBySide[i].localName;
-                                if (typeEle == 'img') {
-                                    this.elementSideBySide[i].src = ''
-                                } else
-                                    this.elementSideBySide[i].innerHTML = ''
-                                break;
-                            case 'text':
-                            case 'password':
-                            case 'textarea':
-                            case 'number':
-                            case 'tel':
-                            case 'date':
-                            case 'time':
-                            case 'range':
-                            case 'hidden':
-                                ax.elementSideBySide[i].value = ''
-                                break;
-                            case 'radio':
-                                console.log(ax.elementSideBySide[i], 'tem que ver o radio button')
-                                    // ax.elementSideBySide[i].querySelector('[value="' + value + '"]')
-                                    // elementSideBySide.find('[name="' + field + '"][value="' + value + '"]').prop('checked', true);
-                                break;
-                            case 'select-one':
-                                ax.elementSideBySide[i].value = ''
-                                break;
-                            case 'checkbox':
-                                ax.elementSideBySide[i].checked = false
-                                break;
-                            case '':
-                                { //href
-                                    ax.elementSideBySide[i].href = ''
-                                    ax.elementSideBySide[i].innerHTML = ''
+                            switch (type) {
+                                case undefined:
+                                    var typeEle = this.elementSideBySide[i].localName;
+                                    if (typeEle == 'img') {
+                                        this.elementSideBySide[i].src = ''
+                                    } else
+                                        this.elementSideBySide[i].innerHTML = ''
                                     break;
-                                }
+                                case 'text':
+                                case 'password':
+                                case 'textarea':
+                                case 'number':
+                                case 'tel':
+                                case 'date':
+                                case 'time':
+                                case 'range':
+                                case 'hidden':
+                                    ax.elementSideBySide[i].value = ''
+                                    break;
+                                case 'radio':
+                                    let radios = { ...ax.elementSideBySide[i] }
+                                    delete radios.type
+                                    for (let r in radios) {
+                                        radios[r].checked = false
+                                        break
+                                    }
+                                    break;
+                                case 'select-one':
+                                    ax.elementSideBySide[i].value = ''
+                                    break;
+                                case 'checkbox':
+                                    ax.elementSideBySide[i].checked = false
+                                    break;
+                                case '':
+                                    { //href
+                                        ax.elementSideBySide[i].href = ''
+                                        ax.elementSideBySide[i].innerHTML = ''
+                                        break;
+                                    }
+                            }
                         }
-                    }
             },
-
+            querySourceAdd(source) {
+                if (this.tabindex == 0)
+                    this.source(source)
+                else
+                    this.createLine(source)
+            },
+            queryOpen(param) {
+                this.paramQuery = param
+                this.tabindex = 0
+                this.arg.query.execute(this.tabindex, param)
+            }
         }
 
         ax.arg = Object.assign(argDefault, param);
@@ -992,6 +1006,10 @@ let xGrid = (function() {
         this.getDifTwoJson = (toUpperCase) => ax.getDifTwoJson(toUpperCase)
 
         this.clearElementSideBySide = () => ax.clearElementSideBySide()
+
+        this.queryOpen = (param) => ax.queryOpen(param)
+
+        this.querySourceAdd = (source) => ax.querySourceAdd(source)
 
     }
 
