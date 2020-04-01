@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- <script src="https://raw.githubusercontent.com/jgallen23/jquery-builder/0.7.0/dist/1.11.1/jquery-css-deprecated-dimensions-effects-event-alias-offset-wrap.min.js" type="text/javascript"></script> -->
     <script src="../xGridV2.js" type="text/javascript"></script>
-    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <!-- <script src="https://unpkg.com/axios/dist/axios.min.js"></script> -->
     <link rel="stylesheet" href="../xGridV2.css">
     <style>
         body {
@@ -23,8 +23,8 @@
 <body>
 
     <div id="myGrid"></div>
+    <br />
 
-    <br>
 
     <button onclick="grid.load();grid.source(json)">source</button>
     <button onclick="grid.load();grid.sourceAdd(json)">Add Source</button>
@@ -45,11 +45,11 @@
 
     <div class="campos">
         <span>nome</span>
-        <input type="text" name="DESC_PRODUTO">
+        <input type="text" name="DESC_PRODUTO" obr>
         <span>cpf</span>
-        <input type="text" name="cpf">
+        <input type="text" name="NUM_FABRICANTE">
         <span>idade</span>
-        <input type="text" name="old">
+        <input type="text" name="END_ESTOQUE">
         <span>casado</span>
         <input type="checkbox" name="casado"><span>Sim</span>
         <!-- <span>img</span>
@@ -79,6 +79,9 @@
 
     <br>
     <div id="theGrid"></div>
+    <div id="myGridFrame"></div>
+
+    <br />
     <button onclick="ajaxJS()">GetProduto AjaxJS</button>
     <button onclick="ajaxAxios()">GetProduto Axios</button>
     <button onclick="ajaxAxiosAppend()">GetProduto Append Axios</button>
@@ -302,18 +305,15 @@
             el: '#myGrid',
             height: 300,
             count: true,
-
         })
 
         //  grid.queryOpen('FAROL LD GOL');
-
-
 
         const theGrid = new xGrid.create({
             el: '#theGrid',
             height: 300,
             width: 800,
-            // count: true,
+            count: true,
             heightLine: 50, //tem que fazer
             // setfocus: 1,
             theme: 'x-darkBC',
@@ -398,11 +398,64 @@
             },
             sideBySide: {
                 el: '.campos',
+                tabToEnter: true,
                 render: {
                     cpf: reveter
                 },
                 compare: {
                     name: 'junta'
+                },
+                duplicity: {
+                    dataField: ['NUM_FABRICANTE', 'DESC_PRODUTO', 'END_ESTOQUE'],
+                    execute: (r) => {
+                        console.log(r);
+                        // getServidor
+                        // repostar
+                        let valueBanco = 'aaaa'
+
+                        if (r.value != valueBanco) {
+                            theGrid.showMessageDuplicity(r.text + ' já esta em uso ok')
+                            return false
+                        }
+                    }
+                },
+                frame: {
+                    el: '#myGridFrame',
+                    class: 'texte novo',
+                    style: 'text-align: center; width:800px',
+                    print: {
+                        html: 'imprimir',
+                        style: 'background: red;',
+                        class: 'mybtn'
+                    },
+                    insert: {
+                        html: 'Novo',
+                        state: xGrid.state.insert,
+                        click: (ln, e) => {
+                            console.log(e, 'novo');
+                            return false
+                        }
+                    },
+                    editar: {
+                        html: 'Alterar',
+                        state: xGrid.state.update,
+                        click: () => alert('Alterar')
+                    },
+                    delete: {
+                        html: 'Excluir',
+                        state: xGrid.state.delete,
+                        click: () => alert('Excluir')
+                    },
+                    salvarBtn: {
+                        html: 'Salvar',
+                        state: xGrid.state.save,
+                        click: () => alert('salvar')
+                    },
+                    cancel: {
+                        html: 'Cancel',
+                        state: xGrid.state.cancel,
+                        click: () => alert('cancelar')
+                    }
                 }
             },
             query: {
@@ -420,9 +473,9 @@
                     formData.append('param[skip]', offset)
 
                     fetch('http://reallatas.myftp.org:2424/balcao/servidor/per.balcao.php', {
-                            method: 'POST',
-                            body: formData
-                        })
+                        method: 'POST',
+                        body: formData
+                    })
                         .then(response => response.json())
                         // .then(json => grid.querySourceAdd(json))
                         .then((json_) => {
@@ -463,7 +516,7 @@
             let xhr = new XMLHttpRequest();
 
             xhr.open('POST', 'http://reallatas.myftp.org:2424/balcao/servidor/per.balcao.php');
-            xhr.onload = function() {
+            xhr.onload = function () {
                 // console.table(JSON.parse(xhr.response));
                 count += Object.keys(JSON.parse(xhr.response)).length
                 theGrid.source(JSON.parse(xhr.response))
@@ -476,20 +529,20 @@
 
         function ajaxAxios() {
             axios({
-                    method: 'post',
-                    url: 'http://reallatas.myftp.org:2424/balcao/servidor/per.balcao.php',
-                    data: formData,
-                    headers: {
-                        'Content-Type': 'multipart/form-data'
-                    }
-                })
-                .then(function(response) {
+                method: 'post',
+                url: 'http://reallatas.myftp.org:2424/balcao/servidor/per.balcao.php',
+                data: formData,
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            })
+                .then(function (response) {
                     //handle success
                     theGrid.source(response.data)
                     count += Object.keys(response.data).length
                     console.log(response.data);
                 })
-                .catch(function(response) {
+                .catch(function (response) {
                     //handle error
                     console.log(response);
                 });
@@ -500,20 +553,20 @@
             formData.delete('param[skip]')
             formData.append('param[skip]', contador)
             axios({
-                    method: 'post',
-                    url: 'http://reallatas.myftp.org:2424/balcao/servidor/per.balcao.php',
-                    data: formData,
-                    headers: {
-                        'Content-Type': 'multipart/form-data'
-                    }
-                })
-                .then(function(response) {
+                method: 'post',
+                url: 'http://reallatas.myftp.org:2424/balcao/servidor/per.balcao.php',
+                data: formData,
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            })
+                .then(function (response) {
                     // theGrid.search(response.data)
 
                     theGrid.sourceAdd(response.data)
-                        // theGrid.source(response.data)
+                    // theGrid.source(response.data)
                 })
-                .catch(function(response) {
+                .catch(function (response) {
                     //handle error
                     console.log(response);
                 });

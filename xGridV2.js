@@ -1,7 +1,7 @@
 // export default (function() {
 let xGrid = (function () {
     const version = 4.0;
-
+    const state = { save: 'save', insert: 'insert', update: 'update', select: 'select', cancel: 'cancel', delete: 'delete' }
     // configuração de icones global
     // ajaxSetup global
 
@@ -69,6 +69,8 @@ let xGrid = (function () {
             divLoad: null,
             controlScroll: true,
             paramQuery: false,
+            buttonsFrame: {},
+            messageDuplicity: '',
             constructor() {
                 this.element = document.querySelector(this.arg.el)
                 this.idElment = this.element.id
@@ -104,10 +106,8 @@ let xGrid = (function () {
                         })
                     }
 
-                    //vou usar isso no duplicite
-                    //theGrid.getAx().elementSideBySide[1].previousSibling.previousElementSibling.innerText
-                    //theGrid.getAx().elementSideBySide[0].getAttribute("name");
-
+                    this.frame()
+                    this.duplicity()
                 }
 
             },
@@ -958,14 +958,119 @@ let xGrid = (function () {
                 this.paramQuery = param
                 this.tabindex = 0
                 this.arg.query.execute(this.tabindex, param)
-            }
+            },
+            frame() {
+                let btns = {}
+                if (this.arg.sideBySide.frame)
+                    if (this.arg.sideBySide.frame.el) {
+                        let elFrame = document.querySelector(this.arg.sideBySide.frame.el);
+
+                        if (this.arg.sideBySide.frame.style)
+                            elFrame.style = this.arg.sideBySide.frame.style
+
+                        if (this.arg.sideBySide.frame.class)
+                            this.arg.sideBySide.frame.class.split(' ').forEach((e) => elFrame.classList.add(e))
+
+
+                        for (let key in this.arg.sideBySide.frame) {
+                            if (key == 'el' || key == 'style' || key == 'class')
+                                continue
+
+                            let btn = document.createElement('button');
+                            btn.classList.add('btn-Frame', 'btn-Frame-blue')
+                            btn.innerHTML = this.arg.sideBySide.frame[key].html
+
+                            if (this.arg.sideBySide.frame[key].click)
+                                btn.addEventListener('click', (e) => {
+                                    if (this.arg.sideBySide.frame[key].click(this.sourceSelect, e) == false)
+                                        return false
+
+                                    if (e.target.getAttribute('state') != state.delete)
+                                        for (let keyBtns in btns) {
+                                            this.buttonsFrame[keyBtns].disabled = !this.buttonsFrame[keyBtns].disabled
+                                        }
+                                })
+
+
+                            if (this.arg.sideBySide.frame[key].class)
+                                this.arg.sideBySide.frame[key].class.split(' ').forEach((e) => btn.classList.add(e))
+
+                            if (this.arg.sideBySide.frame[key].style)
+                                btn.style = this.arg.sideBySide.frame[key].style
+
+
+                            if (this.arg.sideBySide.frame[key].state) {
+                                btn.setAttribute('state', this.arg.sideBySide.frame[key].state)
+                                btns[key] = this.arg.sideBySide.frame[key].state
+                            }
+
+                            if (this.arg.sideBySide.frame[key].state == state.save || this.arg.sideBySide.frame[key].state == state.cancel)
+                                btn.disabled = true
+
+
+                            this.buttonsFrame[key] = btn
+                            elFrame.appendChild(btn)
+
+                        }
+                    }
+            },
+            duplicity() {
+                this.messageDuplicity = document.createElement('div');
+
+                this.arg.sideBySide.duplicity.dataField.forEach((field) => {
+                    // this.elementSideBySide[field].style.color = 'red'
+
+                    this.elementSideBySide[field].addEventListener('focusout', (e) => {
+                        if (this.sourceSelect[field] != e.target.value) {
+                            this.arg.sideBySide.duplicity.execute({
+                                field: field,
+                                value: e.target.value,
+                                text: this.elementSideBySide[field].previousSibling.previousElementSibling.innerText
+                            })
+
+                            // msg.innerHTML = this.elementSideBySide[field].previousSibling.previousElementSibling.innerText +
+                            //     (this.arg.sideBySide.duplicity.textMessage != undefined ? this.arg.sideBySide.duplicity.textMessage : ' já está em uso.')
+
+                            // if (this.arg.sideBySide.duplicity.showMessage == true || this.arg.sideBySide.duplicity.showMessage == undefined) {
+                            //     msg.classList.add('treme', 'pnMensDuplicity')
+                            //     setTimeout(() => msg.remove(), 5000)
+                            //     document.body.appendChild(msg)
+                            // }
+                        }
+                    })
+                })
+            },
+            showMessageDuplicity(text) {
+                this.messageDuplicity.innerHTML = text
+                this.messageDuplicity.classList.add('treme', 'pnMensDuplicity')
+                setTimeout(() => this.messageDuplicity.remove(), 5000)
+                document.body.appendChild(this.messageDuplicity)
+            },
+            getDuplicityAll() {
+                let that = true;
+
+                for (let i in this.arg.sideBySide.duplicity.dataField) {
+                    let field = this.arg.sideBySide.duplicity.dataField[i]
+
+                    if (this.sourceSelect[field] != this.elementSideBySide[field].value) {
+                        that = this.arg.sideBySide.duplicity.execute({
+                            field: field,
+                            value: this.elementSideBySide[field].value.trim(),
+                            text: this.elementSideBySide[field].previousSibling.previousElementSibling.innerText
+                        })
+                        return false
+                    }
+                }
+                return that
+            },
+            tabToEnter() {
+
+            },
         }
 
         ax.arg = Object.assign(argDefault, param);
 
         ax.constructor();
-
-        // console.log(ax.arg);
 
         this.getAx = () => ax;
 
@@ -1011,10 +1116,15 @@ let xGrid = (function () {
 
         this.querySourceAdd = (source) => ax.querySourceAdd(source)
 
+        this.getDuplicityAll = () => ax.getDuplicityAll()
+
+        this.showMessageDuplicity = (text) => ax.showMessageDuplicity(text)
+
     }
 
 
     return {
-        create: create
+        create: create,
+        state: state
     }
 })();
