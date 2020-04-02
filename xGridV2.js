@@ -1,6 +1,8 @@
 // export default (function() {
+
+// eslint-disable-next-line no-unused-vars
 let xGrid = (function () {
-    const version = 4.0;
+    const version = 2.0;
     const state = { save: 'save', insert: 'insert', update: 'update', select: 'select', cancel: 'cancel', delete: 'delete' }
     // configuração de icones global
     // ajaxSetup global
@@ -47,8 +49,8 @@ let xGrid = (function () {
 
         param = Object.assign({}, param);
         if (param.filter) {
-            param.filter.concat = Object.assign(argDefalt.filter.concat, param.filter.concat)
-            param.filter.fieldByField = Object.assign(argDefalt.filter.fieldByField, param.filter.fieldByField)
+            param.filter.concat = Object.assign(argDefault.filter.concat, param.filter.concat)
+            param.filter.fieldByField = Object.assign(argDefault.filter.fieldByField, param.filter.fieldByField)
         }
         if (param.query)
             param.query = Object.assign(argDefault.query, param.query)
@@ -71,6 +73,7 @@ let xGrid = (function () {
             paramQuery: false,
             buttonsFrame: {},
             messageDuplicity: '',
+            listTabForEnter: false,
             constructor() {
                 this.element = document.querySelector(this.arg.el)
                 this.idElment = this.element.id
@@ -88,9 +91,13 @@ let xGrid = (function () {
                 // lê os fields do html
                 if (this.arg.sideBySide) {
                     if (this.arg.sideBySide.el) {
+                        this.listTabForEnter =
+                            [...document.querySelector(this.arg.sideBySide.el)
+                                .querySelectorAll('input[name], select[name],button[name],textarea[name]')]
                         let qto = 0;
                         document.querySelectorAll(this.arg.sideBySide.el).forEach((el) => {
                             el.querySelectorAll('[name]').forEach((field) => {
+
                                 if (this.elementSideBySide[field.name]) {
                                     if (qto == 0) {
                                         let _el_ = this.elementSideBySide[field.name]
@@ -100,14 +107,17 @@ let xGrid = (function () {
                                     }
                                     qto++
                                     this.elementSideBySide[field.name][qto] = field
-                                } else
+                                } else {
                                     this.elementSideBySide[field.name] = field
+                                    this.tabToEnter(field.name)
+                                }
                             })
                         })
-                    }
 
+                    }
                     this.frame()
                     this.duplicity()
+                    this.tabToEnter()
                 }
 
             },
@@ -395,9 +405,7 @@ let xGrid = (function () {
 
                         try {
                             e.target.previousSibling.previousSibling.previousSibling.previousSibling.focus()
-                        } catch (error) {
-
-                        }
+                        } catch (error) { return }
 
                         if (e.preventDefault)
                             e.preventDefault();
@@ -409,9 +417,7 @@ let xGrid = (function () {
                     if (e.keyCode == 34) {
                         try {
                             e.target.nextSibling.nextSibling.nextSibling.nextSibling.focus()
-                        } catch (error) {
-
-                        }
+                        } catch (error) { return }
 
                         if (e.preventDefault)
                             e.preventDefault();
@@ -470,7 +476,7 @@ let xGrid = (function () {
 
 
                 },
-                focusout(e) {
+                focusout() {
                     if (ax.onEvent._control == false) {
                         let select = ax.gridContent.querySelectorAll('.xGrid-Selected')
                         select.forEach((r) => {
@@ -692,7 +698,7 @@ let xGrid = (function () {
 
                 let del = this.arg.source[index]
                 delete this.arg.source[index];
-                let indexOld = index;
+                //  let indexOld = index;
                 let target = this.gridContent.querySelector('[tabindex="' + index + '"]');
 
                 if (target.nextSibling)
@@ -784,7 +790,7 @@ let xGrid = (function () {
                     /*para igular os valores no edit esta 1,00 no sourceSelect esta 1.00*/
                     if (!isNaN(parseFloat(value))) {
                         if (value.indexOf(",") != -1)
-                            value = value.replace(/\./g, '').replace(/\,/g, '.');
+                            value = value.replace(/\./g, '').replace(/\\,/g, '.');
                     }
 
                     /*tratamento para data*/
@@ -818,6 +824,7 @@ let xGrid = (function () {
 
                     if (this.arg.sideBySide.el)
                         for (let i in this.elementSideBySide) {
+
                             let value = this.sourceSelect[i];
                             let type = this.elementSideBySide[i].type
 
@@ -825,9 +832,7 @@ let xGrid = (function () {
                                 if (this.arg.render[this.arg.sideBySide.render[i]])
                                     try {
                                         value = this.arg.sideBySide.render[i](value)
-                                    } catch (error) {
-                                        throw 'erro see your function render'
-                                    }
+                                    } catch (error) { throw 'erro see your function render' }
 
                             if (this.arg.sideBySide.compare)
                                 if (this.arg.compare[this.arg.sideBySide.compare[i]]) {
@@ -835,9 +840,7 @@ let xGrid = (function () {
                                         let _source = { ...this.sourceSelect }
                                         _source.value = value
                                         value = this.arg.compare[this.arg.sideBySide.compare[i]](_source)
-                                    } catch (error) {
-                                        throw 'erro see your function compare'
-                                    }
+                                    } catch (error) { throw 'erro see your function compare' }
                                 }
 
                             switch (type) {
@@ -860,6 +863,7 @@ let xGrid = (function () {
                                     ax.elementSideBySide[i].value = value
                                     break;
                                 case 'radio':
+                                    // eslint-disable-next-line no-case-declarations
                                     let radios = { ...ax.elementSideBySide[i] }
                                     delete radios.type
                                     for (let r in radios) {
@@ -875,12 +879,11 @@ let xGrid = (function () {
                                 case 'checkbox':
                                     ax.elementSideBySide[i].checked = (value == '1' ? true : false)
                                     break;
-                                case '':
-                                    { //href
-                                        ax.elementSideBySide[i].href = value
-                                        ax.elementSideBySide[i].innerHTML = value
-                                        break;
-                                    }
+                                case '': { //href
+                                    ax.elementSideBySide[i].href = value
+                                    ax.elementSideBySide[i].innerHTML = value
+                                    break;
+                                }
                             }
                         }
                 }
@@ -926,6 +929,7 @@ let xGrid = (function () {
                                     ax.elementSideBySide[i].value = ''
                                     break;
                                 case 'radio':
+                                    // eslint-disable-next-line no-case-declarations
                                     let radios = { ...ax.elementSideBySide[i] }
                                     delete radios.type
                                     for (let r in radios) {
@@ -1002,6 +1006,9 @@ let xGrid = (function () {
                             if (this.arg.sideBySide.frame[key].state) {
                                 btn.setAttribute('state', this.arg.sideBySide.frame[key].state)
                                 btns[key] = this.arg.sideBySide.frame[key].state
+                                if (this.arg.sideBySide.frame[key].state == 'save')
+                                    this.listTabForEnter.push(btn)
+                                // this.buttonsFrame['_save_'] = btn
                             }
 
                             if (this.arg.sideBySide.frame[key].state == state.save || this.arg.sideBySide.frame[key].state == state.cancel)
@@ -1009,6 +1016,9 @@ let xGrid = (function () {
 
 
                             this.buttonsFrame[key] = btn
+
+
+
                             elFrame.appendChild(btn)
 
                         }
@@ -1063,8 +1073,48 @@ let xGrid = (function () {
                 }
                 return that
             },
-            tabToEnter() {
+            tabToEnter(name) {
 
+                if (this.arg.sideBySide.tabToEnter != false) {
+                    if (this.elementSideBySide[name] == undefined) return false
+
+                    this.elementSideBySide[name].addEventListener('keydown', function (e) {
+                        if (e.keyCode == 13) {
+
+                            let next = ax.listTabForEnter[ax.listTabForEnter.indexOf(this) + 1]
+                            if (next != undefined)
+                                if (next.tagName == 'BUTTON' || next.tagName == 'SELECT')
+                                    next.focus()
+                                else
+                                    next.select()
+
+                            e.preventDefault()
+                            e.stopPropagation()
+                        }
+                    })
+                }
+            },
+            focusField(name) {
+                if (name == undefined) {
+                    if (this.listTabForEnter[0].tagName == 'BUTTON' || this.listTabForEnter[0].tagName == 'SELECT')
+                        this.listTabForEnter[0].focus()
+                    else
+                        this.listTabForEnter[0].select()
+                } else
+                    if (this.elementSideBySide[name].tagName == 'BUTTON' || this.elementSideBySide[name].tagName == 'SELECT')
+                        this.elementSideBySide[name].focus()
+                    else
+                        this.elementSideBySide[name].select()
+            },
+            disabledBtnsSalvarCancelar(disabled = true) {
+                for (let i in this.buttonsFrame)
+                    if (this.buttonsFrame[i].getAttribute('state') == 'save') {
+                        if (this.buttonsFrame[i].disabled == disabled)
+                            for (let i in this.buttonsFrame)
+                                if (this.buttonsFrame[i].getAttribute('state'))
+                                    this.buttonsFrame[i].disabled = !this.buttonsFrame[i].disabled
+                        break
+                    }
             },
         }
 
@@ -1073,6 +1123,8 @@ let xGrid = (function () {
         ax.constructor();
 
         this.getAx = () => ax;
+
+        this.version = () => version
 
         this.source = (source) => ax.source(source)
 
@@ -1119,6 +1171,10 @@ let xGrid = (function () {
         this.getDuplicityAll = () => ax.getDuplicityAll()
 
         this.showMessageDuplicity = (text) => ax.showMessageDuplicity(text)
+
+        this.focusField = (name) => ax.focusField(name)
+
+        this.disabledBtnsSalvarCancelar = (disabled) => ax.disabledBtnsSalvarCancelar(disabled)
 
     }
 

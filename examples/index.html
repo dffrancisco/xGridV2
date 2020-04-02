@@ -45,21 +45,21 @@
 
     <div class="campos">
         <span>nome</span>
-        <input type="text" name="DESC_PRODUTO" obr>
+        <input type="text" name="DESC_PRODUTO">
         <span>cpf</span>
         <input type="text" name="NUM_FABRICANTE">
         <span>idade</span>
         <input type="text" name="END_ESTOQUE">
         <span>casado</span>
-        <input type="checkbox" name="casado"><span>Sim</span>
+        <!-- <input type="checkbox" name="casado"><span>Sim</span> -->
         <!-- <span>img</span>
         <img src="" alt="teste" name="img" height="15" /> -->
-        <br>
+        <!-- <br>
         <span>sexo</span>
         <input type="radio" name="genero" value="M" /> Man
         <input type="radio" name="genero" value="F" /> Woman
         <input type="radio" name="genero" value="D" /> Woman
-
+-->
         <span>select</span>
         <select name="qto">
             <option value="13">Treze</option>
@@ -330,6 +330,7 @@
                 },
             },
             enter: () => {
+                theGrid.focusField()
                 console.log('estou no enter funcção');
             },
             columns: {
@@ -398,7 +399,7 @@
             },
             sideBySide: {
                 el: '.campos',
-                tabToEnter: true,
+                // tabToEnter: true,
                 render: {
                     cpf: reveter
                 },
@@ -432,29 +433,32 @@
                         html: 'Novo',
                         state: xGrid.state.insert,
                         click: (ln, e) => {
-                            console.log(e, 'novo');
+                            console.warn(e, 'novo');
                             return false
                         }
                     },
                     editar: {
                         html: 'Alterar',
                         state: xGrid.state.update,
-                        click: () => alert('Alterar')
+                        click: () => {
+                            console.warn('Alterar')
+                            theGrid.focusField('qto')
+                        }
                     },
                     delete: {
                         html: 'Excluir',
                         state: xGrid.state.delete,
-                        click: () => alert('Excluir')
+                        click: () => console.warn('Excluir')
                     },
                     salvarBtn: {
                         html: 'Salvar',
                         state: xGrid.state.save,
-                        click: () => alert('salvar')
+                        click: () => console.warn('salvar')
                     },
                     cancel: {
                         html: 'Cancel',
                         state: xGrid.state.cancel,
-                        click: () => alert('cancelar')
+                        click: () => console.warn('cancelar')
                     }
                 }
             },

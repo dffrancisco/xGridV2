@@ -1,0 +1,25 @@
+{
+  "name": "xgridv2",
+  "version": "2.0.0",
+  "description": "",
+  "main": "xGridV2.js",
+  "directories": {
+    "example": "examples"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dffrancisco/xGridV2.git"
+  },
+  "author": "Francisco Alves",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/dffrancisco/xGridV2/issues"
+  },
+  "homepage": "https://github.com/dffrancisco/xGridV2#readme",
+  "devDependencies": {
+    "eslint": "^6.8.0"
+  }
+}
