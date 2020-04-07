@@ -1,10 +1,10 @@
-    .xGrid-main {
+    .xGridV2-main {
         width: 100%;
         position: relative;
         margin-bottom: 20px;
     }
 
-    .xGrid-main .xGrid-title {
+    .xGridV2-main .xGridV2-title {
         position: sticky;
         top: 0;
         display: flex;
@@ -12,20 +12,45 @@
         flex-direction: row;
     }
 
-    .xGrid-main .xGrid-title .xGrid-col {
+    .xGridV2-main .xGridV2-title .xGridV2-col {
         overflow: hidden;
+        /* cursor: col-resize; */
+        /* padding: 0 !important; */
     }
 
-    .xGrid-main .xGrid-content {
+    .xGridV2-main .xGridV2-title .xGridV2-col span {
+        cursor: pointer;
+        /* cursor: col-resize; */
+        /* padding: 0 !important; */
+    }
+
+    .xGridV2-main .xGridV2-title .xGridV2-col {
+        padding: 4px;
+        position: relative;
+    }
+
+    .xGridV2-main .xGridV2-title .xGridV2-col div {
+        height: 100px;
+        width: 4px;
+        /* float: right; */
+        /* cursor: col-resize; */
+        cursor: ew-resize;
+        /* background: red; */
+        position: absolute;
+        top: 0;
+        right: 0;
+    }
+
+    .xGridV2-main .xGridV2-content {
         overflow-y: scroll;
         height: 100%;
     }
 
-    .xGrid-main .xGrid-content .xGrid-row {
+    .xGridV2-main .xGridV2-content .xGridV2-row {
         display: flex;
     }
 
-    .xGrid-main .xGrid-content .xGrid-col {
+    .xGridV2-main .xGridV2-content .xGridV2-col {
         min-height: 1px;
         overflow: hidden;
         display: flex;
@@ -33,14 +58,15 @@
         align-items: center;
     }
 
-    .xGrid-disable {
-        background: #ffffff7a;
+    .xGridV2-disable {
+        background: #ffffff3d;
         height: 100%;
         width: 100%;
         position: absolute;
+        z-index: 1;
     }
 
-    .xGrid-load {
+    .xGridV2-load {
         background-color: rgba(0, 0, 0, 0.8);
         top: 50%;
         left: 50%;
@@ -55,7 +81,7 @@
         padding-top: 15px;
     }
 
-    .xGrid-load-search {
+    .xGridV2-load-search {
         background-color: rgba(8, 8, 8, 0.82);
         bottom: -22px;
         color: #ffffff;
@@ -72,6 +98,13 @@
         z-index: 10;
         border-top-left-radius: 5px;
         border-top-right-radius: 5px;
+    }
+
+    .xGridV2-main .xGridV2-content nav {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
     }
 
     /*for duplicity*/
@@ -143,6 +176,31 @@
         }
     }
 
+    .xGridV2Asc {
+        background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAQAAADZc7J/AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAIGNIUk0AAHolAACAgwAA+f8AAIDoAABSCAABFVgAADqXAAAXb9daH5AAAADGSURBVHjaYvzPQBlgYhg1YHgasKV1y5ctS7dIE2cAI2ZC2vKHgZmBgeELQytDn88vcrzAzMDAwMDAw9DOcHWLB2VhoMKwfcvGLSqkegFd6DtDH0Orz3fyY4GToZrhxpYQ8l0AA/sYMn1uUZIOnBh2DHBKPMCAJVJZiNT8iKHUZxU2CWIM+MHQy9Dm8w27JGEDNjMU+dzBLY3fgDsMuT47SA/EvwwMDAwMXxgqGbQJacfugk6GAoYNDGU+T8nMzqNl4gg0ADAATzAzTDMWcgQAAAAASUVORK5CYII=) no-repeat;
+        background-size: 17px;
+        padding-bottom: 13px;
+        padding-left: 12px;
+        padding-right: 5px;
+        transform: rotate(90deg);
+        float: right;
+    }
+
+    .xGridV2Desc {
+        background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAQAAADZc7J/AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAIGNIUk0AAHolAACAgwAA+f8AAIDoAABSCAABFVgAADqXAAAXb9daH5AAAADGSURBVHjaYvzPQBlgYhg1YHgasKV1y5ctS7dIE2cAI2ZC2vKHgZmBgeELQytDn88vcrzAzMDAwMDAw9DOcHWLB2VhoMKwfcvGLSqkegFd6DtDH0Orz3fyY4GToZrhxpYQ8l0AA/sYMn1uUZIOnBh2DHBKPMCAJVJZiNT8iKHUZxU2CWIM+MHQy9Dm8w27JGEDNjMU+dzBLY3fgDsMuT47SA/EvwwMDAwMXxgqGbQJacfugk6GAoYNDGU+T8nMzqNl4gg0ADAATzAzTDMWcgQAAAAASUVORK5CYII=) no-repeat;
+        background-size: 17px;
+        padding-bottom: 13px;
+        padding-left: 12px;
+        padding-right: 5px;
+        transform: rotate(30deg);
+        float: right;
+    }
+
+    /* .preloadInput {
+        background: url('loadNew.gif')no-repeat right;
+        background-color: #ffffff;
+    } */
+
     /*----------------frame buttons------------------------------*/
 
     .btn-Frame {
@@ -196,26 +254,77 @@
         color: #fbfbfb;
     }
 
+    /*-----------Print------------------*/
+
+    .xGridV2-main .x-print {
+        color: black;
+        /* page-break-before: always; */
+        /* background: red; */
+    }
+
+    .x-print .xGridV2-title {
+        color: #131313;
+        border-bottom: 1px solid #8e8e97;
+        border-top: 1px solid #8e8e97;
+        background-color: rgb(212, 212, 212);
+    }
+
+    /* borda do titulo*/
+
+    .x-print .xGridV2-title .xGridV2-col {
+        border-right: 1px solid #8e8e97;
+        padding: 4px;
+        text-align: center;
+    }
+
+    .x-print .xGridV2-content {
+        overflow: unset;
+    }
+
+    .x-print .xGridV2-content .xGridV2-col {
+        border-right: 1px solid #8e8e97;
+        padding: 4px;
+    }
+
+    .x-print .xGridV2-col:first-child {
+        border-left: 1px solid #8e8e97;
+    }
+
+    .x-print .xGridV2-content .xGridV2-row {
+        border-bottom: 1px solid #8e8e97;
+        background-color: #ffffff;
+        height: 22px;
+        font-weight: 600;
+        /* page-break-before: always; */
+        page-break-inside: avoid;
+    }
+
+    .x-print .xGridV2-content .xGridV2-row:nth-child(odd) {
+        background-color: rgb(231, 231, 231);
+    }
+
+    /*-----------Print------------------*/
+
     /***********tema*********************/
 
-    .xGrid-deleteLine {
+    .xGridV2-deleteLine {
         transition: all 0.5s cubic-bezier(0.61, -0.12, 0.34, 1.16);
         height: 0 !important;
         opacity: .0;
     }
 
-    .x-gray {
+    .x-grayV2 {
         color: #484848;
     }
 
-    .x-gray .xGrid-title .xGrid-col span {
-        padding: 3px 0 3px 0;
+    .x-grayV2 .xGridV2-title .xGridV2-col span {
+        /* padding: 3px 0 3px 0; */
         text-align: center;
     }
 
     /* color titulo */
 
-    .x-gray .xGrid-title {
+    .x-grayV2 .xGridV2-title {
         color: #131313;
         border-bottom: 1px solid #8e8e97;
         background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #ffffff), color-stop(1%, #efeff1), color-stop(4%, #ededf0), color-stop(100%, #d2d2d8));
@@ -223,31 +332,31 @@
 
     /* borda do titulo*/
 
-    .x-gray .xGrid-title .xGrid-col {
+    .x-grayV2 .xGridV2-title .xGridV2-col {
         border-right: 1px solid #8e8e97;
         cursor: pointer;
         padding: 4px;
         text-align: center;
     }
 
-    .x-gray .xGrid-title .xGrid-col:last-child {
+    .x-grayV2 .xGridV2-title .xGridV2-col:last-child {
         padding-right: 18px;
     }
 
-    .x-gray .xGrid-content {
+    .x-grayV2 .xGridV2-content {
         background: #f8f8f8;
     }
 
-    .x-gray .xGrid-content .xGrid-col {
+    .x-grayV2 .xGridV2-content .xGridV2-col {
         border-right: 1px solid #8e8e97;
         padding: 4px;
     }
 
-    .x-gray .xGrid-content .xGrid-col:last-child {
+    .x-grayV2 .xGridV2-content .xGridV2-col:last-child {
         border-right: none;
     }
 
-    .x-gray .xGrid-content .xGrid-row {
+    .x-grayV2 .xGridV2-content .xGridV2-row {
         border-bottom: 1px solid #8e8e97;
         background-color: #ffffff;
         height: 28px;
@@ -255,11 +364,11 @@
         color: #1b1b1b;
     }
 
-    .x-gray .xGrid-content .xGrid-row:nth-child(odd) {
+    .x-grayV2 .xGridV2-content .xGridV2-row:nth-child(odd) {
         background-color: #EEEEEE;
     }
 
-    .x-gray .xGrid-Selected {
+    .x-grayV2 .xGridV2-Selected {
         background: #058cf5;
         background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #058cf5), color-stop(19%, #0385f3), color-stop(72%, #0167e9), color-stop(100%, #015de6));
         border-color: #014ab8;
@@ -267,19 +376,23 @@
         outline: 0;
     }
 
-    .xGrid-SelectedFocusOut {
+    .x-grayV2 .xGridV2-content nav {
+        color: #131313;
+    }
+
+    .xGridV2-SelectedFocusOut {
         background: rgba(50, 177, 220, 0.26) !important;
         outline: 0;
     }
 
-    .xGrid-main::-webkit-scrollbar, .x-gray .xGrid-content::-webkit-scrollbar {
+    .xGridV2-main::-webkit-scrollbar, .x-grayV2 .xGridV2-content::-webkit-scrollbar {
         width: 15px;
         background: #ffffff;
         border-left: 1px solid #8e8e97;
         border-top: 1px solid #8e8e97;
     }
 
-    .xGrid-main::-webkit-scrollbar-corner {
+    .xGridV2-main::-webkit-scrollbar-corner {
         background: #EEEEEE;
         border-left: 1px solid #8e8e97;
         border-top: 1px solid #8e8e97;
@@ -287,27 +400,25 @@
 
     /* ::-webkit-resizer */
 
-    .xGrid-main::-webkit-scrollbar-thumb:vertical, .xGrid-main::-webkit-scrollbar-thumb:horizontal, .x-gray .xGrid-content::-webkit-scrollbar-thumb:vertical, .x-gray .xGrid-content::-webkit-scrollbar-thumb:horizontal {
+    .xGridV2-main::-webkit-scrollbar-thumb:vertical, .xGridV2-main::-webkit-scrollbar-thumb:horizontal, .x-grayV2 .xGridV2-content::-webkit-scrollbar-thumb:vertical, .x-grayV2 .xGridV2-content::-webkit-scrollbar-thumb:horizontal {
         background-image: linear-gradient(to top left, #ddd 0%, #fff 100%);
         border: 1px solid #8e8e97;
     }
 
     /* Cor do indicador de rolagem - ao passar o mouse */
 
-    .xGrid-main::-webkit-scrollbar-thumb:vertical:hover, .xGrid-main::-webkit-scrollbar-thumb:horizontal:hover, .x-gray .xGrid-content::-webkit-scrollbar-thumb:vertical:hover, .x-gray .xGrid-content::-webkit-scrollbar-thumb:horizontal:hover {
+    .xGridV2-main::-webkit-scrollbar-thumb:vertical:hover, .xGridV2-main::-webkit-scrollbar-thumb:horizontal:hover, .x-grayV2 .xGridV2-content::-webkit-scrollbar-thumb:vertical:hover, .x-grayV2 .xGridV2-content::-webkit-scrollbar-thumb:horizontal:hover {
         background-color: #717171
     }
 
-    /*--------------------x-darkBC--------------------------------------*/
+    /*--------------------x-dark--------------------------------------*/
 
-    .x-darkBC {
+    .x-darkV2 {
         color: #e6f5ff;
         border-radius: 0px;
     }
 
-    /* color titulo */
-
-    .x-darkBC .xGrid-title {
+    .x-darkV2 .xGridV2-title {
         border-top-left-radius: 3px;
         border-top-right-radius: 3px;
         border-bottom: 1px solid #546e7a;
@@ -316,74 +427,151 @@
         font-size: 10px;
     }
 
-    .x-darkBC .xGrid-title .xGrid-col {
+    .x-darkV2 .xGridV2-title .xGridV2-col {
         border-right: 1px solid #455a64;
-        cursor: pointer;
-        padding: 4px;
         text-align: center;
     }
 
-    .x-darkBC .xGrid-content {
+    .x-darkV2 .xGridV2-content {
         background: #455a64;
     }
 
-    .x-darkBC .xGrid-content .xGrid-col {
+    .x-darkV2 .xGridV2-content .xGridV2-col {
         border-right: 1px solid #546e7a;
         padding: 4px;
     }
 
-    .x-darkBC .xGrid-content .xGrid-row {
+    .x-darkV2 .xGridV2-content .xGridV2-row {
         height: 30px;
     }
 
-    .x-darkBC .xGrid-content .xGrid-row:nth-child(odd) {
+    .x-darkV2 .xGridV2-content .xGridV2-row:nth-child(odd) {
         background-color: #495f69;
     }
 
-    .x-darkBC .xGrid-Selected {
+    .x-darkV2 .xGridV2-Selected {
         background: rgba(0, 161, 236, 0.20) !important;
         box-shadow: 0 0 0 1px #00aeff inset;
         outline: 0;
     }
 
-    .x-darkBC .xGrid-load {
+    .x-darkV2 .xGridV2-load {
         height: 24px;
         width: 160px;
     }
 
-    .x-darkBC .xGrid-SelectedFocusOut {
+    .x-darkV2 .xGridV2-SelectedFocusOut {
         background: rgba(67, 175, 232, 0.2) !important;
     }
 
-    .x-darkBC .xGrid-title {
+    .x-darkV2 .xGridV2-title {
         padding-right: 10px;
+    }
+
+    .x-darkV2 .xGridV2-content nav {
+        color: #b0bec5;
     }
 
     /*****scrollbar*****/
 
-    .x-darkBC .xGrid-content::-webkit-scrollbar-track-piece {
+    .x-darkV2 .xGridV2-content::-webkit-scrollbar-track-piece {
         border-left: none;
         /*background: #37474f;*/
         background: rgba(0, 0, 0, 0.00);
     }
 
-    .x-darkBC .xGrid-content::-webkit-scrollbar {
+    .x-darkV2 .xGridV2-content::-webkit-scrollbar {
         width: 10px;
     }
 
-    /* Cor do indicador de rolagem */
-
-    .x-darkBC .xGrid-content::-webkit-scrollbar-thumb:vertical, .x-darkBC .xGrid-content::-webkit-scrollbar-thumb:horizontal {
-        /*  background: rgba(0, 161, 236, 0.20);
-box-shadow: 0 0 0 1px #00aeff inset;
-border-radius: 1px;*/
+    .x-darkV2 .xGridV2-content::-webkit-scrollbar-thumb:vertical, .x-darkV2 .xGridV2-content::-webkit-scrollbar-thumb:horizontal {
         background: rgba(0, 0, 0, 0.15);
         border-radius: 5px;
     }
 
-    /* Cor do indicador de rolagem - ao passar o mouse */
-
-    .x-darkBC .xGrid-content::-webkit-scrollbar-thumb:vertical:hover, .x-darkBC .xGrid-content::-webkit-scrollbar-thumb:horizontal:hover {
+    .x-darkV2 .xGridV2-content::-webkit-scrollbar-thumb:vertical:hover, .x-darkV2 .xGridV2-content::-webkit-scrollbar-thumb:horizontal:hover {
         box-shadow: none;
         background: rgba(0, 0, 0, 0.55);
+    }
+
+    /*--------------------x-opacite--------------------------------------*/
+
+    .x-opacite {
+        color: #e6f5ff;
+        border-radius: 0px;
+    }
+
+    .x-opacite .xGridV2-title {
+        border-top-left-radius: 3px;
+        border-top-right-radius: 3px;
+        border-bottom: 1px solid rgba(249, 249, 249, 0.17);
+        color: #c6bdcd;
+        background-image: linear-gradient(45deg, #3f3251 2%, #002025 100%);
+        font-size: 10px;
+    }
+
+    .x-opacite .xGridV2-title .xGridV2-col {
+        border-right: 1px solid rgba(249, 249, 249, 0.17);
+        text-align: center;
+    }
+
+    .x-opacite .xGridV2-content {
+        background: linear-gradient(45deg, #3f3251 2%, #002025 100%);
+    }
+
+    .x-opacite .xGridV2-content .xGridV2-col {
+        border-right: 1px solid rgba(249, 249, 249, 0.17);
+        padding: 4px;
+    }
+
+    .x-opacite .xGridV2-content .xGridV2-row {
+        height: 30px;
+    }
+
+    .x-opacite .xGridV2-content .xGridV2-row:nth-child(odd) {
+        background-image: linear-gradient(45deg, #413452 2%, #001c21 100%);
+    }
+
+    .x-opacite .xGridV2-Selected {
+        background: #483563a6 !important;
+        box-shadow: 0 0 0 1px #9578bd inset;
+        outline: 0;
+    }
+
+    .x-opacite .xGridV2-load {
+        height: 24px;
+        width: 160px;
+    }
+
+    .x-opacite .xGridV2-SelectedFocusOut {
+        background: rgb(33, 40, 58) !important;
+    }
+
+    .x-opacite .xGridV2-title {
+        padding-right: 10px;
+    }
+
+    .x-opacite .xGridV2-content nav {
+        color: #c6bdcd;
+    }
+
+    /*****scrollbar*****/
+
+    .x-opacite .xGridV2-content::-webkit-scrollbar-track-piece {
+        border-left: none;
+        background: rgba(0, 0, 0, 0.00);
+    }
+
+    .x-opacite .xGridV2-content::-webkit-scrollbar {
+        width: 10px;
+    }
+
+    .x-opacite .xGridV2-content::-webkit-scrollbar-thumb:vertical, .x-opacite .xGridV2-content::-webkit-scrollbar-thumb:horizontal {
+        background: #483563a6;
+        border-radius: 2px;
+    }
+
+    .x-opacite .xGridV2-content::-webkit-scrollbar-thumb:vertical:hover, .x-opacite .xGridV2-content::-webkit-scrollbar-thumb:horizontal:hover {
+        box-shadow: none;
+        background: #48356346;
     }

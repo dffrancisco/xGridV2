@@ -9,6 +9,14 @@
     <script src="../xGridV2.js" type="text/javascript"></script>
     <!-- <script src="https://unpkg.com/axios/dist/axios.min.js"></script> -->
     <link rel="stylesheet" href="../xGridV2.css">
+    <link rel="stylesheet" src="legal">
+
+    <link rel="stylesheet" href="http://reallatas.myftp.org:1515/_projeto_real/superClass/mofo-v2/mofoV2.css">
+    <script src="http://reallatas.myftp.org:1515/_projeto_real/superClass/mofo-v2/mofoV2.js"
+        type="text/javascript"></script>
+
+
+
     <style>
         body {
             /* background: #083952; */
@@ -22,8 +30,10 @@
 
 <body>
 
-    <div id="myGrid"></div>
+
     <br />
+    <div id="myGrid"></div>
+
 
 
     <button onclick="grid.load();grid.source(json)">source</button>
@@ -43,43 +53,43 @@
     <br>
     <hr>
 
-    <div class="campos">
-        <span>nome</span>
-        <input type="text" name="DESC_PRODUTO">
-        <span>cpf</span>
-        <input type="text" name="NUM_FABRICANTE">
-        <span>idade</span>
-        <input type="text" name="END_ESTOQUE">
-        <span>casado</span>
-        <!-- <input type="checkbox" name="casado"><span>Sim</span> -->
-        <!-- <span>img</span>
+    <div id="modal">
+        <div class="campos">
+            <span>nome</span>
+            <input type="text" name="DESC_PRODUTO">
+            <span>cpf</span>
+            <input type="text" name="NUM_FABRICANTE">
+            <span>idade</span>
+            <input type="text" name="END_ESTOQUE">
+            <span>casado</span>
+            <!-- <input type="checkbox" name="casado"><span>Sim</span> -->
+            <!-- <span>img</span>
         <img src="" alt="teste" name="img" height="15" /> -->
-        <!-- <br>
+            <!-- <br>
         <span>sexo</span>
         <input type="radio" name="genero" value="M" /> Man
         <input type="radio" name="genero" value="F" /> Woman
         <input type="radio" name="genero" value="D" /> Woman
 -->
-        <span>select</span>
-        <select name="qto">
-            <option value="13">Treze</option>
-            <option value="98">Dezessei</option>
-            <option value="8">oito</option>
-            <option value="21">Vinte e dois</option>
-            <option value="33">Trinta e Três</option>
-        </select>
+            <span>select</span>
+            <select name="qto">
+                <option value="13">Treze</option>
+                <option value="98">Dezessei</option>
+                <option value="8">oito</option>
+                <option value="21">Vinte e dois</option>
+                <option value="33">Trinta e Três</option>
+            </select>
 
-        <span>link</span>
-        <a href="" name=cidade></a>
+            <span>link</span>
+            <a href="" name=cidade></a>
+
+            <textarea name="CARRO"></textarea>
+        </div>
+        <hr>
+
+        <div id="theGrid"></div>
+        <div id="myGridFrame"></div>
     </div>
-    <!-- <div class="campos">
-        <span>tel</span>
-        <input type="text" name="tel">
-    </div> -->
-
-    <br>
-    <div id="theGrid"></div>
-    <div id="myGridFrame"></div>
 
     <br />
     <button onclick="ajaxJS()">GetProduto AjaxJS</button>
@@ -297,11 +307,24 @@
             genero: 'M'
         }];
 
+        // let modal = new mofo.create({
+        //     el: '#modal',
+        //     // theme: 'mofo-dark',
+        //     theme: 'mofo-opacity',
+        //     // resize: true,
+        //     //resize: [false, false, false]
+        // })
+
+        // modal.open()
+
+        xGridV2.setNotFound('not Found')
+        xGridV2.setPrintHead('<div>Minha cabeça</div>')
+
         function reveter(value) {
             return value.split('').reverse('').join('')
         }
 
-        const grid = new xGrid.create({
+        const grid = new xGridV2.create({
             el: '#myGrid',
             height: 300,
             count: true,
@@ -309,29 +332,41 @@
 
         //  grid.queryOpen('FAROL LD GOL');
 
-        const theGrid = new xGrid.create({
+        const theGrid = new xGridV2.create({
             el: '#theGrid',
             height: 300,
-            width: 800,
+            // width: 800,
             count: true,
-            heightLine: 50, //tem que fazer
+            // heightLine: 50,
             // setfocus: 1,
-            theme: 'x-darkBC',
+            // theme: 'x-darkV2',
+            theme: 'x-opacite',
             onSelectLine: (r) => {
 
+            },
+            filter: {
+                // filterBegin: false, //quando true ele pesquisa igual a palavra
+                // concat: {
+                //       fields: ['DESC_PRODUTO', 'MARCA'],
+                //       condicional: 'AND'
+                //   },
+                fieldByField: {
+                    condicional: 'AND'
+                }
             },
             onKeyDown: {
                 13: (ln, e) => {
                     console.log(ln);
                     console.log('o Enter ta funcionado')
                 },
-                'ctrl+13': (e) => {
+                'ctrl+13': (objectLine, e) => {
                     console.log('ctrl+enter pressionado')
                 },
             },
             enter: () => {
                 theGrid.focusField()
-                console.log('estou no enter funcção');
+                theGrid.disable()
+                theGrid.disabledBtnsSalvarCancelar()
             },
             columns: {
                 'Marca': {
@@ -371,27 +406,6 @@
                     style: 'text-align: right'
                 }
             },
-            // 'Alves': {
-            //     dataField: 'name',
-            //     // width: '40%',
-            //     render: reveter,
-            //     style: 'text-align: right',
-            // },
-            // 'cpf': {
-            //     dataField: 'cpf',
-            //     width: '17%'
-            // },
-            // 'tel': {
-            //     dataField: 'tel',
-            //     width: '15%',
-            //     compare: 'junta',
-            //     render: reveter
-            // },
-            // 'cidade': {
-            //     dataField: 'cidade',
-            //     width: '20%'
-            // }
-            //},
             compare: {
                 junta: (r) => {
                     return r.value + ' ' + r.old
@@ -401,7 +415,7 @@
                 el: '.campos',
                 // tabToEnter: true,
                 render: {
-                    cpf: reveter
+                    'NUM_FABRICANTE': reveter
                 },
                 compare: {
                     name: 'junta'
@@ -423,15 +437,18 @@
                 frame: {
                     el: '#myGridFrame',
                     class: 'texte novo',
-                    style: 'text-align: center; width:800px',
+                    style: 'text-align: center;',
                     print: {
-                        html: 'imprimir',
+                        html: '<i class="fa fa-edit"></i> imprimir',
                         style: 'background: red;',
-                        class: 'mybtn'
+                        class: 'mybtn',
+                        click: () => {
+                            theGrid.print()
+                        }
                     },
                     insert: {
                         html: 'Novo',
-                        state: xGrid.state.insert,
+                        state: xGridV2.state.insert,
                         click: (ln, e) => {
                             console.warn(e, 'novo');
                             return false
@@ -439,7 +456,7 @@
                     },
                     editar: {
                         html: 'Alterar',
-                        state: xGrid.state.update,
+                        state: xGridV2.state.update,
                         click: () => {
                             console.warn('Alterar')
                             theGrid.focusField('qto')
@@ -447,18 +464,25 @@
                     },
                     delete: {
                         html: 'Excluir',
-                        state: xGrid.state.delete,
+                        state: xGridV2.state.delete,
                         click: () => console.warn('Excluir')
                     },
                     salvarBtn: {
                         html: 'Salvar',
-                        state: xGrid.state.save,
-                        click: () => console.warn('salvar')
+                        state: xGridV2.state.save,
+                        click: () => {
+                            theGrid.enable()
+                            theGrid.focus()
+                            console.warn('salvar')
+                        }
                     },
                     cancel: {
                         html: 'Cancel',
-                        state: xGrid.state.cancel,
-                        click: () => console.warn('cancelar')
+                        state: xGridV2.state.cancel,
+                        click: () => {
+                            theGrid.enable()
+                            console.warn('cancelar')
+                        }
                     }
                 }
             },
@@ -492,7 +516,11 @@
         })
 
 
+
+
+
         theGrid.load()
+
         theGrid.queryOpen({
             desc_produto: 'FAROL LD'
         })
@@ -506,14 +534,10 @@
         formData.append('param[desc_produto]', 'FAROL GOL LD N')
         formData.append('param[vercao]', 'false')
 
-
         formData.append('param[maxItem]', '30')
         formData.append('param[skip]', '0')
 
-
-
         let count = 0;
-
 
         function ajaxJS() {
             theGrid.load()
@@ -529,7 +553,6 @@
 
             xhr.send(formData);
         }
-
 
         function ajaxAxios() {
             axios({
@@ -551,7 +574,6 @@
                     console.log(response);
                 });
         }
-
 
         function ajaxAxiosAppend(contador) {
             formData.delete('param[skip]')
@@ -575,6 +597,11 @@
                     console.log(response);
                 });
         }
+
+
+
+
+        // function makeResizableDiv(el, topLeft, topRight, buttonLeft, buttonRight) {
     </script>
 
 
