@@ -127,7 +127,7 @@ let xGridV2 = (function () {
                 this.gridTitle.classList.add('xGridV2-row')
 
                 if (Object.keys(this.arg.columns).length > 0) {
-                    this.checkWidthColuns();
+                    this.checkWidthColumns();
                     this.widthAll = Object.values(this.arg.columns).reduce((total, b) => total + parseInt(b.width), 0);
                     this.setColumnsTitle(this.arg.columns);
                 } else
@@ -228,7 +228,7 @@ let xGridV2 = (function () {
                     this.focus(this.arg.setfocus - 1)
 
             },
-            checkWidthColuns() {
+            checkWidthColumns() {
                 let valPercente = 0;
                 let qtoColumn = 0;
 
@@ -855,19 +855,19 @@ let xGridV2 = (function () {
                             let type = this.elementSideBySide[i].type
 
                             if (this.arg.sideBySide.render)
-                                if (this.arg.render[this.arg.sideBySide.render[i]])
+                                if (this.arg.sideBySide.render[i])
                                     try {
                                         value = this.arg.sideBySide.render[i](value)
                                     } catch (error) { throw 'erro see your function render' }
 
                             if (this.arg.sideBySide.compare)
-                                if (this.arg.compare[this.arg.sideBySide.compare[i]]) {
+                                if (this.arg.compare[this.arg.sideBySide.compare[i]])
                                     try {
                                         let _source = { ...this.sourceSelect }
                                         _source.value = value
                                         value = this.arg.compare[this.arg.sideBySide.compare[i]](_source)
                                     } catch (error) { throw 'erro see your function compare' }
-                                }
+
 
                             switch (type) {
                                 case undefined:
@@ -984,10 +984,11 @@ let xGridV2 = (function () {
                 else
                     this.createLine(source)
             },
-            queryOpen(param) {
+            queryOpen(param, call) {
                 this.paramQuery = param
                 this.tabindex = 0
                 this.arg.query.execute(this.tabindex, param)
+                call && call()
             },
             frame() {
                 let btns = {}
@@ -1259,7 +1260,6 @@ let xGridV2 = (function () {
                         } catch (error) {
                             return (a[field] > b[field]) ? 1 : (a[field] == b[field]) ? ((a[field].size > b[field].size) ? 1 : -1) : -1;
                         }
-
                     }
                     if (order == 'asc')
                         try {
@@ -1417,8 +1417,6 @@ let xGridV2 = (function () {
 
         ax.constructor();
 
-        this.getAx = () => ax;
-
         this.source = (source) => ax.source(source)
 
         this.sourceAdd = (source) => ax.createLine(source)
@@ -1457,7 +1455,7 @@ let xGridV2 = (function () {
 
         this.clearElementSideBySide = () => ax.clearElementSideBySide()
 
-        this.queryOpen = (param) => ax.queryOpen(param)
+        this.queryOpen = (param, call) => ax.queryOpen(param, call)
 
         this.querySourceAdd = (source) => ax.querySourceAdd(source)
 

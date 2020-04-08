@@ -44,6 +44,7 @@
     .xGridV2-main .xGridV2-content {
         overflow-y: scroll;
         height: 100%;
+        user-select: none;
     }
 
     .xGridV2-main .xGridV2-content .xGridV2-row {
@@ -258,8 +259,6 @@
 
     .xGridV2-main .x-print {
         color: black;
-        /* page-break-before: always; */
-        /* background: red; */
     }
 
     .x-print .xGridV2-title {
@@ -267,6 +266,7 @@
         border-bottom: 1px solid #8e8e97;
         border-top: 1px solid #8e8e97;
         background-color: rgb(212, 212, 212);
+        width: 842px !important;
     }
 
     /* borda do titulo*/
@@ -279,6 +279,8 @@
 
     .x-print .xGridV2-content {
         overflow: unset;
+        width: 842px !important;
+
     }
 
     .x-print .xGridV2-content .xGridV2-col {

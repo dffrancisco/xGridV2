@@ -30,71 +30,40 @@
 
 <body>
 
+    <div class="campos">
+        <span>Descrição Produto</span>
+        <input type="text" name="DESC_PRODUTO">
+        <span>Num Fabricante</span>
+        <input type="text" name="NUM_FABRICANTE">
+        <span>End Estoque</span>
+        <input type="text" name="END_ESTOQUE">
 
-    <br />
-    <div id="myGrid"></div>
-
-
-
-    <button onclick="grid.load();grid.source(json)">source</button>
-    <button onclick="grid.load();grid.sourceAdd(json)">Add Source</button>
-    <button onclick="grid.focus(2)">focus linha 2</button>
-    <button onclick="grid.focus()">focus</button>
-    <button onclick="grid.insertLine({
-        name: 'DEUS DEUS DEUS',
-        login: 'Meire <br>Legal',
-        cpf: '444',
-        old: 40,
-        tel: '845-453',
-        qto: 13,
-        cidade: 'SIA'
-    }, 'TOP')">insertLine</button>
-    <br>
-    <br>
-    <hr>
-
-    <div id="modal">
-        <div class="campos">
-            <span>nome</span>
-            <input type="text" name="DESC_PRODUTO">
-            <span>cpf</span>
-            <input type="text" name="NUM_FABRICANTE">
-            <span>idade</span>
-            <input type="text" name="END_ESTOQUE">
-            <span>casado</span>
-            <!-- <input type="checkbox" name="casado"><span>Sim</span> -->
-            <!-- <span>img</span>
+        <!-- <input type="checkbox" name="casado"><span>Sim</span> -->
+        <!-- <span>img</span>
         <img src="" alt="teste" name="img" height="15" /> -->
-            <!-- <br>
+        <!-- <br>
         <span>sexo</span>
         <input type="radio" name="genero" value="M" /> Man
         <input type="radio" name="genero" value="F" /> Woman
-        <input type="radio" name="genero" value="D" /> Woman
--->
-            <span>select</span>
-            <select name="qto">
-                <option value="13">Treze</option>
-                <option value="98">Dezessei</option>
-                <option value="8">oito</option>
-                <option value="21">Vinte e dois</option>
-                <option value="33">Trinta e Três</option>
-            </select>
+        <input type="radio" name="genero" value="D" /> Woman -->
 
-            <span>link</span>
-            <a href="" name=cidade></a>
+        <span>Unidade</span>
+        <select name="UNIDADE">
+            <option value="PC">Peça</option>
+            <option value="JG">Jogo</option>
+            <option value="UN">Unidade</option>
+        </select>
 
-            <textarea name="CARRO"></textarea>
-        </div>
-        <hr>
-
-        <div id="theGrid"></div>
-        <div id="myGridFrame"></div>
+        <span>Carro</span>
+        <textarea name="CARRO"></textarea>
     </div>
+    <hr>
 
-    <br />
-    <button onclick="ajaxJS()">GetProduto AjaxJS</button>
-    <button onclick="ajaxAxios()">GetProduto Axios</button>
-    <button onclick="ajaxAxiosAppend()">GetProduto Append Axios</button>
+    <div id="theGrid"></div>
+    <div id="myGridFrame"></div>
+
+
+
 
     <script>
         var json = [{
@@ -261,61 +230,6 @@
             cidade: 'Brasilia',
             casado: 1
         }];
-        var json = [{
-            name: '#################################',
-            login: 'Meire <br>Legal',
-            cpf: '444',
-            old: 40,
-            tel: '845-453',
-            qto: 13,
-            cidade: 'SIA',
-            casado: true,
-            img: 'https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcQt_OgCNxpF6e4nfAWcjZF9LQ11XKLg55c4B65Xf4I1sV1vQ5ii',
-            genero: 'F'
-        }, {
-            name: 'Kallebe Alves',
-            login: 'Kallebe',
-            cpf: '654654',
-            old: 16,
-            tel: '888-345',
-            qto: 98,
-            cidade: 'Recando da Emas',
-            casado: 0,
-            img: 'https://img.icons8.com/cotton/2x/small-axe.png',
-            genero: 'M'
-        }, {
-            name: 'Alves Xico',
-            login: 'Alves',
-            cpf: '11577',
-            old: 37,
-            tel: '466-664',
-            qto: 8,
-            cidade: 'Taguatinga',
-            casado: 0,
-            img: 'https://images.vexels.com/media/users/3/145135/isolated/lists/76608161d143a7d27f20cdcc336bc09c-sun-sharp-rays-big-and-small-icon.png',
-            genero: 'F',
-        }, {
-            name: 'Sousa Alves',
-            login: 'Sousa',
-            cpf: '874465',
-            old: 22,
-            tel: '858-999',
-            qto: 21,
-            cidade: 'Setor O',
-            casado: 1,
-            img: 'https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcRt9CN_qbCoonWIms6Q1peJXSsXaRFeuPHVIYicUnatXZF0ge95',
-            genero: 'M'
-        }];
-
-        // let modal = new mofo.create({
-        //     el: '#modal',
-        //     // theme: 'mofo-dark',
-        //     theme: 'mofo-opacity',
-        //     // resize: true,
-        //     //resize: [false, false, false]
-        // })
-
-        // modal.open()
 
         xGridV2.setNotFound('not Found')
         xGridV2.setPrintHead('<div>Minha cabeça</div>')
@@ -324,13 +238,6 @@
             return value.split('').reverse('').join('')
         }
 
-        const grid = new xGridV2.create({
-            el: '#myGrid',
-            height: 300,
-            count: true,
-        })
-
-        //  grid.queryOpen('FAROL LD GOL');
 
         const theGrid = new xGridV2.create({
             el: '#theGrid',
@@ -369,6 +276,10 @@
                 theGrid.disabledBtnsSalvarCancelar()
             },
             columns: {
+                'Nº Fabricante': {
+                    dataField: 'NUM_FABRICANTE',
+                    width: '10%'
+                },
                 'Marca': {
                     dataField: 'MARCA',
                     width: '10%'
@@ -408,7 +319,7 @@
             },
             compare: {
                 junta: (r) => {
-                    return r.value + ' ' + r.old
+                    return r.value + ' ' + r.COD_PRODUTO
                 }
             },
             sideBySide: {
@@ -418,7 +329,7 @@
                     'NUM_FABRICANTE': reveter
                 },
                 compare: {
-                    name: 'junta'
+                    DESC_PRODUTO: 'junta'
                 },
                 duplicity: {
                     dataField: ['NUM_FABRICANTE', 'DESC_PRODUTO', 'END_ESTOQUE'],
@@ -426,7 +337,7 @@
                         console.log(r);
                         // getServidor
                         // repostar
-                        let valueBanco = 'aaaa'
+                        let valueBanco = 'valor que vem do banco de dados'
 
                         if (r.value != valueBanco) {
                             theGrid.showMessageDuplicity(r.text + ' já esta em uso ok')
@@ -451,6 +362,7 @@
                         state: xGridV2.state.insert,
                         click: (ln, e) => {
                             console.warn(e, 'novo');
+                            /*esse retorno falso bloquea a açao do do click*/
                             return false
                         }
                     },
@@ -490,7 +402,7 @@
                 // endScroll: 0.5,
                 execute: (offset, param) => {
                     let formData = new FormData();
-                    formData.append('id_sociedade', '')
+                    formData.append('id_sociedade', '10')
                     formData.append('call', 'getProdutos')
                     formData.append('param[id_carro]', '9999')
                     formData.append('param[get]', 'getProdutosNewLoc')
@@ -500,6 +412,7 @@
                     formData.append('param[desc_produto]', param.desc_produto)
                     formData.append('param[skip]', offset)
 
+                    // fetch('http://www.realacessorios.com.br/balcao/servidor/per.balcao.php', {
                     fetch('http://reallatas.myftp.org:2424/balcao/servidor/per.balcao.php', {
                         method: 'POST',
                         body: formData
@@ -508,100 +421,25 @@
                         // .then(json => grid.querySourceAdd(json))
                         .then((json_) => {
                             theGrid.querySourceAdd(json_)
+                            console.log(theGrid.sumDataField('VALOR_VENDA'))
                             return json_
                         })
+
+
                 }
             }
 
         })
 
 
-
+        function tio(a) {
+            console.log(a);
+        }
 
 
         theGrid.load()
+        theGrid.queryOpen({ desc_produto: 'FAROL LD' })
 
-        theGrid.queryOpen({
-            desc_produto: 'FAROL LD'
-        })
-
-
-        let formData = new FormData();
-        formData.append('id_sociedade', '')
-        formData.append('call', 'getProdutos')
-        formData.append('param[id_carro]', '9999')
-        formData.append('param[get]', 'getProdutosNewLoc')
-        formData.append('param[desc_produto]', 'FAROL GOL LD N')
-        formData.append('param[vercao]', 'false')
-
-        formData.append('param[maxItem]', '30')
-        formData.append('param[skip]', '0')
-
-        let count = 0;
-
-        function ajaxJS() {
-            theGrid.load()
-            let xhr = new XMLHttpRequest();
-
-            xhr.open('POST', 'http://reallatas.myftp.org:2424/balcao/servidor/per.balcao.php');
-            xhr.onload = function () {
-                // console.table(JSON.parse(xhr.response));
-                count += Object.keys(JSON.parse(xhr.response)).length
-                theGrid.source(JSON.parse(xhr.response))
-            }
-
-
-            xhr.send(formData);
-        }
-
-        function ajaxAxios() {
-            axios({
-                method: 'post',
-                url: 'http://reallatas.myftp.org:2424/balcao/servidor/per.balcao.php',
-                data: formData,
-                headers: {
-                    'Content-Type': 'multipart/form-data'
-                }
-            })
-                .then(function (response) {
-                    //handle success
-                    theGrid.source(response.data)
-                    count += Object.keys(response.data).length
-                    console.log(response.data);
-                })
-                .catch(function (response) {
-                    //handle error
-                    console.log(response);
-                });
-        }
-
-        function ajaxAxiosAppend(contador) {
-            formData.delete('param[skip]')
-            formData.append('param[skip]', contador)
-            axios({
-                method: 'post',
-                url: 'http://reallatas.myftp.org:2424/balcao/servidor/per.balcao.php',
-                data: formData,
-                headers: {
-                    'Content-Type': 'multipart/form-data'
-                }
-            })
-                .then(function (response) {
-                    // theGrid.search(response.data)
-
-                    theGrid.sourceAdd(response.data)
-                    // theGrid.source(response.data)
-                })
-                .catch(function (response) {
-                    //handle error
-                    console.log(response);
-                });
-        }
-
-
-
-
-        // function makeResizableDiv(el, topLeft, topRight, buttonLeft, buttonRight) {
     </script>
 
 
