@@ -1,6 +1,6 @@
 // export default (function() {
 // eslint-disable-next-line no-unused-vars
-let xGridV2 = (function () {
+let xGridV2 = (function() {
     const version = 2.0;
     const state = { save: 'save', insert: 'insert', update: 'update', select: 'select', cancel: 'cancel', delete: 'delete' }
     let notFound = 'Nada Localizado'
@@ -26,6 +26,7 @@ let xGridV2 = (function () {
             height: 'default',
             width: 'default',
             setfocus: false,
+            multiSelect: false,
             render: {},
             theme: 'x-grayV2',
             query: {
@@ -63,6 +64,7 @@ let xGridV2 = (function () {
             widthAll: 0,
             columnsAutoCreate: [],
             tabindex: 0,
+            page: 1,
             sourceSelect: false,
             indexSelect: false,
             gridDisable: null,
@@ -73,7 +75,6 @@ let xGridV2 = (function () {
             messageDuplicity: '',
             listTabForEnter: false,
             filterControl: false,
-
             constructor() {
                 this.element = document.querySelector(this.arg.el)
                 this.idElment = this.element.id
@@ -147,6 +148,10 @@ let xGridV2 = (function () {
 
             },
             setColumnsTitle(columns) {
+
+                if (this.arg.title == false)
+                    return
+
                 for (let id in columns) {
                     let col = document.createElement("div")
                     let label = document.createElement("label")
@@ -161,10 +166,10 @@ let xGridV2 = (function () {
                     if (columns[id].dataField == '_count_')
                         span.innerHTML = '&nbsp;'
                     else
-                        if (this.widthAll > 100)
-                            span.innerHTML = columns[id].dataField
-                        else
-                            span.innerHTML = id
+                    if (this.widthAll > 100)
+                        span.innerHTML = columns[id].dataField
+                    else
+                        span.innerHTML = id
 
                     col.appendChild(span)
                     col.appendChild(resize)
@@ -177,10 +182,8 @@ let xGridV2 = (function () {
                     this.resizeTitle(resize)
                 }
 
-                if (this.widthAll > 100) {
+                if (this.widthAll > 100)
                     this.gridTitle.lastChild.style.paddingRight = '3px'
-                }
-                // this.gridTitle.appendChild(templete)
 
                 this.orderByGrid();
 
@@ -193,6 +196,16 @@ let xGridV2 = (function () {
 
                 if (this.arg.query.execute)
                     this.gridContent.addEventListener('scroll', this.eventListenerScroll)
+
+                if (this.arg.dblClick)
+                    this.gridContent.addEventListener('dblclick', () => {
+                        this.arg.dblClick(this.sourceSelect);
+                    })
+
+                if (this.arg.click)
+                    this.gridContent.addEventListener('click', () => {
+                        this.arg.click(this.sourceSelect);
+                    })
 
 
                 return this.gridContent;
@@ -254,7 +267,7 @@ let xGridV2 = (function () {
                 if (qtoColumn != 0)
                     for (let i in this.arg.columns) {
                         if (this.arg.columns[i].width == undefined)
-                            // this.arg.columns[i].width = ((100 - valPercente) / qtoColumn).toFixed(2) + '%';
+                        // this.arg.columns[i].width = ((100 - valPercente) / qtoColumn).toFixed(2) + '%';
                             this.arg.columns[i].width = ((100 - valPercente) / qtoColumn) + '%';
                     }
 
@@ -270,7 +283,7 @@ let xGridV2 = (function () {
                         // console.log(source[0][i].length);
                         // wid = source[0][i].length > 4 ? source[0][i].length : 4
                         wid = wid < 15 ? 20 : wid
-                        // this.arg.columns.push({ dataField: i, width: wid + '%' });
+                            // this.arg.columns.push({ dataField: i, width: wid + '%' });
                         this.columnsAutoCreate.push({ dataField: i, width: wid + '%' });
                     }
                 }
@@ -279,15 +292,16 @@ let xGridV2 = (function () {
             setCompare(col, source) {
 
                 if (col.compare) {
-                    let _source = { ...source }
-                    // source.value = source[col.dataField]
+                    let _source = {...source }
+                        // source.value = source[col.dataField]
                     _source.value = _source[col.dataField]
                     let value = this.arg.compare[col.compare](_source)
 
                     if (value == undefined)
                         return false
                     else
-                        return this.arg.compare[col.compare](_source)
+                    //    return this.arg.compare[col.compare](_source)
+                        return value
                 }
             },
             createLine(source, order) {
@@ -312,29 +326,25 @@ let xGridV2 = (function () {
                     div.setAttribute('tabindex', this.tabindex)
                     this.tabindex++
 
-                    if (this.arg.count)
-                        source[i]._count_ = this.tabindex
+                        if (this.arg.count)
+                            source[i]._count_ = this.tabindex
 
                     for (let c in col) {
-
+                        let divCol = document.createElement('div')
+                            // let span = document.createElement('span')
                         let value = source[i][col[c].dataField]
-
                         let compare = this.setCompare(col[c], source[i])
+
                         if (compare) value = compare
 
-                        if (col[c].render != undefined)
-                            value = col[c].render(value)
+                        if (col[c].render) value = col[c].render(value)
 
-                        if (col[c].style != undefined) {
-                            value = '<span style="width:100%; ' + col[c].style + ' ">' + value + '</span>'
-                        }
+                        value = this.elementSpanConfig(col[c], value)
 
                         if (this.arg.count)
                             if (col[c].dataField == '_count_')
-                                value = '<span style="width:100%;text-align: center;opacity: 0.5; ">' + value + '</span>'
+                                value = `<span style="width:100%;text-align: center;opacity: 0.5;">${value}</span>`
 
-
-                        let divCol = document.createElement('div');
                         divCol.classList.add('xGridV2-col')
                         divCol.style.width = col[c].width
                         divCol.setAttribute('name', col[c].dataField)
@@ -357,13 +367,12 @@ let xGridV2 = (function () {
                 }
 
 
-
-
                 if (Object.keys(source).length > 0) {
                     this.controlScroll = true
                     if (this.gridContent.querySelector('nav'))
                         this.gridContent.querySelector('nav').remove()
                 } else
+                if (this.arg.query.execute == false)
                     if (!this.gridContent.querySelector('nav')) {
                         let nav = document.createElement('nav')
                         nav.innerHTML = notFound
@@ -374,55 +383,55 @@ let xGridV2 = (function () {
                 this.closeLoad()
                 this.loadMore(false)
             },
+            setaForUp(e) {
+                if (ax.widthAll <= 100) {
+                    if (ax.gridContent.scrollTop > 0)
+                        ax.gridContent.scrollTop = ax.gridContent.scrollTop - 1;
+                } else {
+                    let scroll = ax.element.scrollTop
+                    if (scroll > 0) {
+                        let rowHeight = e.target.offsetHeight
+                        ax.element.scrollTop = (scroll - rowHeight);
+                    }
+                }
+
+                if (e.target.previousSibling)
+                    e.target.previousSibling.focus()
+
+                if (e.preventDefault)
+                    e.preventDefault();
+                if (e.stopPropagation)
+                    e.stopPropagation();
+            },
+            setaForDown(e) {
+                if (ax.widthAll <= 100)
+                    ax.gridContent.scrollTop = ax.gridContent.scrollTop + 1
+                else
+                    ax.element.scrollTop = ax.element.scrollTop + 1
+
+                if (e.target.nextSibling)
+                    e.target.nextSibling.focus()
+
+                e.preventDefault();
+                e.stopPropagation();
+            },
             onEvent: {
                 _control: false,
                 divDisable: [],
                 keyup(e) {
-                    if (e.keyCode == 17) {
-                        ax.onEvent._control = false
-                    }
+                    if (ax.arg.multiSelect)
+                        if (e.keyCode == 17) {
+                            ax.onEvent._control = false
+                        }
                 },
                 keydown(e) {
                     // seta para cima
-                    if (e.keyCode == 38) {
-
-                        if (ax.widthAll <= 100) {
-                            if (ax.gridContent.scrollTop > 0)
-                                ax.gridContent.scrollTop = ax.gridContent.scrollTop - 1;
-                        } else {
-                            let scroll = ax.element.scrollTop
-                            if (scroll > 0) {
-                                let rowHeight = e.target.offsetHeight
-                                ax.element.scrollTop = (scroll - rowHeight);
-                            }
-                        }
-
-
-                        if (e.target.previousSibling)
-                            e.target.previousSibling.focus()
-
-
-                        if (e.preventDefault)
-                            e.preventDefault();
-                        if (e.stopPropagation)
-                            e.stopPropagation();
-                    }
+                    if (e.keyCode == 38)
+                        ax.setaForUp(e)
 
                     // seta para baixo
-                    if (e.keyCode == 40) {
-
-                        if (ax.widthAll <= 100)
-                            ax.gridContent.scrollTop = ax.gridContent.scrollTop + 1
-                        else
-                            ax.element.scrollTop = ax.element.scrollTop + 1
-
-
-                        if (e.target.nextSibling)
-                            e.target.nextSibling.focus()
-
-                        e.preventDefault();
-                        e.stopPropagation();
-                    }
+                    if (e.keyCode == 40)
+                        ax.setaForDown(e)
 
                     // page up
                     if (e.keyCode == 33) {
@@ -463,10 +472,10 @@ let xGridV2 = (function () {
                         e.stopPropagation();
                     }
 
-
                     // control pressionado
-                    if (e.keyCode == 17)
-                        ax.onEvent._control = true
+                    if (ax.arg.multiSelect)
+                        if (e.keyCode == 17)
+                            ax.onEvent._control = true
 
                 },
                 focusin(e) {
@@ -483,10 +492,7 @@ let xGridV2 = (function () {
                         ax.indexSelect = e.currentTarget.getAttribute('tabindex')
                         ax.sourceSelect = ax.arg.source[ax.indexSelect]
 
-
-
                         ax.setElementSideBySide()
-
 
                     } else {
                         ax.indexSelect = e.currentTarget.getAttribute('tabindex')
@@ -548,6 +554,20 @@ let xGridV2 = (function () {
                     })
                 }
             },
+            elementSpanConfig(col, value) {
+                let span = document.createElement('span')
+                if (col.style || col.class || col.center || col.right) {
+                    if (col.style) span.style = col.style
+                    span.style.width = '100%'
+                    if (col.class) col.class.split(' ').forEach((e) => span.classList.add(e))
+                    if (col.center) span.style.textAlign = 'center'
+                    if (col.right) span.style.textAlign = 'right'
+                    span.innerHTML = value
+                    return span.outerHTML
+                }
+
+                return value
+            },
             dataSource(field, value) {
 
                 if (typeof field == 'string') {
@@ -558,17 +578,17 @@ let xGridV2 = (function () {
 
                         for (let i in columns) {
                             if (columns[i].dataField == field) {
+                                //  let span = document.createElement('span')
+
                                 ax.sourceSelect[field] = value;
 
                                 let compare = this.setCompare(columns[i], ax.sourceSelect)
                                 if (compare) value = compare
 
-
                                 if (columns[i].render != undefined)
                                     value = columns[i].render(value)
 
-                                if (columns[i].style != undefined)
-                                    value = '<span style="width:100%; ' + columns[i].style + ' ">' + value + '</span>'
+                                value = this.elementSpanConfig(columns[i], value)
                             }
                         }
 
@@ -599,8 +619,8 @@ let xGridV2 = (function () {
                                 if (columns[i].render != undefined)
                                     _value = columns[i].render(_value)
 
-                                if (columns[i].style != undefined)
-                                    _value = '<span style="width:100%; ' + columns[i].style + ' ">' + _value + '</span>'
+                                _value = this.elementSpanConfig(columns[i], _value)
+
                             }
                         }
                         cell.innerHTML = _value
@@ -617,7 +637,8 @@ let xGridV2 = (function () {
                 if (ax.controlScroll)
                     if ((target.offsetHeight + target.scrollTop >= h)) {
                         ax.loadMore()
-                        ax.arg.query.execute(ax.tabindex, ax.paramQuery)
+                        ax.page++;
+                        ax.arg.query.execute({ offset: ax.tabindex, page: ax.page, param: ax.paramQuery })
                         ax.controlScroll = false
                     }
             },
@@ -730,8 +751,8 @@ let xGridV2 = (function () {
                 if (target.nextSibling)
                     target.nextSibling.focus()
                 else
-                    if (target.previousSibling)
-                        target.previousSibling.focus()
+                if (target.previousSibling)
+                    target.previousSibling.focus()
 
                 this.onEvent.removeEventListenerElement(target)
 
@@ -774,14 +795,14 @@ let xGridV2 = (function () {
                     let altKey = e.altKey ? "alt+" : "";
                     let key = ctrlKey + shiftKey + altKey + e.keyCode;
 
-
                     if (key == 13) {
                         if (this.arg.enter)
                             this.arg.enter(this.sourceSelect, e)
                     }
 
-                    if (this.arg.onKeyDown[key])
-                        this.arg.onKeyDown[key](this.sourceSelect, e)
+                    if (this.arg.onKeyDown)
+                        if (this.arg.onKeyDown[key])
+                            this.arg.onKeyDown[key](this.sourceSelect, e)
 
                     e.preventDefault();
                     e.stopPropagation();
@@ -812,8 +833,8 @@ let xGridV2 = (function () {
                         if (value == '')
                             continue
 
-                    /*se o conteudo da variavel for numerico ele retorna false*/
-                    /*para igular os valores no edit esta 1,00 no sourceSelect esta 1.00*/
+                        /*se o conteudo da variavel for numerico ele retorna false*/
+                        /*para igular os valores no edit esta 1,00 no sourceSelect esta 1.00*/
                     if (!isNaN(parseFloat(value))) {
                         if (value.indexOf(",") != -1)
                             value = value.replace(/\./g, '').replace(/\\,/g, '.');
@@ -863,7 +884,7 @@ let xGridV2 = (function () {
                             if (this.arg.sideBySide.compare)
                                 if (this.arg.compare[this.arg.sideBySide.compare[i]])
                                     try {
-                                        let _source = { ...this.sourceSelect }
+                                        let _source = {...this.sourceSelect }
                                         _source.value = value
                                         value = this.arg.compare[this.arg.sideBySide.compare[i]](_source)
                                     } catch (error) { throw 'erro see your function compare' }
@@ -890,7 +911,7 @@ let xGridV2 = (function () {
                                     break;
                                 case 'radio':
                                     // eslint-disable-next-line no-case-declarations
-                                    let radios = { ...ax.elementSideBySide[i] }
+                                    let radios = {...ax.elementSideBySide[i] }
                                     delete radios.type
                                     for (let r in radios) {
                                         if (radios[r].value == value) {
@@ -956,7 +977,7 @@ let xGridV2 = (function () {
                                     break;
                                 case 'radio':
                                     // eslint-disable-next-line no-case-declarations
-                                    let radios = { ...ax.elementSideBySide[i] }
+                                    let radios = {...ax.elementSideBySide[i] }
                                     delete radios.type
                                     for (let r in radios) {
                                         radios[r].checked = false
@@ -987,7 +1008,7 @@ let xGridV2 = (function () {
             queryOpen(param, call) {
                 this.paramQuery = param
                 this.tabindex = 0
-                this.arg.query.execute(this.tabindex, param)
+                this.arg.query.execute({ offset: this.tabindex, page: ax.page, param: param })
                 call && call()
             },
             frame() {
@@ -1101,7 +1122,7 @@ let xGridV2 = (function () {
                 if (this.arg.sideBySide.tabToEnter != false) {
                     if (this.elementSideBySide[name] == undefined) return false
 
-                    this.elementSideBySide[name].addEventListener('keydown', function (e) {
+                    this.elementSideBySide[name].addEventListener('keydown', function(e) {
                         if (e.keyCode == 13) {
 
                             let next = ax.listTabForEnter[ax.listTabForEnter.indexOf(this) + 1]
@@ -1124,10 +1145,10 @@ let xGridV2 = (function () {
                     else
                         this.listTabForEnter[0].select()
                 } else
-                    if (this.elementSideBySide[name].tagName == 'BUTTON' || this.elementSideBySide[name].tagName == 'SELECT')
-                        this.elementSideBySide[name].focus()
-                    else
-                        this.elementSideBySide[name].select()
+                if (this.elementSideBySide[name].tagName == 'BUTTON' || this.elementSideBySide[name].tagName == 'SELECT')
+                    this.elementSideBySide[name].focus()
+                else
+                    this.elementSideBySide[name].select()
             },
             disabledBtnsSalvarCancelar(disabled = true) {
 
@@ -1161,7 +1182,7 @@ let xGridV2 = (function () {
                             break;
                         case 'radio':
                             // eslint-disable-next-line no-case-declarations
-                            let radios = { ...ax.elementSideBySide[i] }
+                            let radios = {...ax.elementSideBySide[i] }
                             delete radios.type
                             for (let r in radios) {
                                 radios[r].disabled = disable
@@ -1191,7 +1212,7 @@ let xGridV2 = (function () {
                 let text
                 let width
 
-                resizers.addEventListener('mousedown', function (e) {
+                resizers.addEventListener('mousedown', function(e) {
 
                     fieldTitle = ax.gridTitle.querySelector('[name="' + this.parentElement.getAttribute('name') + '"]')
 
@@ -1246,7 +1267,7 @@ let xGridV2 = (function () {
                     el.removeAttribute('order')
                 })
 
-                let newArray = this.arg.source.sort(function (a, b) {
+                let newArray = this.arg.source.sort(function(a, b) {
 
                     if (a[field] == null || a[field] == undefined)
                         a[field] = ''
@@ -1288,7 +1309,7 @@ let xGridV2 = (function () {
                 this.filterControl = true;
                 let newData
 
-                if (typeof (filter) == 'string') {
+                if (typeof(filter) == 'string') {
 
                     filter = filter.trim().split(' ');
 
@@ -1324,41 +1345,41 @@ let xGridV2 = (function () {
 
                     });
                 } else
-                    if (typeof (filter) == 'object') {
+                if (typeof(filter) == 'object') {
 
-                        newData = this.arg.source.filter((el) => {
+                    newData = this.arg.source.filter((el) => {
 
-                            let retorno = 0;
+                        let retorno = 0;
 
-                            for (let i in filter) {
+                        for (let i in filter) {
 
-                                let field = i;
-                                let value = filter[i].toString().toUpperCase();
+                            let field = i;
+                            let value = filter[i].toString().toUpperCase();
 
-                                if (el[field] == undefined) {
-                                    console.log('The field (' + field + ') not find');
-                                    return false;
-                                }
-
-                                if (this.arg.filter.filterBegin)
-                                    if (el[field].toString().toUpperCase().indexOf(value) == 0)
-                                        retorno++;
-
-                                if (!this.arg.filter.filterBegin)
-                                    if (el[field].toString().toUpperCase().indexOf(value) > -1)
-                                        retorno++;
+                            if (el[field] == undefined) {
+                                console.log('The field (' + field + ') not find');
+                                return false;
                             }
 
-                            if (this.arg.filter.fieldByField.condicional == 'AND')
-                                if (Object.keys(filter).length == retorno)
-                                    return true
+                            if (this.arg.filter.filterBegin)
+                                if (el[field].toString().toUpperCase().indexOf(value) == 0)
+                                    retorno++;
 
-                            if (this.arg.filter.fieldByField.condicional == 'OR')
-                                if (retorno > 0)
-                                    return true
-                        });
+                            if (!this.arg.filter.filterBegin)
+                                if (el[field].toString().toUpperCase().indexOf(value) > -1)
+                                    retorno++;
+                        }
 
-                    }
+                        if (this.arg.filter.fieldByField.condicional == 'AND')
+                            if (Object.keys(filter).length == retorno)
+                                return true
+
+                        if (this.arg.filter.fieldByField.condicional == 'OR')
+                            if (retorno > 0)
+                                return true
+                    });
+
+                }
 
                 this.source(newData)
                 call && call(Object.keys(newData).length)
@@ -1370,11 +1391,11 @@ let xGridV2 = (function () {
                 let iframe = document.createElement('iframe');
                 iframe.setAttribute('name', 'iframe')
                 iframe.style = 'position:absolute; top:-100000px;'
-                // iframe.style = 'position:absolute; top:0px; width:100%; left:0; height:700px'
+                    // iframe.style = 'position:absolute; top:0px; width:100%; left:0; height:700px'
                 document.querySelector('body').appendChild(iframe);
-                let frameDoc = iframe.contentWindow ? iframe.contentWindow
-                    : iframe.contentDocument.document ? iframe.contentDocument.document
-                        : iframe.contentDocument;
+                let frameDoc = iframe.contentWindow ? iframe.contentWindow :
+                    iframe.contentDocument.document ? iframe.contentDocument.document :
+                    iframe.contentDocument;
                 frameDoc.document.open();
                 frameDoc.document.write('<html><head><title>Impressão de Documento</title>');
                 frameDoc.document.write(`<style>
@@ -1387,7 +1408,7 @@ let xGridV2 = (function () {
                         page-break-before: always;
                     }
                 </style>`);
-                let style = { ...document.querySelectorAll('link[rel=stylesheet]') }
+                let style = {...document.querySelectorAll('link[rel=stylesheet]') }
                 for (let i in style) {
                     if (style[i].outerHTML.indexOf('href') >= 0)
                         frameDoc.document.write(style[i].outerHTML)
@@ -1405,7 +1426,7 @@ let xGridV2 = (function () {
 
                 frameDoc.document.close();
 
-                setTimeout(function () {
+                setTimeout(function() {
                     window.frames["iframe"].focus();
                     window.frames["iframe"].print();
                     iframe.remove();
@@ -1416,6 +1437,8 @@ let xGridV2 = (function () {
         ax.arg = Object.assign(argDefault, param);
 
         ax.constructor();
+
+        this.getAx = () => ax
 
         this.source = (source) => ax.source(source)
 
@@ -1472,6 +1495,10 @@ let xGridV2 = (function () {
         this.disableFieldsSideBySide = (disabled) => ax.disableFieldsSideBySide(disabled)
 
         this.print = (headHTML) => ax.print(headHTML)
+
+        this.selectUp = (event) => ax.setaForUp(event)
+
+        this.selectDown = (event) => ax.setaForDown(event)
 
     }
     return {

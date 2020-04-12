@@ -5,18 +5,8 @@
     <title>TODO supply a title</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- <script src="https://raw.githubusercontent.com/jgallen23/jquery-builder/0.7.0/dist/1.11.1/jquery-css-deprecated-dimensions-effects-event-alias-offset-wrap.min.js" type="text/javascript"></script> -->
     <script src="../xGridV2.js" type="text/javascript"></script>
-    <!-- <script src="https://unpkg.com/axios/dist/axios.min.js"></script> -->
     <link rel="stylesheet" href="../xGridV2.css">
-    <link rel="stylesheet" src="legal">
-
-    <link rel="stylesheet" href="http://reallatas.myftp.org:1515/_projeto_real/superClass/mofo-v2/mofoV2.css">
-    <script src="http://reallatas.myftp.org:1515/_projeto_real/superClass/mofo-v2/mofoV2.js"
-        type="text/javascript"></script>
-
-
-
     <style>
         body {
             /* background: #083952; */
@@ -243,11 +233,13 @@
             el: '#theGrid',
             height: 300,
             // width: 800,
-            count: true,
+            // count: true,
             // heightLine: 50,
             // setfocus: 1,
-            // theme: 'x-darkV2',
-            theme: 'x-opacite',
+            theme: 'x-darkV2',
+            multiSelect: true,
+            // title:false,
+            // theme: 'x-opacite',
             onSelectLine: (r) => {
 
             },
@@ -276,57 +268,35 @@
                 theGrid.disabledBtnsSalvarCancelar()
             },
             columns: {
-                'Nº Fabricante': {
-                    dataField: 'NUM_FABRICANTE',
-                    width: '10%'
-                },
-                'Marca': {
-                    dataField: 'MARCA',
-                    width: '10%'
-                },
-                'FT': {
-                    dataField: 'FOTO',
-                    width: '3%',
-                    style: 'text-align: center',
-                },
-                'Descrição Produto': {
-                    dataField: 'DESC_PRODUTO',
-                },
-                'C.G': {
-                    dataField: 'CURVA_ABC_G',
-                    width: '3%',
-                    style: 'text-align: center'
-                },
-                'UN': {
-                    dataField: 'UNIDADE',
-                    width: '4%',
-                    style: 'text-align: center'
-                },
-                'Carro': {
-                    dataField: 'CARRO',
-                    width: '15%',
-                },
-                'Qto': {
-                    dataField: 'QUANTIDADE',
+                'ID': {
+                    dataField: 'id',
                     width: '5%',
-                    style: 'text-align: center',
+                    // class: 'umaClass',
+                    center: true,
+                    style: 'color:#6ff1e5'
                 },
-                'Preço': {
-                    dataField: 'VALOR_VENDA',
-                    width: '8%',
-                    style: 'text-align: right'
+                'Name': {
+                    dataField: 'name',
+                    width: '18%'
+                },
+                'E-Mail': {
+                    dataField: 'email',
+                    width: '20%',
+                },
+                'Body': {
+                    dataField: 'body',
                 }
             },
             compare: {
                 junta: (r) => {
-                    return r.value + ' ' + r.COD_PRODUTO
+                    return r.value + ' ' + r.name
                 }
             },
             sideBySide: {
                 el: '.campos',
                 // tabToEnter: true,
                 render: {
-                    'NUM_FABRICANTE': reveter
+                    'name': reveter
                 },
                 compare: {
                     DESC_PRODUTO: 'junta'
@@ -400,49 +370,48 @@
             },
             query: {
                 // endScroll: 0.5,
-                execute: (offset, param) => {
-                    let formData = new FormData();
-                    formData.append('id_sociedade', '10')
-                    formData.append('call', 'getProdutos')
-                    formData.append('param[id_carro]', '9999')
-                    formData.append('param[get]', 'getProdutosNewLoc')
-                    formData.append('param[vercao]', 'false')
-                    formData.append('param[maxItem]', '30')
+                // execute: (offset, param) => {
+                execute: (r) => {
+                    console.log(r, 'execute');
+                    // let formData = new FormData();
+                    // formData.append('id_sociedade', '10')
+                    // formData.append('call', 'getProdutos')
+                    // formData.append('param[id_carro]', '9999')
+                    // formData.append('param[get]', 'getProdutosNewLoc')
+                    // formData.append('param[vercao]', 'false')
+                    // formData.append('param[maxItem]', '30')
 
-                    formData.append('param[desc_produto]', param.desc_produto)
-                    formData.append('param[skip]', offset)
+                    // formData.append('param[desc_produto]', r.param.desc_produto)
+                    // formData.append('param[skip]', r.offset)
 
-                    // fetch('http://www.realacessorios.com.br/balcao/servidor/per.balcao.php', {
-                    fetch('http://reallatas.myftp.org:2424/balcao/servidor/per.balcao.php', {
-                        method: 'POST',
-                        body: formData
-                    })
+                    // // fetch('http://www.realacessorios.com.br/balcao/servidor/per.balcao.php', {
+                    // fetch('http://reallatas.myftp.org:2424/balcao/servidor/per.balcao.php', {
+                    //         method: 'POST',
+                    //         body: formData
+                    //     })
+                    //     .then(response => response.json())
+                    //     // .then(json => grid.querySourceAdd(json))
+                    //     .then((json_) => {
+                    //         theGrid.querySourceAdd(json_)
+                    //         console.log(theGrid.sumDataField('VALOR_VENDA'))
+                    //         return json_
+                    //     })
+
+                    fetch(`http://jsonplaceholder.typicode.com/comments?_limit=20&_page=${r.page}`)
                         .then(response => response.json())
-                        // .then(json => grid.querySourceAdd(json))
-                        .then((json_) => {
-                            theGrid.querySourceAdd(json_)
-                            console.log(theGrid.sumDataField('VALOR_VENDA'))
-                            return json_
-                        })
-
+                        .then(json => theGrid.querySourceAdd(json))
 
                 }
             }
 
         })
 
-
-        function tio(a) {
-            console.log(a);
-        }
-
-
         theGrid.load()
-        theGrid.queryOpen({ desc_produto: 'FAROL LD' })
-
+            // theGrid.queryOpen({
+            //     desc_produto: 'FAROL LD'
+            // })
+        theGrid.queryOpen()
     </script>
-
-
 
 
 </body>

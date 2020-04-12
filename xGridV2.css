@@ -1,7 +1,7 @@
     .xGridV2-main {
         width: 100%;
         position: relative;
-        margin-bottom: 20px;
+        /* margin-bottom: 20px; */
     }
 
     .xGridV2-main .xGridV2-title {
@@ -16,16 +16,18 @@
         overflow: hidden;
         /* cursor: col-resize; */
         /* padding: 0 !important; */
+        white-space: nowrap;
+        display: flex;
     }
 
     .xGridV2-main .xGridV2-title .xGridV2-col span {
         cursor: pointer;
+        width: 100%;
         /* cursor: col-resize; */
         /* padding: 0 !important; */
     }
 
     .xGridV2-main .xGridV2-title .xGridV2-col {
-        padding: 4px;
         position: relative;
     }
 
@@ -84,7 +86,7 @@
 
     .xGridV2-load-search {
         background-color: rgba(8, 8, 8, 0.82);
-        bottom: -22px;
+        bottom: 6px;
         color: #ffffff;
         font-size: 13px;
         height: 28px;
@@ -92,8 +94,6 @@
         padding-top: 3px;
         position: absolute;
         text-align: center;
-        -webkit-transform: translate(-50%);
-        -ms-transform: translate(-50%);
         transform: translate(-50%);
         width: 200px;
         z-index: 10;
@@ -220,15 +220,21 @@
         cursor: no-drop;
     }
 
-    select:disabled {
+    /* select:disabled {
         background: #ffffff;
     }
 
     select {
         background: #ffffff;
-    }
+    } */
 
     /*Theme*/
+
+    .xGridV2-deleteLine {
+        transition: all 0.5s cubic-bezier(0.61, -0.12, 0.34, 1.16);
+        height: 0 !important;
+        opacity: .0;
+    }
 
     .btn-Frame-blue {
         border: 1px solid #367fa9;
@@ -280,7 +286,6 @@
     .x-print .xGridV2-content {
         overflow: unset;
         width: 842px !important;
-
     }
 
     .x-print .xGridV2-content .xGridV2-col {
@@ -309,14 +314,12 @@
 
     /***********tema*********************/
 
-    .xGridV2-deleteLine {
-        transition: all 0.5s cubic-bezier(0.61, -0.12, 0.34, 1.16);
-        height: 0 !important;
-        opacity: .0;
-    }
-
     .x-grayV2 {
         color: #484848;
+        border: 1px solid #8e8e97;
+        border-radius: 4px;
+        font-size: 10px;
+        font-family: Verdana, Arial, sans-serif;
     }
 
     .x-grayV2 .xGridV2-title .xGridV2-col span {
@@ -337,16 +340,17 @@
     .x-grayV2 .xGridV2-title .xGridV2-col {
         border-right: 1px solid #8e8e97;
         cursor: pointer;
-        padding: 4px;
+        padding: 1px;
         text-align: center;
     }
 
     .x-grayV2 .xGridV2-title .xGridV2-col:last-child {
-        padding-right: 18px;
+        padding-right: 19px;
     }
 
     .x-grayV2 .xGridV2-content {
         background: #f8f8f8;
+        height: calc(100% - 21px);
     }
 
     .x-grayV2 .xGridV2-content .xGridV2-col {
@@ -355,6 +359,10 @@
     }
 
     .x-grayV2 .xGridV2-content .xGridV2-col:last-child {
+        border-right: none;
+    }
+
+    .x-grayV2 .xGridV2-title .xGridV2-col:last-child {
         border-right: none;
     }
 
@@ -391,7 +399,7 @@
         width: 15px;
         background: #ffffff;
         border-left: 1px solid #8e8e97;
-        border-top: 1px solid #8e8e97;
+        /* border-top: 1px solid #8e8e97; */
     }
 
     .xGridV2-main::-webkit-scrollbar-corner {
@@ -404,7 +412,10 @@
 
     .xGridV2-main::-webkit-scrollbar-thumb:vertical, .xGridV2-main::-webkit-scrollbar-thumb:horizontal, .x-grayV2 .xGridV2-content::-webkit-scrollbar-thumb:vertical, .x-grayV2 .xGridV2-content::-webkit-scrollbar-thumb:horizontal {
         background-image: linear-gradient(to top left, #ddd 0%, #fff 100%);
-        border: 1px solid #8e8e97;
+        /* border: 1px solid #8e8e97; */
+        border-top: 1px solid #8e8e97;
+        border-bottom: 1px solid #8e8e97;
+        border-left: 1px solid #8e8e97;
     }
 
     /* Cor do indicador de rolagem - ao passar o mouse */
@@ -435,6 +446,7 @@
     }
 
     .x-darkV2 .xGridV2-content {
+        height: calc(100% - 18px);
         background: #455a64;
     }
 
@@ -519,6 +531,7 @@
 
     .x-opacite .xGridV2-content {
         background: linear-gradient(45deg, #3f3251 2%, #002025 100%);
+        height: calc(100% - 18px);
     }
 
     .x-opacite .xGridV2-content .xGridV2-col {
