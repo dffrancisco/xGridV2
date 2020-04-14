@@ -1,6 +1,6 @@
 // export default (function() {
 // eslint-disable-next-line no-unused-vars
-let xGridV2 = (function() {
+let xGridV2 = (function () {
     const version = 2.0;
     const state = { save: 'save', insert: 'insert', update: 'update', select: 'select', cancel: 'cancel', delete: 'delete' }
     let notFound = 'Nada Localizado'
@@ -9,15 +9,21 @@ let xGridV2 = (function() {
     function create(param) {
         let argDefault = {
             source: [],
-            filter: {
-                filterBegin: false,
-                concat: {
-                    fields: false,
-                    condicional: 'OR'
-                },
-                fieldByField: {
-                    condicional: 'OR'
-                }
+            // filter: {
+            //     filterBegin: false,
+            //     concat: {
+            //         fields: false,
+            //         condicional: 'OR'
+            //     },
+            //     fieldByField: {
+            //         condicional: 'OR'
+            //     }
+            // },
+
+             filter: {
+                filterBegin: false, //quando true ele pesquisa igual a palavra
+                fields: false,
+                condicional: 'AND'
             },
             columns: {},
             onSelectLine: false,
@@ -38,7 +44,7 @@ let xGridV2 = (function() {
             click: false,
             dblClick: false,
             enter: false,
-            duplicity: false,
+            // duplicity: false,
             frame: false,
             complete: false,
             keyDown: false,
@@ -166,10 +172,10 @@ let xGridV2 = (function() {
                     if (columns[id].dataField == '_count_')
                         span.innerHTML = '&nbsp;'
                     else
-                    if (this.widthAll > 100)
-                        span.innerHTML = columns[id].dataField
-                    else
-                        span.innerHTML = id
+                        if (this.widthAll > 100)
+                            span.innerHTML = columns[id].dataField
+                        else
+                            span.innerHTML = id
 
                     col.appendChild(span)
                     col.appendChild(resize)
@@ -267,7 +273,7 @@ let xGridV2 = (function() {
                 if (qtoColumn != 0)
                     for (let i in this.arg.columns) {
                         if (this.arg.columns[i].width == undefined)
-                        // this.arg.columns[i].width = ((100 - valPercente) / qtoColumn).toFixed(2) + '%';
+                            // this.arg.columns[i].width = ((100 - valPercente) / qtoColumn).toFixed(2) + '%';
                             this.arg.columns[i].width = ((100 - valPercente) / qtoColumn) + '%';
                     }
 
@@ -283,7 +289,7 @@ let xGridV2 = (function() {
                         // console.log(source[0][i].length);
                         // wid = source[0][i].length > 4 ? source[0][i].length : 4
                         wid = wid < 15 ? 20 : wid
-                            // this.arg.columns.push({ dataField: i, width: wid + '%' });
+                        // this.arg.columns.push({ dataField: i, width: wid + '%' });
                         this.columnsAutoCreate.push({ dataField: i, width: wid + '%' });
                     }
                 }
@@ -292,15 +298,15 @@ let xGridV2 = (function() {
             setCompare(col, source) {
 
                 if (col.compare) {
-                    let _source = {...source }
-                        // source.value = source[col.dataField]
+                    let _source = { ...source }
+                    // source.value = source[col.dataField]
                     _source.value = _source[col.dataField]
                     let value = this.arg.compare[col.compare](_source)
 
                     if (value == undefined)
                         return false
                     else
-                    //    return this.arg.compare[col.compare](_source)
+                        //    return this.arg.compare[col.compare](_source)
                         return value
                 }
             },
@@ -326,12 +332,12 @@ let xGridV2 = (function() {
                     div.setAttribute('tabindex', this.tabindex)
                     this.tabindex++
 
-                        if (this.arg.count)
-                            source[i]._count_ = this.tabindex
+                    if (this.arg.count)
+                        source[i]._count_ = this.tabindex
 
                     for (let c in col) {
                         let divCol = document.createElement('div')
-                            // let span = document.createElement('span')
+                        // let span = document.createElement('span')
                         let value = source[i][col[c].dataField]
                         let compare = this.setCompare(col[c], source[i])
 
@@ -372,12 +378,12 @@ let xGridV2 = (function() {
                     if (this.gridContent.querySelector('nav'))
                         this.gridContent.querySelector('nav').remove()
                 } else
-                if (this.arg.query.execute == false)
-                    if (!this.gridContent.querySelector('nav')) {
-                        let nav = document.createElement('nav')
-                        nav.innerHTML = notFound
-                        this.gridContent.appendChild(nav)
-                    }
+                    if (this.arg.query.execute == false)
+                        if (!this.gridContent.querySelector('nav')) {
+                            let nav = document.createElement('nav')
+                            nav.innerHTML = notFound
+                            this.gridContent.appendChild(nav)
+                        }
 
 
                 this.closeLoad()
@@ -751,8 +757,8 @@ let xGridV2 = (function() {
                 if (target.nextSibling)
                     target.nextSibling.focus()
                 else
-                if (target.previousSibling)
-                    target.previousSibling.focus()
+                    if (target.previousSibling)
+                        target.previousSibling.focus()
 
                 this.onEvent.removeEventListenerElement(target)
 
@@ -796,17 +802,19 @@ let xGridV2 = (function() {
                     let key = ctrlKey + shiftKey + altKey + e.keyCode;
 
                     if (key == 13) {
-                        if (this.arg.enter)
+                        if (this.arg.enter) {
                             this.arg.enter(this.sourceSelect, e)
+                            e.preventDefault();
+                            e.stopPropagation();
+                        }
                     }
 
                     if (this.arg.onKeyDown)
-                        if (this.arg.onKeyDown[key])
+                        if (this.arg.onKeyDown[key]) {
                             this.arg.onKeyDown[key](this.sourceSelect, e)
-
-                    e.preventDefault();
-                    e.stopPropagation();
-
+                            e.preventDefault();
+                            e.stopPropagation();
+                        }
                 })
             },
             onSelectLine() {
@@ -833,8 +841,8 @@ let xGridV2 = (function() {
                         if (value == '')
                             continue
 
-                        /*se o conteudo da variavel for numerico ele retorna false*/
-                        /*para igular os valores no edit esta 1,00 no sourceSelect esta 1.00*/
+                    /*se o conteudo da variavel for numerico ele retorna false*/
+                    /*para igular os valores no edit esta 1,00 no sourceSelect esta 1.00*/
                     if (!isNaN(parseFloat(value))) {
                         if (value.indexOf(",") != -1)
                             value = value.replace(/\./g, '').replace(/\\,/g, '.');
@@ -884,7 +892,7 @@ let xGridV2 = (function() {
                             if (this.arg.sideBySide.compare)
                                 if (this.arg.compare[this.arg.sideBySide.compare[i]])
                                     try {
-                                        let _source = {...this.sourceSelect }
+                                        let _source = { ...this.sourceSelect }
                                         _source.value = value
                                         value = this.arg.compare[this.arg.sideBySide.compare[i]](_source)
                                     } catch (error) { throw 'erro see your function compare' }
@@ -911,7 +919,7 @@ let xGridV2 = (function() {
                                     break;
                                 case 'radio':
                                     // eslint-disable-next-line no-case-declarations
-                                    let radios = {...ax.elementSideBySide[i] }
+                                    let radios = { ...ax.elementSideBySide[i] }
                                     delete radios.type
                                     for (let r in radios) {
                                         if (radios[r].value == value) {
@@ -977,7 +985,7 @@ let xGridV2 = (function() {
                                     break;
                                 case 'radio':
                                     // eslint-disable-next-line no-case-declarations
-                                    let radios = {...ax.elementSideBySide[i] }
+                                    let radios = { ...ax.elementSideBySide[i] }
                                     delete radios.type
                                     for (let r in radios) {
                                         radios[r].checked = false
@@ -1122,7 +1130,7 @@ let xGridV2 = (function() {
                 if (this.arg.sideBySide.tabToEnter != false) {
                     if (this.elementSideBySide[name] == undefined) return false
 
-                    this.elementSideBySide[name].addEventListener('keydown', function(e) {
+                    this.elementSideBySide[name].addEventListener('keydown', function (e) {
                         if (e.keyCode == 13) {
 
                             let next = ax.listTabForEnter[ax.listTabForEnter.indexOf(this) + 1]
@@ -1145,10 +1153,10 @@ let xGridV2 = (function() {
                     else
                         this.listTabForEnter[0].select()
                 } else
-                if (this.elementSideBySide[name].tagName == 'BUTTON' || this.elementSideBySide[name].tagName == 'SELECT')
-                    this.elementSideBySide[name].focus()
-                else
-                    this.elementSideBySide[name].select()
+                    if (this.elementSideBySide[name].tagName == 'BUTTON' || this.elementSideBySide[name].tagName == 'SELECT')
+                        this.elementSideBySide[name].focus()
+                    else
+                        this.elementSideBySide[name].select()
             },
             disabledBtnsSalvarCancelar(disabled = true) {
 
@@ -1182,7 +1190,7 @@ let xGridV2 = (function() {
                             break;
                         case 'radio':
                             // eslint-disable-next-line no-case-declarations
-                            let radios = {...ax.elementSideBySide[i] }
+                            let radios = { ...ax.elementSideBySide[i] }
                             delete radios.type
                             for (let r in radios) {
                                 radios[r].disabled = disable
@@ -1212,7 +1220,7 @@ let xGridV2 = (function() {
                 let text
                 let width
 
-                resizers.addEventListener('mousedown', function(e) {
+                resizers.addEventListener('mousedown', function (e) {
 
                     fieldTitle = ax.gridTitle.querySelector('[name="' + this.parentElement.getAttribute('name') + '"]')
 
@@ -1267,7 +1275,7 @@ let xGridV2 = (function() {
                     el.removeAttribute('order')
                 })
 
-                let newArray = this.arg.source.sort(function(a, b) {
+                let newArray = this.arg.source.sort(function (a, b) {
 
                     if (a[field] == null || a[field] == undefined)
                         a[field] = ''
@@ -1309,7 +1317,7 @@ let xGridV2 = (function() {
                 this.filterControl = true;
                 let newData
 
-                if (typeof(filter) == 'string') {
+                if (typeof (filter) == 'string') {
 
                     filter = filter.trim().split(' ');
 
@@ -1345,41 +1353,41 @@ let xGridV2 = (function() {
 
                     });
                 } else
-                if (typeof(filter) == 'object') {
+                    if (typeof (filter) == 'object') {
 
-                    newData = this.arg.source.filter((el) => {
+                        newData = this.arg.source.filter((el) => {
 
-                        let retorno = 0;
+                            let retorno = 0;
 
-                        for (let i in filter) {
+                            for (let i in filter) {
 
-                            let field = i;
-                            let value = filter[i].toString().toUpperCase();
+                                let field = i;
+                                let value = filter[i].toString().toUpperCase();
 
-                            if (el[field] == undefined) {
-                                console.log('The field (' + field + ') not find');
-                                return false;
+                                if (el[field] == undefined) {
+                                    console.log('The field (' + field + ') not find');
+                                    return false;
+                                }
+
+                                if (this.arg.filter.filterBegin)
+                                    if (el[field].toString().toUpperCase().indexOf(value) == 0)
+                                        retorno++;
+
+                                if (!this.arg.filter.filterBegin)
+                                    if (el[field].toString().toUpperCase().indexOf(value) > -1)
+                                        retorno++;
                             }
 
-                            if (this.arg.filter.filterBegin)
-                                if (el[field].toString().toUpperCase().indexOf(value) == 0)
-                                    retorno++;
+                            if (this.arg.filter.fieldByField.condicional == 'AND')
+                                if (Object.keys(filter).length == retorno)
+                                    return true
 
-                            if (!this.arg.filter.filterBegin)
-                                if (el[field].toString().toUpperCase().indexOf(value) > -1)
-                                    retorno++;
-                        }
+                            if (this.arg.filter.fieldByField.condicional == 'OR')
+                                if (retorno > 0)
+                                    return true
+                        });
 
-                        if (this.arg.filter.fieldByField.condicional == 'AND')
-                            if (Object.keys(filter).length == retorno)
-                                return true
-
-                        if (this.arg.filter.fieldByField.condicional == 'OR')
-                            if (retorno > 0)
-                                return true
-                    });
-
-                }
+                    }
 
                 this.source(newData)
                 call && call(Object.keys(newData).length)
@@ -1391,11 +1399,11 @@ let xGridV2 = (function() {
                 let iframe = document.createElement('iframe');
                 iframe.setAttribute('name', 'iframe')
                 iframe.style = 'position:absolute; top:-100000px;'
-                    // iframe.style = 'position:absolute; top:0px; width:100%; left:0; height:700px'
+                // iframe.style = 'position:absolute; top:0px; width:100%; left:0; height:700px'
                 document.querySelector('body').appendChild(iframe);
                 let frameDoc = iframe.contentWindow ? iframe.contentWindow :
                     iframe.contentDocument.document ? iframe.contentDocument.document :
-                    iframe.contentDocument;
+                        iframe.contentDocument;
                 frameDoc.document.open();
                 frameDoc.document.write('<html><head><title>Impressão de Documento</title>');
                 frameDoc.document.write(`<style>
@@ -1408,7 +1416,7 @@ let xGridV2 = (function() {
                         page-break-before: always;
                     }
                 </style>`);
-                let style = {...document.querySelectorAll('link[rel=stylesheet]') }
+                let style = { ...document.querySelectorAll('link[rel=stylesheet]') }
                 for (let i in style) {
                     if (style[i].outerHTML.indexOf('href') >= 0)
                         frameDoc.document.write(style[i].outerHTML)
@@ -1426,7 +1434,7 @@ let xGridV2 = (function() {
 
                 frameDoc.document.close();
 
-                setTimeout(function() {
+                setTimeout(function () {
                     window.frames["iframe"].focus();
                     window.frames["iframe"].print();
                     iframe.remove();
