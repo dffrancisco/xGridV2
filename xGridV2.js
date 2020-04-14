@@ -20,7 +20,7 @@ let xGridV2 = (function () {
             //     }
             // },
 
-             filter: {
+            filter: {
                 filterBegin: false, //quando true ele pesquisa igual a palavra
                 fields: false,
                 condicional: 'AND'
@@ -44,7 +44,6 @@ let xGridV2 = (function () {
             click: false,
             dblClick: false,
             enter: false,
-            // duplicity: false,
             frame: false,
             complete: false,
             keyDown: false,
@@ -53,10 +52,11 @@ let xGridV2 = (function () {
         };
 
         param = Object.assign({}, param);
-        if (param.filter) {
-            param.filter.concat = Object.assign(argDefault.filter.concat, param.filter.concat)
-            param.filter.fieldByField = Object.assign(argDefault.filter.fieldByField, param.filter.fieldByField)
-        }
+        // if (param.filter) {
+        //     param.filter.concat = Object.assign(argDefault.filter.concat, param.filter.concat)
+        //     param.filter.fieldByField = Object.assign(argDefault.filter.fieldByField, param.filter.fieldByField)
+        // }
+
         if (param.query)
             param.query = Object.assign(argDefault.query, param.query)
 
@@ -1324,10 +1324,10 @@ let xGridV2 = (function () {
                     newData = this.arg.source.filter((el) => {
                         let concat = '';
 
-                        if (!this.arg.filter.concat.fields)
-                            this.arg.filter.concat.fields = Object.keys(el)
+                        if (!this.arg.filter.fields)
+                            this.arg.filter.fields = Object.keys(el)
 
-                        this.arg.filter.concat.fields.forEach((ln) => {
+                        this.arg.filter.fields.forEach((ln) => {
                             concat += el[ln] + ' ';
                         })
 
@@ -1343,11 +1343,11 @@ let xGridV2 = (function () {
                                     retorno++;
                         })
 
-                        if (this.arg.filter.concat.condicional == 'AND')
+                        if (this.arg.filter.condicional == 'AND')
                             if (filter.length == retorno)
                                 return true
 
-                        if (this.arg.filter.concat.condicional == 'OR')
+                        if (this.arg.filter.condicional == 'OR')
                             if (retorno > 0)
                                 return true
 
@@ -1378,11 +1378,11 @@ let xGridV2 = (function () {
                                         retorno++;
                             }
 
-                            if (this.arg.filter.fieldByField.condicional == 'AND')
+                            if (this.arg.filter.condicional == 'AND')
                                 if (Object.keys(filter).length == retorno)
                                     return true
 
-                            if (this.arg.filter.fieldByField.condicional == 'OR')
+                            if (this.arg.filter.condicional == 'OR')
                                 if (retorno > 0)
                                     return true
                         });
@@ -1394,6 +1394,12 @@ let xGridV2 = (function () {
 
                 this.filterControl = false;
 
+            },
+            setFilterBegin(filterBegin) {
+                this.arg.filter.filterBegin = filterBegin
+            },
+            setFilterCondicional(condicional) {
+                this.arg.filter.condicional = condicional
             },
             print(headHTML = '') {
                 let iframe = document.createElement('iframe');
@@ -1507,6 +1513,10 @@ let xGridV2 = (function () {
         this.selectUp = (event) => ax.setaForUp(event)
 
         this.selectDown = (event) => ax.setaForDown(event)
+
+        this.setFilterBegin = (filterBegin) => ax.setFilterBegin(filterBegin)
+
+        this.setFilterCondicional = (condicional) => ax.setFilterCondicional(condicional)
 
     }
     return {
