@@ -127,6 +127,10 @@ let xGridV2 = (function () {
                     this.tabToEnter()
                 }
 
+                if (this.arg.complete)
+                    this.arg.complete()
+
+
             },
             createTitle() {
                 this.gridTitle = document.createElement("div")
