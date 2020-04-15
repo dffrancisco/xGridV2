@@ -9,21 +9,10 @@ let xGridV2 = (function () {
     function create(param) {
         let argDefault = {
             source: [],
-            // filter: {
-            //     filterBegin: false,
-            //     concat: {
-            //         fields: false,
-            //         condicional: 'OR'
-            //     },
-            //     fieldByField: {
-            //         condicional: 'OR'
-            //     }
-            // },
-
             filter: {
                 filterBegin: false, //quando true ele pesquisa igual a palavra
                 fields: false,
-                condicional: 'AND'
+                condicional: 'OR'
             },
             columns: {},
             onSelectLine: false,
@@ -52,11 +41,6 @@ let xGridV2 = (function () {
         };
 
         param = Object.assign({}, param);
-        // if (param.filter) {
-        //     param.filter.concat = Object.assign(argDefault.filter.concat, param.filter.concat)
-        //     param.filter.fieldByField = Object.assign(argDefault.filter.fieldByField, param.filter.fieldByField)
-        // }
-
         if (param.query)
             param.query = Object.assign(argDefault.query, param.query)
 
@@ -1210,13 +1194,6 @@ let xGridV2 = (function () {
 
                     }
                 }
-
-
-                // $(sideBySide.id).find("input[type='text'], textarea").prop('readonly', false);
-                // $(sideBySide.id).find("select, input[type='radio'], input[type='checkbox']").prop('disabled', false);
-
-
-
             },
             resizeTitle(resizers) {
                 let fieldTitle
@@ -1476,7 +1453,7 @@ let xGridV2 = (function () {
 
         this.clear = (call) => ax.clear(call)
 
-        this.load = (call) => ax.load(call)
+        this.load = (text, call) => ax.load(text, call)
 
         this.closeLoad = (call) => ax.closeLoad(call)
 

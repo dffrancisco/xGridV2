@@ -21,21 +21,12 @@
 <body>
 
     <div class="campos">
-        <span>Descrição Produto</span>
+        <span>Title</span>
         <input type="text" name="DESC_PRODUTO">
         <span>Num Fabricante</span>
         <input type="text" name="NUM_FABRICANTE">
         <span>End Estoque</span>
         <input type="text" name="END_ESTOQUE">
-
-        <!-- <input type="checkbox" name="casado"><span>Sim</span> -->
-        <!-- <span>img</span>
-        <img src="" alt="teste" name="img" height="15" /> -->
-        <!-- <br>
-        <span>sexo</span>
-        <input type="radio" name="genero" value="M" /> Man
-        <input type="radio" name="genero" value="F" /> Woman
-        <input type="radio" name="genero" value="D" /> Woman -->
 
         <span>Unidade</span>
         <select name="UNIDADE">
@@ -51,8 +42,6 @@
 
     <div id="theGrid"></div>
     <div id="myGridFrame"></div>
-
-
 
 
     <script>
@@ -234,24 +223,22 @@
             height: 300,
             // width: 800,
             // count: true,
-            // heightLine: 50,
+            heightLine: 60,
             // setfocus: 1,
-            theme: 'x-darkV2',
             multiSelect: true,
             // title:false,
-            // theme: 'x-opacite',
+            // theme: 'x-darkV2',
+            theme: 'x-opacite',
             onSelectLine: (r) => {
 
             },
+            complete: () => {
+                console.log('complete');
+            },
             filter: {
                 // filterBegin: false, //quando true ele pesquisa igual a palavra
-                // concat: {
-                //       fields: ['DESC_PRODUTO', 'MARCA'],
-                //       condicional: 'AND'
-                //   },
-                fieldByField: {
-                    condicional: 'AND'
-                }
+                // fields: ['DESC_PRODUTO', 'MARCA'],
+                // condicional: 'AND'
             },
             onKeyDown: {
                 13: (ln, e) => {
@@ -268,28 +255,22 @@
                 theGrid.disabledBtnsSalvarCancelar()
             },
             columns: {
-                'ID': {
-                    dataField: 'id',
-                    width: '5%',
-                    // class: 'umaClass',
-                    center: true,
-                    style: 'color:#6ff1e5'
-                },
-                'Name': {
-                    dataField: 'name',
-                    width: '18%'
-                },
-                'E-Mail': {
-                    dataField: 'email',
-                    width: '20%',
-                },
-                'Body': {
-                    dataField: 'body',
-                }
+                'thumbnail': { dataField: 'thumbnail', compare: 'thumbnail', width: '5%', center: true },
+                'Title': { dataField: 'title', compare: 'title' },
+                'authors': { dataField: 'authors', compare: 'authors', width: '40%' },
             },
             compare: {
-                junta: (r) => {
-                    return r.value + ' ' + r.name
+                title: (r) => {
+                    return r.volumeInfo.title
+                },
+                authors: (r) => {
+                    return r.volumeInfo.authors
+                },
+                thumbnail: (r) => {
+                    let thumbnail = ''
+                    if (r.volumeInfo.imageLinks)
+                        thumbnail = r.volumeInfo.imageLinks.smallThumbnail
+                    return `<img height="50px" src="${thumbnail}" >`
                 }
             },
             sideBySide: {
@@ -370,36 +351,19 @@
             },
             query: {
                 // endScroll: 0.5,
-                // execute: (offset, param) => {
-                execute: (r) => {
-                    console.log(r, 'execute');
-                    // let formData = new FormData();
-                    // formData.append('id_sociedade', '10')
-                    // formData.append('call', 'getProdutos')
-                    // formData.append('param[id_carro]', '9999')
-                    // formData.append('param[get]', 'getProdutosNewLoc')
-                    // formData.append('param[vercao]', 'false')
-                    // formData.append('param[maxItem]', '30')
+                execute: async (r) => {
+                    let fields = `&fields=items(volumeInfo(title,authors,description,publishedDate,language,imageLinks(smallThumbnail)))`
+                    fields = ''
 
-                    // formData.append('param[desc_produto]', r.param.desc_produto)
-                    // formData.append('param[skip]', r.offset)
+                    let result = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${r.param.desc}&startIndex=${r.offset}&maxResults=10${fields}`)
+                        .then(response => {
+                            return response.json();
+                        })
 
-                    // // fetch('http://www.realacessorios.com.br/balcao/servidor/per.balcao.php', {
-                    // fetch('http://reallatas.myftp.org:2424/balcao/servidor/per.balcao.php', {
-                    //         method: 'POST',
-                    //         body: formData
-                    //     })
-                    //     .then(response => response.json())
-                    //     // .then(json => grid.querySourceAdd(json))
-                    //     .then((json_) => {
-                    //         theGrid.querySourceAdd(json_)
-                    //         console.log(theGrid.sumDataField('VALOR_VENDA'))
-                    //         return json_
-                    //     })
+                    if (result.items)
+                        theGrid.querySourceAdd(result.items);
 
-                    fetch(`http://jsonplaceholder.typicode.com/comments?_limit=20&_page=${r.page}`)
-                        .then(response => response.json())
-                        .then(json => theGrid.querySourceAdd(json))
+                    // console.log(result.items);
 
                 }
             }
@@ -407,10 +371,7 @@
         })
 
         theGrid.load()
-            // theGrid.queryOpen({
-            //     desc_produto: 'FAROL LD'
-            // })
-        theGrid.queryOpen()
+        theGrid.queryOpen({ desc: 'sherlock' })
     </script>
 
 
