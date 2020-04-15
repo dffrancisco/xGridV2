@@ -179,7 +179,8 @@ let xGridV2 = (function () {
                 }
 
                 if (this.widthAll > 100)
-                    this.gridTitle.lastChild.style.paddingRight = '3px'
+                    this.gridTitle.lastChild.style.marginRight = '0px'
+                // this.gridTitle.lastChild.style.paddingRight = '3px'
 
                 this.orderByGrid();
 
@@ -272,15 +273,13 @@ let xGridV2 = (function () {
                 if (this.arg.count)
                     this.columnsAutoCreate.push({ dataField: '_count_', width: '4%' });
 
-                if (source[0] != undefined) {
-
+                    if (source[0] != undefined) {
                     let wid = 100 / Object.keys(source[0]).length;
                     for (let i in source[0]) {
-                        // console.log(source[0][i].length);
-                        // wid = source[0][i].length > 4 ? source[0][i].length : 4
-                        wid = wid < 15 ? 20 : wid
-                        // this.arg.columns.push({ dataField: i, width: wid + '%' });
-                        this.columnsAutoCreate.push({ dataField: i, width: wid + '%' });
+                        let lengthString = source[0][i].length == undefined ? wid : (source[0][i].trim().length * 85 /100)
+                        // wid = wid < 15 ? 20 : wid
+                        // lengthString = lengthString * 85/100  
+                        this.columnsAutoCreate.push({ dataField: i, width: lengthString + '%' });
                     }
                 }
 
