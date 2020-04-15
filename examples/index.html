@@ -22,7 +22,7 @@
 
     <div class="campos">
         <span>Title</span>
-        <input type="text" name="DESC_PRODUTO">
+        <input type="text" name="title">
         <span>Num Fabricante</span>
         <input type="text" name="NUM_FABRICANTE">
         <span>End Estoque</span>
@@ -240,6 +240,8 @@
                 // fields: ['DESC_PRODUTO', 'MARCA'],
                 // condicional: 'AND'
             },
+            keySelectUp: 87,
+            keySelectDown: [68, 83],
             onKeyDown: {
                 13: (ln, e) => {
                     console.log(ln);
@@ -252,7 +254,7 @@
             enter: () => {
                 theGrid.focusField()
                 theGrid.disable()
-                theGrid.disabledBtnsSalvarCancelar()
+                theGrid.disableBtnsSaveCancel()
             },
             columns: {
                 'thumbnail': { dataField: 'thumbnail', compare: 'thumbnail', width: '5%', center: true },
@@ -283,18 +285,18 @@
                     DESC_PRODUTO: 'junta'
                 },
                 duplicity: {
-                    dataField: ['NUM_FABRICANTE', 'DESC_PRODUTO', 'END_ESTOQUE'],
-                    execute: (r) => {
-                        console.log(r);
-                        // getServidor
-                        // repostar
-                        let valueBanco = 'valor que vem do banco de dados'
+                    // dataField: ['NUM_FABRICANTE', 'DESC_PRODUTO', 'END_ESTOQUE'],
+                    // execute: (r) => {
+                    //     console.log(r);
+                    //     // getServidor
+                    //     // repostar
+                    //     let valueBanco = 'valor que vem do banco de dados'
 
-                        if (r.value != valueBanco) {
-                            theGrid.showMessageDuplicity(r.text + ' já esta em uso ok')
-                            return false
-                        }
-                    }
+                    //     if (r.value != valueBanco) {
+                    //         theGrid.showMessageDuplicity(r.text + ' já esta em uso ok')
+                    //         return false
+                    //     }
+                    // }
                 },
                 frame: {
                     el: '#myGridFrame',

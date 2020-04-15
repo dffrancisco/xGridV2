@@ -12,7 +12,7 @@ let xGridV2 = (function () {
             filter: {
                 filterBegin: false, //quando true ele pesquisa igual a palavra
                 fields: false,
-                condicional: 'OR'
+                conditional: 'OR'
             },
             columns: {},
             onSelectLine: false,
@@ -37,7 +37,9 @@ let xGridV2 = (function () {
             complete: false,
             keyDown: false,
             count: false,
-            title: true
+            title: true,
+            keySelectUp: false,
+            keySelectDown: false,
         };
 
         param = Object.assign({}, param);
@@ -423,9 +425,35 @@ let xGridV2 = (function () {
                     if (e.keyCode == 38)
                         ax.setaForUp(e)
 
+                    // seta para cima por parametros
+                    if (ax.arg.keySelectUp) {
+                        if (typeof ax.arg.keySelectUp == 'object') {
+                            ax.arg.keySelectUp.forEach(ln => {
+                                if (e.keyCode == ln)
+                                    ax.setaForUp(e)
+                            })
+                        } else {
+                            if (e.keyCode == ax.arg.keySelectUp)
+                                ax.setaForUp(e)
+                        }
+                    }
+
                     // seta para baixo
                     if (e.keyCode == 40)
                         ax.setaForDown(e)
+
+                    // seta para baixo por parametros
+                    if (ax.arg.keySelectDown) {
+                        if (typeof ax.arg.keySelectDown == 'object') {
+                            ax.arg.keySelectDown.forEach(ln => {
+                                if (e.keyCode == ln)
+                                    ax.setaForDown(e)
+                            })
+                        } else {
+                            if (e.keyCode == ax.arg.keySelectDown)
+                                ax.setaForDown(e)
+                        }
+                    }
 
                     // page up
                     if (e.keyCode == 33) {
@@ -932,7 +960,7 @@ let xGridV2 = (function () {
                         }
                 }
             },
-            getDifTwoJson(toUpperCase = false, empty = true) {
+            getDiffTwoJson(toUpperCase = false, empty = true) {
                 let diff = { old: {}, new: {} }
                 let fieldsSideBySide = this.getElementSideBySideJson(toUpperCase, empty)
 
@@ -1034,12 +1062,12 @@ let xGridV2 = (function () {
 
                                     if ([state.insert, state.update].indexOf(e.target.getAttribute('state')) >= 0) {
                                         this.disableFieldsSideBySide(true)
-                                        this.disabledBtnsSalvarCancelar(true)
+                                        this.disableBtnsSaveCancel(true)
                                     }
 
                                     if ([state.save, state.cancel].indexOf(e.target.getAttribute('state')) >= 0) {
                                         this.disableFieldsSideBySide(false)
-                                        this.disabledBtnsSalvarCancelar(false)
+                                        this.disableBtnsSaveCancel(false)
                                     }
 
                                 })
@@ -1065,30 +1093,35 @@ let xGridV2 = (function () {
                     }
             },
             duplicity() {
-                this.messageDuplicity = document.createElement('div');
 
-                this.arg.sideBySide.duplicity.dataField.forEach((field) => {
-                    // this.elementSideBySide[field].style.color = 'red'
+                if (this.arg.sideBySide.duplicity) {
+                    this.messageDuplicity = document.createElement('div');
+                    if (this.arg.sideBySide.duplicity.dataField)
+                        this.arg.sideBySide.duplicity.dataField.forEach((field) => {
+                            // this.elementSideBySide[field].style.color = 'red'
 
-                    this.elementSideBySide[field].addEventListener('focusout', (e) => {
-                        if (this.sourceSelect[field] != e.target.value) {
-                            this.arg.sideBySide.duplicity.execute({
-                                field: field,
-                                value: e.target.value,
-                                text: this.elementSideBySide[field].previousSibling.previousElementSibling.innerText
+                            console.log(field, this.elementSideBySide[field]);
+
+                            this.elementSideBySide[field].addEventListener('focusout', (e) => {
+                                if (this.sourceSelect[field] != e.target.value) {
+                                    this.arg.sideBySide.duplicity.execute({
+                                        field: field,
+                                        value: e.target.value,
+                                        text: this.elementSideBySide[field].previousSibling.previousElementSibling.innerText
+                                    })
+
+                                    // msg.innerHTML = this.elementSideBySide[field].previousSibling.previousElementSibling.innerText +
+                                    //     (this.arg.sideBySide.duplicity.textMessage != undefined ? this.arg.sideBySide.duplicity.textMessage : ' já está em uso.')
+
+                                    // if (this.arg.sideBySide.duplicity.showMessage == true || this.arg.sideBySide.duplicity.showMessage == undefined) {
+                                    //     msg.classList.add('treme', 'pnMensDuplicity')
+                                    //     setTimeout(() => msg.remove(), 5000)
+                                    //     document.body.appendChild(msg)
+                                    // }
+                                }
                             })
-
-                            // msg.innerHTML = this.elementSideBySide[field].previousSibling.previousElementSibling.innerText +
-                            //     (this.arg.sideBySide.duplicity.textMessage != undefined ? this.arg.sideBySide.duplicity.textMessage : ' já está em uso.')
-
-                            // if (this.arg.sideBySide.duplicity.showMessage == true || this.arg.sideBySide.duplicity.showMessage == undefined) {
-                            //     msg.classList.add('treme', 'pnMensDuplicity')
-                            //     setTimeout(() => msg.remove(), 5000)
-                            //     document.body.appendChild(msg)
-                            // }
-                        }
-                    })
-                })
+                        })
+                }
             },
             showMessageDuplicity(text) {
                 this.messageDuplicity.innerHTML = text
@@ -1146,7 +1179,7 @@ let xGridV2 = (function () {
                     else
                         this.elementSideBySide[name].select()
             },
-            disabledBtnsSalvarCancelar(disabled = true) {
+            disableBtnsSaveCancel(disabled = true) {
 
                 for (let i in this.buttonsFrame)
                     if (this.buttonsFrame[i].getAttribute('state') == 'save') {
@@ -1324,11 +1357,11 @@ let xGridV2 = (function () {
                                     retorno++;
                         })
 
-                        if (this.arg.filter.condicional == 'AND')
+                        if (this.arg.filter.conditional == 'AND')
                             if (filter.length == retorno)
                                 return true
 
-                        if (this.arg.filter.condicional == 'OR')
+                        if (this.arg.filter.conditional == 'OR')
                             if (retorno > 0)
                                 return true
 
@@ -1359,11 +1392,11 @@ let xGridV2 = (function () {
                                         retorno++;
                             }
 
-                            if (this.arg.filter.condicional == 'AND')
+                            if (this.arg.filter.conditional == 'AND')
                                 if (Object.keys(filter).length == retorno)
                                     return true
 
-                            if (this.arg.filter.condicional == 'OR')
+                            if (this.arg.filter.conditional == 'OR')
                                 if (retorno > 0)
                                     return true
                         });
@@ -1379,8 +1412,8 @@ let xGridV2 = (function () {
             setFilterBegin(filterBegin) {
                 this.arg.filter.filterBegin = filterBegin
             },
-            setFilterCondicional(condicional) {
-                this.arg.filter.condicional = condicional
+            setFilterconditional(conditional) {
+                this.arg.filter.conditional = conditional
             },
             print(headHTML = '') {
                 let iframe = document.createElement('iframe');
@@ -1465,11 +1498,11 @@ let xGridV2 = (function () {
 
         this.sumDataField = (dataField) => ax.sumDataField(dataField)
 
-        this.compare = ax.arg.compare
+        this.getCompare = ax.arg.compare
 
         this.getElementSideBySideJson = (toUpperCase, empty) => ax.getElementSideBySideJson(toUpperCase, empty)
 
-        this.getDifTwoJson = (toUpperCase) => ax.getDifTwoJson(toUpperCase)
+        this.getDiffTwoJson = (toUpperCase) => ax.getDiffTwoJson(toUpperCase)
 
         this.clearElementSideBySide = () => ax.clearElementSideBySide()
 
@@ -1485,19 +1518,21 @@ let xGridV2 = (function () {
 
         this.filter = (filter, call) => ax.filter(filter, call)
 
-        this.disabledBtnsSalvarCancelar = (disabled) => ax.disabledBtnsSalvarCancelar(disabled)
+        this.disableBtnsSaveCancel = (disabled) => ax.disableBtnsSaveCancel(disabled)
 
         this.disableFieldsSideBySide = (disabled) => ax.disableFieldsSideBySide(disabled)
 
         this.print = (headHTML) => ax.print(headHTML)
 
-        this.selectUp = (event) => ax.setaForUp(event)
+        // this.selectUp = (event) => ax.setaForUp(event)
+        this.setKeySelectUp = (codeKey) => ax.arg.keySelectUp = codeKey
 
-        this.selectDown = (event) => ax.setaForDown(event)
+        // this.selectDown = (event) => ax.setaForDown(event)
+        this.setKeySelectDown = (codeKey) => ax.arg.keySelectDown = codeKey
 
         this.setFilterBegin = (filterBegin) => ax.setFilterBegin(filterBegin)
 
-        this.setFilterCondicional = (condicional) => ax.setFilterCondicional(condicional)
+        this.setFilterconditional = (conditional) => ax.setFilterconditional(conditional)
 
     }
     return {
