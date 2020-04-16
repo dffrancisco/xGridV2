@@ -1047,48 +1047,49 @@ let xGridV2 = (function () {
                             this.arg.sideBySide.frame.class.split(' ').forEach((e) => elFrame.classList.add(e))
 
 
-                        for (let key in this.arg.sideBySide.frame) {
-                            if (key == 'el' || key == 'style' || key == 'class')
-                                continue
+                        if (this.arg.sideBySide.frame.buttons)
+                            for (let key in this.arg.sideBySide.frame.buttons) {
+                                // if (key == 'el' || key == 'style' || key == 'class')
+                                //     continue
 
-                            let btn = document.createElement('button');
-                            btn.classList.add('btn-Frame', 'btn-Frame-blue')
-                            btn.innerHTML = this.arg.sideBySide.frame[key].html
+                                let btn = document.createElement('button');
+                                btn.classList.add('btn-Frame', 'btn-Frame-blue')
+                                btn.innerHTML = this.arg.sideBySide.frame.buttons[key].html
 
-                            if (this.arg.sideBySide.frame[key].click)
-                                btn.addEventListener('click', (e) => {
-                                    if (ax.arg.sideBySide.frame[key].click(this.sourceSelect, e) == false) return false
+                                if (this.arg.sideBySide.frame.buttons[key].click)
+                                    btn.addEventListener('click', (e) => {
+                                        if (ax.arg.sideBySide.frame.buttons[key].click(this.sourceSelect, e) == false) return false
 
-                                    if ([state.insert, state.update].indexOf(e.target.getAttribute('state')) >= 0) {
-                                        this.disableFieldsSideBySide(true)
-                                        this.disableBtnsSaveCancel(true)
-                                    }
+                                        if ([state.insert, state.update].indexOf(e.target.getAttribute('state')) >= 0) {
+                                            this.disableFieldsSideBySide(true)
+                                            this.disableBtnsSaveCancel(true)
+                                        }
 
-                                    if ([state.save, state.cancel].indexOf(e.target.getAttribute('state')) >= 0) {
-                                        this.disableFieldsSideBySide(false)
-                                        this.disableBtnsSaveCancel(false)
-                                    }
+                                        if ([state.save, state.cancel].indexOf(e.target.getAttribute('state')) >= 0) {
+                                            this.disableFieldsSideBySide(false)
+                                            this.disableBtnsSaveCancel(false)
+                                        }
 
-                                })
+                                    })
 
-                            if (this.arg.sideBySide.frame[key].class) this.arg.sideBySide.frame[key].class.split(' ').forEach((e) => btn.classList.add(e))
+                                if (this.arg.sideBySide.frame.buttons[key].class) this.arg.sideBySide.frame.buttons[key].class.split(' ').forEach((e) => btn.classList.add(e))
 
-                            if (this.arg.sideBySide.frame[key].style) btn.style = this.arg.sideBySide.frame[key].style
+                                if (this.arg.sideBySide.frame.buttons[key].style) btn.style = this.arg.sideBySide.frame.buttons[key].style
 
-                            if (this.arg.sideBySide.frame[key].state) {
-                                btn.setAttribute('state', this.arg.sideBySide.frame[key].state)
-                                btns[key] = this.arg.sideBySide.frame[key].state
-                                if (this.arg.sideBySide.frame[key].state == 'save')
-                                    this.listTabForEnter.push(btn)
+                                if (this.arg.sideBySide.frame.buttons[key].state) {
+                                    btn.setAttribute('state', this.arg.sideBySide.frame.buttons[key].state)
+                                    btns[key] = this.arg.sideBySide.frame.buttons[key].state
+                                    if (this.arg.sideBySide.frame.buttons[key].state == 'save')
+                                        this.listTabForEnter.push(btn)
+                                }
+
+                                if (this.arg.sideBySide.frame.buttons[key].state == state.save || this.arg.sideBySide.frame.buttons[key].state == state.cancel) btn.disabled = true
+
+                                this.buttonsFrame[key] = btn
+
+                                elFrame.appendChild(btn)
+                                ax.disableFieldsSideBySide(true)
                             }
-
-                            if (this.arg.sideBySide.frame[key].state == state.save || this.arg.sideBySide.frame[key].state == state.cancel) btn.disabled = true
-
-                            this.buttonsFrame[key] = btn
-
-                            elFrame.appendChild(btn)
-                            ax.disableFieldsSideBySide(true)
-                        }
                     }
             },
             duplicity() {
@@ -1115,15 +1116,6 @@ let xGridV2 = (function () {
                                         value: e.target.value,
                                         text: text
                                     })
-
-                                    // msg.innerHTML = this.elementSideBySide[field].previousSibling.previousElementSibling.innerText +
-                                    //     (this.arg.sideBySide.duplicity.textMessage != undefined ? this.arg.sideBySide.duplicity.textMessage : ' já está em uso.')
-
-                                    // if (this.arg.sideBySide.duplicity.showMessage == true || this.arg.sideBySide.duplicity.showMessage == undefined) {
-                                    //     msg.classList.add('treme', 'pnMensDuplicity')
-                                    //     setTimeout(() => msg.remove(), 5000)
-                                    //     document.body.appendChild(msg)
-                                    // }
                                 }
                             })
                         })
