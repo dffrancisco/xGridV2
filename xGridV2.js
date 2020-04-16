@@ -273,10 +273,10 @@ let xGridV2 = (function () {
                 if (this.arg.count)
                     this.columnsAutoCreate.push({ dataField: '_count_', width: '4%' });
 
-                    if (source[0] != undefined) {
+                if (source[0] != undefined) {
                     let wid = 100 / Object.keys(source[0]).length;
                     for (let i in source[0]) {
-                        let lengthString = source[0][i].length == undefined ? wid : (source[0][i].trim().length * 85 /100)
+                        let lengthString = source[0][i].length == undefined ? wid : (source[0][i].trim().length * 85 / 100)
                         // wid = wid < 15 ? 20 : wid
                         // lengthString = lengthString * 85/100  
                         this.columnsAutoCreate.push({ dataField: i, width: lengthString + '%' });
@@ -1097,16 +1097,23 @@ let xGridV2 = (function () {
                     this.messageDuplicity = document.createElement('div');
                     if (this.arg.sideBySide.duplicity.dataField)
                         this.arg.sideBySide.duplicity.dataField.forEach((field) => {
-                            // this.elementSideBySide[field].style.color = 'red'
-
-                            console.log(field, this.elementSideBySide[field]);
+                            if (this.elementSideBySide[field] == undefined)
+                                return
 
                             this.elementSideBySide[field].addEventListener('focusout', (e) => {
                                 if (this.sourceSelect[field] != e.target.value) {
+                                    let text = field
+
+                                    if (this.elementSideBySide[field].previousSibling.previousElementSibling)
+                                        text = this.elementSideBySide[field].previousSibling.previousElementSibling.innerText
+                                    else
+                                        if (this.elementSideBySide[field].getAttribute('placeholder'))
+                                            text = this.elementSideBySide[field].getAttribute('placeholder')
+
                                     this.arg.sideBySide.duplicity.execute({
                                         field: field,
                                         value: e.target.value,
-                                        text: this.elementSideBySide[field].previousSibling.previousElementSibling.innerText
+                                        text: text
                                     })
 
                                     // msg.innerHTML = this.elementSideBySide[field].previousSibling.previousElementSibling.innerText +
