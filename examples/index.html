@@ -21,22 +21,12 @@
 <body>
 
     <div class="campos">
-        <span>Title</span>
-        <input type="text" name="title">
-        <span>Num Fabricante</span>
-        <input type="text" name="NUM_FABRICANTE">
-        <span>End Estoque</span>
-        <input type="text" name="END_ESTOQUE">
+        <!-- <span>Title</span> -->
+        <input type="text" name="title" placeholder="O Title" style="width: 300px">
+        <span>Authors</span>
+        <input type="text" name="authors">
 
-        <span>Unidade</span>
-        <select name="UNIDADE">
-            <option value="PC">Peça</option>
-            <option value="JG">Jogo</option>
-            <option value="UN">Unidade</option>
-        </select>
 
-        <span>Carro</span>
-        <textarea name="CARRO"></textarea>
     </div>
     <hr>
 
@@ -259,115 +249,109 @@
             },
             columns: {
                 'thumbnail': { dataField: 'thumbnail', compare: 'thumbnail', width: '5%', center: true },
-                'Title': { dataField: 'title', compare: 'title' },
-                'authors': { dataField: 'authors', compare: 'authors', width: '40%' },
+                'Title': { dataField: 'title' },
+                'authors': { dataField: 'authors', width: '40%' },
             },
             compare: {
-                title: (r) => {
-                    return r.volumeInfo.title
-                },
-                authors: (r) => {
-                    return r.volumeInfo.authors
-                },
                 thumbnail: (r) => {
-                    let thumbnail = ''
-                    if (r.volumeInfo.imageLinks)
-                        thumbnail = r.volumeInfo.imageLinks.smallThumbnail
-                    return `<img height="50px" src="${thumbnail}" >`
+                    return `<img height="50px" src="${r.thumbnail}" >`
                 }
             },
             sideBySide: {
                 el: '.campos',
                 // tabToEnter: true,
                 render: {
-                    'name': reveter
+                    //  'name': reveter
                 },
                 compare: {
-                    DESC_PRODUTO: 'junta'
+                    // DESC_PRODUTO: 'junta'
                 },
                 duplicity: {
-                    // dataField: ['NUM_FABRICANTE', 'DESC_PRODUTO', 'END_ESTOQUE'],
-                    // execute: (r) => {
-                    //     console.log(r);
-                    //     // getServidor
-                    //     // repostar
-                    //     let valueBanco = 'valor que vem do banco de dados'
+                    dataField: ['authors', 'title'],
+                    execute: (r) => {
+                        console.log(r);
+                        // getServidor
+                        // repostar
+                        let valueBanco = 'valor que vem do banco de dados'
 
-                    //     if (r.value != valueBanco) {
-                    //         theGrid.showMessageDuplicity(r.text + ' já esta em uso ok')
-                    //         return false
-                    //     }
-                    // }
+                        if (r.value != valueBanco) {
+                            theGrid.showMessageDuplicity(r.text + ' já esta em uso ok')
+                            return false
+                        }
+                    }
                 },
                 frame: {
                     el: '#myGridFrame',
                     class: 'texte novo',
                     style: 'text-align: center;',
-                    print: {
-                        html: '<i class="fa fa-edit"></i> imprimir',
-                        style: 'background: red;',
-                        class: 'mybtn',
-                        click: () => {
-                            theGrid.print()
-                        }
-                    },
-                    insert: {
-                        html: 'Novo',
-                        state: xGridV2.state.insert,
-                        click: (ln, e) => {
-                            console.warn(e, 'novo');
-                            /*esse retorno falso bloquea a açao do do click*/
-                            return false
-                        }
-                    },
-                    editar: {
-                        html: 'Alterar',
-                        state: xGridV2.state.update,
-                        click: () => {
-                            console.warn('Alterar')
-                            theGrid.focusField('qto')
-                        }
-                    },
-                    delete: {
-                        html: 'Excluir',
-                        state: xGridV2.state.delete,
-                        click: () => console.warn('Excluir')
-                    },
-                    salvarBtn: {
-                        html: 'Salvar',
-                        state: xGridV2.state.save,
-                        click: () => {
-                            theGrid.enable()
-                            theGrid.focus()
-                            console.warn('salvar')
-                        }
-                    },
-                    cancel: {
-                        html: 'Cancel',
-                        state: xGridV2.state.cancel,
-                        click: () => {
-                            theGrid.enable()
-                            console.warn('cancelar')
+                    buttons: {
+                        print: {
+                            html: '<i class="fa fa-edit"></i> imprimir',
+                            style: 'background: red;',
+                            class: 'mybtn',
+                            click: () => {
+                                theGrid.print()
+                            }
+                        },
+                        insert: {
+                            html: 'Novo',
+                            state: xGridV2.state.insert,
+                            click: (ln, e) => {
+                                console.warn(e, 'novo');
+                                /*esse retorno falso bloquea a açao do do click*/
+                                return false
+                            }
+                        },
+                        editar: {
+                            html: 'Alterar',
+                            state: xGridV2.state.update,
+                            click: () => {
+                                console.warn('Alterar')
+                                //   theGrid.focusField('qto')
+                            }
+                        },
+                        delete: {
+                            html: 'Excluir',
+                            state: xGridV2.state.delete,
+                            click: () => console.warn('Excluir')
+                        },
+                        salvarBtn: {
+                            html: 'Salvar',
+                            state: xGridV2.state.save,
+                            click: () => {
+                                theGrid.enable()
+                                theGrid.focus()
+                                console.warn('salvar')
+                            }
+                        },
+                        cancel: {
+                            html: 'Cancel',
+                            state: xGridV2.state.cancel,
+                            click: () => {
+                                theGrid.enable()
+                                console.warn('cancelar')
+                            }
                         }
                     }
                 }
             },
             query: {
                 // endScroll: 0.5,
-                execute: async (r) => {
+                execute: (r) => {
                     let fields = `&fields=items(volumeInfo(title,authors,description,publishedDate,language,imageLinks(smallThumbnail)))`
-                    fields = ''
-
-                    let result = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${r.param.desc}&startIndex=${r.offset}&maxResults=10${fields}`)
-                        .then(response => {
-                            return response.json();
+                    let data = []
+                    fetch(`https://www.googleapis.com/books/v1/volumes?q=${r.param.desc}&startIndex=${r.offset}&maxResults=10${fields}`)
+                        .then(response => { return response.json() })
+                        .then(r => {
+                            Object.entries(r.items).forEach(el => {
+                                let ln = {}
+                                ln.title = el[1].volumeInfo.title
+                                ln.thumbnail = el[1].volumeInfo.imageLinks ? el[1].volumeInfo.imageLinks.smallThumbnail : ''
+                                ln.authors = el[1].volumeInfo.authors
+                                data.push(ln)
+                            })
+                            theGrid.querySourceAdd(data)
                         })
-
-                    if (result.items)
-                        theGrid.querySourceAdd(result.items);
-
-                    // console.log(result.items);
-
                 }
             }
 
