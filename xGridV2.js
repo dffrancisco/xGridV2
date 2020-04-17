@@ -43,8 +43,9 @@ let xGridV2 = (function () {
         };
 
         param = Object.assign({}, param);
-        if (param.query)
-            param.query = Object.assign(argDefault.query, param.query)
+
+        param.filter = Object.assign(argDefault.filter, param.filter)
+        param.query = Object.assign(argDefault.query, param.query)
 
         let ax = {
             arg: {},

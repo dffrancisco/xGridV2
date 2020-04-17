@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>TODO supply a title</title>
+    <title>xGridV2</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="../xGridV2.js" type="text/javascript"></script>
@@ -219,7 +219,7 @@
             // title:false,
             theme: 'x-darkV2',
             // theme: 'x-whiteV2',
-            // theme: 'x-opacite',
+            theme: 'x-opacite',
             onSelectLine: (r) => {
 
             },
@@ -280,6 +280,10 @@
                         }
                     }
                 },
+
+                // se chamar o qeuryOpen verificar se o query foi setado
+
+
                 frame: {
                     el: '#myGridFrame',
                     class: 'texte novo',
@@ -299,7 +303,8 @@
                             click: (ln, e) => {
                                 console.warn(e, 'novo');
                                 /*esse retorno falso bloquea a açao do do click*/
-                                return false
+                                // theGrid.focusField()
+                                //return false
                             }
                         },
                         editar: {
@@ -354,11 +359,10 @@
                         })
                 }
             }
-
         })
 
         theGrid.load()
-        theGrid.queryOpen({ desc: 'sherlock' })
+        theGrid.queryOpen({ desc: 'game of thrones' })
     </script>
 
 
