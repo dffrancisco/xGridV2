@@ -75,8 +75,9 @@ let xGridV2 = (function () {
                 this.element.classList.add("xGridV2-main");
                 this.element.classList.add(this.arg.theme ? this.arg.theme : theme);
 
-                let pxHeight = this.arg.height.toString().indexOf('%') > 0 ? '' : 'px'
-                let pxWidth = this.arg.width.toString().indexOf('%') > 0 ? '' : 'px'
+                // let pxHeight = this.arg.height.toString().indexOf('%') > 0 ? '' : 'px'
+                let pxHeight = this.arg.height.toString().indexOf('%') > 0 ? '' : this.arg.height.toString().indexOf('px') > 0 ? '' : 'px'
+                let pxWidth = this.arg.width.toString().indexOf('%') > 0 ? '' : this.arg.width.toString().indexOf('px') > 0 ? '' : 'px'
                 this.element.style.height = this.arg.height != '100%' ? this.arg.height + pxHeight : this.arg.height
                 if (this.arg.width != 'default') this.element.style.width = this.arg.width + pxWidth
 
