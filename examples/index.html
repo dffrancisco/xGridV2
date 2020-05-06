@@ -30,7 +30,10 @@
     </div>
     <hr>
 
-    <div id="theGrid"></div>
+    <div style="height: 400px; background: red;">
+
+        <div id="theGrid"></div>
+    </div>
     <div id="myGridFrame"></div>
 
 
@@ -210,8 +213,8 @@
 
         const theGrid = new xGridV2.create({
             el: '#theGrid',
-            height: 300,
-            // width: 800,
+            // height: '50',
+            width: '100%',
             // count: true,
             heightLine: 60,
             // setfocus: 1,
@@ -280,10 +283,7 @@
                         }
                     }
                 },
-
                 // se chamar o qeuryOpen verificar se o query foi setado
-
-
                 frame: {
                     el: '#myGridFrame',
                     class: 'texte novo',

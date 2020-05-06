@@ -1,9 +1,10 @@
 // export default (function() {
 // eslint-disable-next-line no-unused-vars
 let xGridV2 = (function () {
-    const version = 2.0;
+    const version = 2.1;
     const state = { save: 'save', insert: 'insert', update: 'update', select: 'select', cancel: 'cancel', delete: 'delete' }
     let notFound = 'Nada Localizado'
+    let theme = 'x-grayV2'
     let printHead = '';
 
     function create(param) {
@@ -18,7 +19,7 @@ let xGridV2 = (function () {
             onSelectLine: false,
             compare: {},
             heightLine: false,
-            height: 'default',
+            height: '100%',
             width: 'default',
             setfocus: false,
             multiSelect: false,
@@ -72,10 +73,12 @@ let xGridV2 = (function () {
                 this.element = document.querySelector(this.arg.el)
                 this.idElment = this.element.id
                 this.element.classList.add("xGridV2-main");
-                this.element.classList.add(this.arg.theme);
+                this.element.classList.add(this.arg.theme ? this.arg.theme : theme);
 
-                if (this.arg.height != 'default') this.element.style.height = `${this.arg.height}px`
-                if (this.arg.width != 'default') this.element.style.width = `${this.arg.width}px`
+                let pxHeight = this.arg.height.toString().indexOf('%') > 0 ? '' : 'px'
+                let pxWidth = this.arg.width.toString().indexOf('%') > 0 ? '' : 'px'
+                this.element.style.height = this.arg.height != '100%' ? this.arg.height + pxHeight : this.arg.height
+                if (this.arg.width != 'default') this.element.style.width = this.arg.width + pxWidth
 
                 this.element.appendChild(this.createTitle())
                 this.element.appendChild(this.setContent())
@@ -1111,6 +1114,10 @@ let xGridV2 = (function () {
                                     else
                                         if (this.elementSideBySide[field].getAttribute('placeholder'))
                                             text = this.elementSideBySide[field].getAttribute('placeholder')
+                                        else
+                                            if (this.elementSideBySide[field].getAttribute('label'))
+                                                text = this.elementSideBySide[field].getAttribute('label')
+
 
                                     this.arg.sideBySide.duplicity.execute({
                                         field: field,
@@ -1533,6 +1540,15 @@ let xGridV2 = (function () {
 
         this.setFilterconditional = (conditional) => ax.setFilterconditional(conditional)
 
+
+    }
+    function changeTheme(_theme) {
+        theme = _theme;
+        let el = [...document.querySelectorAll('.xGridV2-main')];
+        for (let i in el) {
+            el[i].classList = 'xGridV2-main';
+            el[i].classList.add(_theme);
+        }
     }
     return {
         create: create,
@@ -1542,5 +1558,7 @@ let xGridV2 = (function () {
         getNotFound: () => notFound,
         getPrintHead: () => printHead,
         setPrintHead: (html) => { printHead = html },
+        setTheme: (_theme) => { theme = _theme; },
+        changeTheme: changeTheme,
     }
 })();
