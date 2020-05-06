@@ -1,6 +1,6 @@
-// export default (function() {
-// eslint-disable-next-line no-unused-vars
-let xGridV2 = (function () {
+export default (function () {
+    // eslint-disable-next-line no-unused-vars
+    //let xGridV2 = (function () {
     const version = 2.1;
     const state = { save: 'save', insert: 'insert', update: 'update', select: 'select', cancel: 'cancel', delete: 'delete' }
     let notFound = 'Nada Localizado'
