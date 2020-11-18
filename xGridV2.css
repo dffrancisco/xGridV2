@@ -62,6 +62,7 @@
 
 .xGridV2-disable {
   background: #ffffff3d;
+  /* height: calc(100% - 30px); */
   height: 100%;
   width: 100%;
   position: absolute;
@@ -208,7 +209,7 @@
   margin-right: 0.1em;
   margin-left: 3px;
   margin-top: 8px;
-  height: 28px;
+  height: 31px;
 }
 
 .btn-Frame:disabled {
@@ -760,3 +761,122 @@
   box-shadow: none;
   background: #d7dada;
 }
+
+/*****************x-blue******************/
+
+.x-blue {
+  color: #00557f;
+  border: 1px solid #006699;
+  font-size: 10px;
+  font-family: Verdana, Arial, sans-serif;
+  font: normal 12px/150% Arial, Helvetica, sans-serif;
+  font-weight: bold;
+}
+
+.x-blue .xGridV2-title {
+  border-bottom: 1px solid #006699;
+  color: #ffffff;
+  background: -webkit-gradient(
+    linear,
+    left top,
+    left bottom,
+    color-stop(0.05, #006699),
+    color-stop(1, #00557f)
+  );
+  cursor: pointer;
+}
+
+.x-blue .xGridV2-title .xGridV2-col {
+  border-right: 1px solid rgba(210, 209, 209, 0.64);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 4px;
+}
+
+.x-blue .xGridV2-title .xGridV2-col:last-child {
+  margin-right: 17px;
+}
+
+.x-blue .xGridV2-content {
+  background: #ebf1f5;
+  height: calc(100% - 28px);
+}
+
+.x-blue .xGridV2-content .xGridV2-col {
+  border-bottom: 1px solid #e1eef4;
+  /* background-color: #ffffff; */
+  padding: 1px;
+  text-align: center;
+  padding: 4px;
+  height: 35px;
+}
+
+.x-blue .xGridV2-content .xGridV2-row:nth-child(odd) {
+  background-color: #e1eef4;
+}
+
+.x-blue .xGridV2-Selected {
+  background: #058cf5;
+  background: -webkit-gradient(
+    linear,
+    left top,
+    left bottom,
+    color-stop(0.05, #0086c9),
+    color-stop(1, #006ca1)
+  ) !important;
+  /*border-color:#014ab8;*/
+  color: #ffffff !important;
+  outline: 0;
+}
+
+.x-blue .xGridV2-load {
+  height: 24px;
+  width: 160px;
+}
+
+.x-blue .xGridV2-SelectedFocusOut {
+  background: rgba(65, 196, 240, 0.26) !important;
+  outline: 0;
+}
+
+.x-blue .xGridV2-content nav {
+  color: #c6bdcd;
+}
+
+/*****scrollbar*****/
+
+.x-blue::-webkit-scrollbar-track-piece,
+.x-blue .xGridV2-content::-webkit-scrollbar-track-piece {
+  border-left: none;
+  background: rgba(0, 0, 0, 0);
+}
+
+.x-blue::-webkit-scrollbar,
+.x-blue .xGridV2-content::-webkit-scrollbar {
+  width: 17px;
+  background: #ffffff;
+}
+
+.x-blue::-webkit-scrollbar-corner {
+  background: #ffffff;
+}
+
+.x-blue::-webkit-scrollbar-thumb:vertical,
+.x-blue::-webkit-scrollbar-thumb:horizontal,
+.x-blue .xGridV2-content::-webkit-scrollbar-thumb:vertical,
+.x-blue .xGridV2-content::-webkit-scrollbar-thumb:horizontal {
+  background: #006699;
+  border: 1px solid #e1eef4;
+  border-radius: 3px;
+}
+
+.x-blue::-webkit-scrollbar-thumb:vertical:hover,
+.x-blue::-webkit-scrollbar-thumb:horizontal:hover,
+.x-blue .xGridV2-content::-webkit-scrollbar-thumb:vertical:hover,
+.x-blue .xGridV2-content::-webkit-scrollbar-thumb:horizontal:hover {
+  box-shadow: none;
+  background-color: #0174ad;
+}
+
