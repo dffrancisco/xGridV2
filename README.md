@@ -886,7 +886,7 @@ Esses métodos serão utilizados no grid instanciado. Ex.:<br>
         <td>Altera a propriedade <a href="#filterConditional">conditional</a> do filter. (<a href="filter">filter</a>)
     </tr>
     <tr>
-        <td>disableBtnsSalvarCancelar</td>
+        <td>disableBtnsSaveCancel</td>
         <td align="center">disable: Boolean
         </td>
         <td>Desabilita/Habilita os botões salvar e cancelar de acordo com a informação passada. (<a href="#frame">frame</a>)

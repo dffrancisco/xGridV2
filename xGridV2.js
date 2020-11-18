@@ -1,6 +1,6 @@
-export default (function () {
-    // eslint-disable-next-line no-unused-vars
-    //let xGridV2 = (function () {
+//export default (function () {
+// eslint-disable-next-line no-unused-vars
+let xGridV2 = (function () {
     const version = 2.1;
     const state = { save: 'save', insert: 'insert', update: 'update', select: 'select', cancel: 'cancel', delete: 'delete' }
     let notFound = 'Nada Localizado'
@@ -224,6 +224,9 @@ export default (function () {
                 this.setTitle(source)
 
                 this.tabindex = 0
+                this.indexSelect = 0
+                this.page = 1
+                this.sourceSelect = false
                 this.gridContent.scrollTop = 0
 
                 this.createLine(source)
@@ -649,7 +652,10 @@ export default (function () {
 
                             }
                         }
-                        cell.innerHTML = _value
+                        if (cell.innerHTML)
+                            cell.innerHTML = _value
+                        if (cell.value)
+                            cell.value = _value
                     }
                 }
 
@@ -692,17 +698,19 @@ export default (function () {
             },
             disable(call) {
                 this.onEvent.divDisable[0] = document.createElement('div')
-                this.onEvent.divDisable[1] = document.createElement('div')
+                // this.onEvent.divDisable[1] = document.createElement('div')
                 this.onEvent.divDisable[0].classList.add('xGridV2-disable')
-                this.onEvent.divDisable[1].classList.add('xGridV2-disable')
+                // this.onEvent.divDisable[1].classList.add('xGridV2-disable')
 
                 this.onEvent.removeEventListener()
 
                 if (this.widthAll > 100)
                     this.element.style.overflow = 'hidden'
 
-                this.gridContent.insertBefore(this.onEvent.divDisable[0], this.gridContent.firstChild)
-                this.gridTitle.insertBefore(this.onEvent.divDisable[1], this.gridTitle.firstChild)
+                // this.gridContent.insertBefore(this.onEvent.divDisable[0], this.gridContent.firstChild)
+                // this.gridTitle.insertBefore(this.onEvent.divDisable[1], this.gridTitle.firstChild)
+
+                this.element.insertBefore(this.onEvent.divDisable[0], this.element.firstChild)
 
                 this.gridDisable = true
 
@@ -712,7 +720,7 @@ export default (function () {
             enable(call) {
                 if (this.onEvent.divDisable[0]) {
                     this.onEvent.divDisable[0].remove()
-                    this.onEvent.divDisable[1].remove()
+                    // this.onEvent.divDisable[1].remove()
 
                     this.onEvent.setEventListenerAll()
 
@@ -1141,16 +1149,29 @@ export default (function () {
 
                 for (let i in this.arg.sideBySide.duplicity.dataField) {
                     let field = this.arg.sideBySide.duplicity.dataField[i]
-
+                    let text = ''
                     if (this.sourceSelect[field] != this.elementSideBySide[field].value) {
+
+                        if (this.elementSideBySide[field].previousSibling.previousElementSibling)
+                            text = this.elementSideBySide[field].previousSibling.previousElementSibling.innerText
+                        else
+                            if (this.elementSideBySide[field].getAttribute('placeholder'))
+                                text = this.elementSideBySide[field].getAttribute('placeholder')
+                            else
+                                if (this.elementSideBySide[field].getAttribute('label'))
+                                    text = this.elementSideBySide[field].getAttribute('label')
+
+
                         that = this.arg.sideBySide.duplicity.execute({
                             field: field,
                             value: this.elementSideBySide[field].value.trim(),
-                            text: this.elementSideBySide[field].previousSibling.previousElementSibling.innerText
+                            //text: this.elementSideBySide[field].previousSibling.previousElementSibling.innerText
+                            text: text
                         })
                         return false
                     }
                 }
+
                 return that
             },
             tabToEnter(name) {
