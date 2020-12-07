@@ -347,7 +347,7 @@ columns: {
                 <tr>
                     <td>compare</td>
                     <td>Informa o nome da função fornecida em <a href="#tdCreateCompare">compare</a> do create que deseja aplicar a esta coluna.
-<pre>grid = new xGrid.create({
+<pre>grid = new xGridV2.create({
     columns: {'Name': {dataField: 'NAME', compare: 'reverse'},},
     compare: {'reverse': (r)=>{
         return r.value.split('').reverse().join('');
@@ -379,7 +379,7 @@ columns: {
                     <th>Default</th>
                 </tr>
                 <tr>
-                    <pre>   grid = new xGrid.create({
+                    <pre>   grid = new xGridV2.create({
             filter: {
                 filterBegin: false,
                 fieldByField: {conditional: 'OR'},
@@ -424,7 +424,7 @@ columns: {
     <tr>
         <td colspan=4>
             <pre>
-grid = new xGrid.create({
+grid = new xGridV2.create({
     query: {
         endScroll: 0.1,
         execute: async (r) => {
@@ -480,7 +480,7 @@ grid.queryOpen({ desc: 'sherlock', maxItem: 20 })</pre>
     </tr>
     <tr>
         <td colspan=4>
-            <pre>       const grid = new xGrid({
+            <pre>       const grid = new xGridV2({
                 sideBySide: {
                     el: '#myForm'
                 }
@@ -516,7 +516,7 @@ grid.queryOpen({ desc: 'sherlock', maxItem: 20 })</pre>
                 <tr>
                     <td>compare</strong></td>
                     <td>Recebe um objeto, sendo a chave do objeto o 'name' do elemento e o valor o nome da função fornecida em <a href="#tdCreateCompare">compare</a> do create.
-<pre>grid = new xGrid.create({
+<pre>grid = new xGridV2.create({
     compare: {'joinName': (r)=>{
         return r.firstName + ' ' + r.lastName;
     }},
@@ -540,7 +540,7 @@ grid.queryOpen({ desc: 'sherlock', maxItem: 20 })</pre>
                 <tr>
                     <td colspan=4>
             <pre>
-            const grid = new xGrid.create({
+            const grid = new xGridV2.create({
                 sideBySide:{
                     frame: {
                         el: '#divButtons',
