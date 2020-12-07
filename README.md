@@ -32,7 +32,7 @@ Em seu html declare o css:
 
 Para usar o xGrid você deve chamá-lo em seu arquivo .js através de import.
 ```javascript
-    import xGrid from './xGridV2';
+    import xGridV2 from './xGridV2';
 ```
 ## Modo de Uso
 
@@ -57,7 +57,7 @@ No javascript iremos instanciar o objeto da seguinte forma:
 <h4>Create</h4>
 
 ```javascript
-    const grid = new xGrid.create({
+    const grid = new xGridV2.create({
         el: '#pnGrid'
     })
 
