@@ -932,7 +932,7 @@ Esses métodos serão utilizados no grid instanciado. Ex.:<br>
     <tr>
         <td>getDuplicityAll</td>
         <td align="center">nenhum</td>
-        <td>Chama a função execute de <a href="#duplicity">duplicity</a> dos fields informados.</td>
+        <td>Chama a função execute de <a href="#duplicity">duplicity</a> dos fields informados. Essa função retorna uma Promise</td>
     </tr>
     <tr>
         <td>showMessageDuplicity</td>
