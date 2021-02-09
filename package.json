@@ -1,6 +1,6 @@
 {
   "name": "xgridv2",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "<p>O xGrid é um grid robusto, possui inúmeras funcionalidades, com uma alta performance. É um componente desenvolvido apenas com javascript sem uso de bibliotecas externas.</p>",
   "main": "xGridV2.js",
   "directories": {
