@@ -679,6 +679,9 @@ let xGridV2 = (function () {
                 if (this.gridDisable)
                     return false
 
+                if (Object.keys(this.arg.source).length == 0)
+                    return false
+
                 if (Object.keys(this.sourceSelect).length > 0) {
                     if (numLine == undefined) {
                         this.gridContent.querySelector('[tabindex="' + this.indexSelect + '"]').focus()
