@@ -500,6 +500,35 @@ grid.queryOpen({ desc: 'sherlock', maxItem: 20 })</pre>
                     <td align="center">Undefined</td>
                 </tr>
                 <tr>
+                    <td>vModel</strong></td>
+                    <td>Recebe um objeto com os campos que seram injetodos nos campos v-text do vuetify
+                    <pre>
+                    #exemplo do vue#
+                    data() {
+                        return {
+                            fields: {
+                                name: "",
+                                cpf: ""
+                            },
+                        }
+                    ###
+                    vModel: this.fields,
+                    </pre>
+                    </td>
+                    <td align="center">Object</td>
+                    <td align="center"></td>
+                </tr>
+                <tr>
+                    <td>vRefs</strong></td>
+                    <td>Os refs do vue onde o xgrid fará o controle do fields
+                    <pre>
+                     vRefs: this.$refs
+                    </pre>
+                    </td>
+                    <td align="center">Object</td>
+                    <td align="center"></td>
+                </tr>
+                <tr>
                     <td>render</strong></td>
                     <td>Recebe um objeto, sendo a chave do objeto o 'name' do elemento e o valor uma função callback que recebe o valor do elemento e retorna um valor modificado pela função.
                      <pre>... sideBySide: {
