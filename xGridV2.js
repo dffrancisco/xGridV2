@@ -628,7 +628,7 @@ let xGridV2 = (function () {
                         return ax.sourceSelect[field];
                 }
 
-                if (typeof field == 'object') {
+                if (typeof field == 'object' && Object.keys(field).length > 0) {
                     let columns = Object.keys(this.arg.columns).length > 0 ? this.arg.columns : this.columnsAutoCreate;
                     let linha = this.gridContent.querySelector('[tabindex="' + this.indexSelect + '"]')
                     let cell;
@@ -636,7 +636,6 @@ let xGridV2 = (function () {
                         let _field = x
                         let _value = field[x]
                         cell = linha.querySelector('[name="' + _field + '"]')
-
                         for (let i in columns) {
                             if (columns[i].dataField == _field) {
                                 ax.sourceSelect[_field] = _value;
@@ -652,10 +651,19 @@ let xGridV2 = (function () {
 
                             }
                         }
-                        if (cell.innerHTML)
+                        if (cell && cell.innerHTML)
                             cell.innerHTML = _value
-                        if (cell.value)
+                        if (cell && cell.value)
                             cell.value = _value
+                    }
+                }
+
+                if (typeof field == 'object' && Object.keys(field).length == 0) {
+                    let columns = Object.keys(this.arg.columns).length > 0 ? this.arg.columns : this.columnsAutoCreate;
+
+                    for (let i in columns) {
+                        console.log(ax.sourceSelect);
+                        ax.sourceSelect[columns[i].dataField] = '';
                     }
                 }
 
