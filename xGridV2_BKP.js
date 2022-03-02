@@ -1,7 +1,7 @@
-//export default (function () {
+// export default (function () {
 // eslint-disable-next-line no-unused-vars
 let xGridV2 = (function () {
-    const version = 2.1;
+    const version = 2.2;
     const state = { save: 'save', insert: 'insert', update: 'update', select: 'select', cancel: 'cancel', delete: 'delete' }
     let notFound = 'Nada Localizado'
     let theme = 'x-grayV2'
@@ -35,7 +35,6 @@ let xGridV2 = (function () {
             dblClick: false,
             enter: false,
             frame: false,
-            vModel: false,
             complete: false,
             keyDown: false,
             count: false,
@@ -71,7 +70,7 @@ let xGridV2 = (function () {
             listTabForEnter: false,
             filterControl: false,
             constructor() {
-                this.element = this.arg.el.tagName == 'DIV' ? this.arg.el : document.querySelector(this.arg.el)
+                this.element = document.querySelector(this.arg.el)
                 this.idElment = this.element.id
                 this.element.classList.add("xGridV2-main");
                 this.element.classList.add(this.arg.theme ? this.arg.theme : theme);
@@ -98,8 +97,6 @@ let xGridV2 = (function () {
                             el.querySelectorAll('[name]').forEach((field) => {
 
                                 if (this.elementSideBySide[field.name]) {
-                                    if (field.nodeName == 'DIV')
-                                        return
                                     if (qto == 0) {
                                         let _el_ = this.elementSideBySide[field.name]
                                         this.elementSideBySide[field.name] = []
@@ -631,7 +628,7 @@ let xGridV2 = (function () {
                         return ax.sourceSelect[field];
                 }
 
-                if (typeof field == 'object' && Object.keys(field).length > 0) {
+                if (typeof field == 'object') {
                     let columns = Object.keys(this.arg.columns).length > 0 ? this.arg.columns : this.columnsAutoCreate;
                     let linha = this.gridContent.querySelector('[tabindex="' + this.indexSelect + '"]')
                     let cell;
@@ -639,6 +636,7 @@ let xGridV2 = (function () {
                         let _field = x
                         let _value = field[x]
                         cell = linha.querySelector('[name="' + _field + '"]')
+
                         for (let i in columns) {
                             if (columns[i].dataField == _field) {
                                 ax.sourceSelect[_field] = _value;
@@ -654,19 +652,10 @@ let xGridV2 = (function () {
 
                             }
                         }
-                        if (cell && cell.innerHTML)
+                        if (cell.innerHTML)
                             cell.innerHTML = _value
-                        if (cell && cell.value)
+                        if (cell.value)
                             cell.value = _value
-                    }
-                }
-
-                if (typeof field == 'object' && Object.keys(field).length == 0) {
-                    let columns = Object.keys(this.arg.columns).length > 0 ? this.arg.columns : this.columnsAutoCreate;
-
-                    for (let i in columns) {
-                        console.log(ax.sourceSelect);
-                        ax.sourceSelect[columns[i].dataField] = '';
                     }
                 }
 
@@ -698,15 +687,13 @@ let xGridV2 = (function () {
                         this.gridContent.querySelector('[tabindex="' + this.indexSelect + '"]').focus()
 
                     } else {
-                        let el = this.gridContent.querySelector('[tabindex="' + numLine + '"]')
-                        if (el) el.focus()
+                        this.gridContent.querySelector('[tabindex="' + numLine + '"]').focus()
                     }
                 } else {
                     if (numLine == undefined) {
                         this.gridContent.querySelector('[tabindex="0"]').focus()
                     } else {
-                        let el = this.gridContent.querySelector('[tabindex="' + numLine + '"]')
-                        if (el) el.focus()
+                        this.gridContent.querySelector('[tabindex="' + numLine + '"]').focus()
                     }
 
                 }
@@ -862,7 +849,6 @@ let xGridV2 = (function () {
                 })
             },
             onSelectLine() {
-                this.vModel()
                 if (this.arg.onSelectLine)
                     this.arg.onSelectLine(this.sourceSelect)
             },
@@ -889,9 +875,8 @@ let xGridV2 = (function () {
                     /*se o conteudo da variavel for numerico ele retorna false*/
                     /*para igular os valores no edit esta 1,00 no sourceSelect esta 1.00*/
                     if (!isNaN(parseFloat(value))) {
-                        if (value.indexOf(",") > -1) {
-                            value = parseFloat(value.replace(/\./g, '').replace(/\,/g, '.'));
-                        }
+                        if (value.indexOf(",") != -1)
+                            value = value.replace(/\./g, '').replace(/\\,/g, '.');
                     }
 
                     /*tratamento para data*/
@@ -923,90 +908,133 @@ let xGridV2 = (function () {
             setElementSideBySide() {
                 if (this.arg.sideBySide) {
 
+                    if (this.arg.sideBySide.vModel) {
+
+                        for (let i in this.arg.sideBySide.vModel) {
+                            let value = this.sourceSelect[i];
+
+                            if (this.arg.sideBySide.render)
+                                if (this.arg.sideBySide.render[i])
+                                    try {
+                                        value = this.arg.sideBySide.render[i](value)
+                                    } catch (error) { throw 'erro see your function render' }
+
+
+                            if (this.arg.sideBySide.compare)
+                                if (this.arg.compare[this.arg.sideBySide.compare[i]])
+                                    try {
+                                        let _source = { ...this.sourceSelect }
+                                        _source.value = value
+                                        value = this.arg.compare[this.arg.sideBySide.compare[i]](_source)
+                                    } catch (error) { throw 'erro see your function compare' }
+
+
+
+                            this.arg.sideBySide.vModel[i] = value
+                        }
+
+                    }
+
                     if (this.arg.sideBySide.el)
-                        if (!this.arg.sideBySide.vModel)
-                            for (let i in this.elementSideBySide) {
+                        for (let i in this.elementSideBySide) {
 
-                                let value = this.sourceSelect[i];
-                                let type = this.elementSideBySide[i].type
+                            let value = this.sourceSelect[i];
+                            let type = this.elementSideBySide[i].type
 
-                                if (this.arg.sideBySide.render)
-                                    if (this.arg.sideBySide.render[i])
-                                        try {
-                                            value = this.arg.sideBySide.render[i](value)
-                                        } catch (error) { throw 'erro see your function render' }
+                            if (this.arg.sideBySide.render)
+                                if (this.arg.sideBySide.render[i])
+                                    try {
+                                        value = this.arg.sideBySide.render[i](value)
+                                    } catch (error) { throw 'erro see your function render' }
 
-                                if (this.arg.sideBySide.compare)
-                                    if (this.arg.compare[this.arg.sideBySide.compare[i]])
-                                        try {
-                                            let _source = { ...this.sourceSelect }
-                                            _source.value = value
-                                            value = this.arg.compare[this.arg.sideBySide.compare[i]](_source)
-                                        } catch (error) { throw 'erro see your function compare' }
+                            if (this.arg.sideBySide.compare)
+                                if (this.arg.compare[this.arg.sideBySide.compare[i]])
+                                    try {
+                                        let _source = { ...this.sourceSelect }
+                                        _source.value = value
+                                        value = this.arg.compare[this.arg.sideBySide.compare[i]](_source)
+                                    } catch (error) { throw 'erro see your function compare' }
 
 
-                                switch (type) {
-                                    case undefined:
-                                        var typeEle = this.elementSideBySide[i].localName;
-                                        if (typeEle == 'img') {
-                                            this.elementSideBySide[i].src = value
-                                        } else
-                                            this.elementSideBySide[i].innerHTML = value
-                                        break;
-                                    case 'text':
-                                    case 'password':
-                                    case 'textarea':
-                                    case 'number':
-                                    case 'tel':
-                                    case 'date':
-                                    case 'time':
-                                    case 'range':
-                                    case 'hidden':
-                                        ax.elementSideBySide[i].value = value
-                                        break;
-                                    case 'radio':
-                                        // eslint-disable-next-line no-case-declarations
-                                        let radios = { ...ax.elementSideBySide[i] }
-                                        delete radios.type
-                                        for (let r in radios) {
-                                            if (radios[r].value == value) {
-                                                radios[r].checked = true
-                                                break
-                                            }
+                            switch (type) {
+                                case undefined:
+                                    var typeEle = this.elementSideBySide[i].localName;
+                                    if (typeEle == 'img') {
+                                        this.elementSideBySide[i].src = value
+                                    } else
+                                        this.elementSideBySide[i].innerHTML = value
+                                    break;
+                                case 'text':
+                                case 'password':
+                                case 'textarea':
+                                case 'number':
+                                case 'tel':
+                                case 'date':
+                                case 'time':
+                                case 'range':
+                                case 'hidden':
+                                    ax.elementSideBySide[i].value = value
+                                    break;
+                                case 'radio':
+                                    // eslint-disable-next-line no-case-declarations
+                                    let radios = { ...ax.elementSideBySide[i] }
+                                    delete radios.type
+                                    for (let r in radios) {
+                                        if (radios[r].value == value) {
+                                            radios[r].checked = true
+                                            break
                                         }
+                                    }
+                                    break;
+                                case 'select-one':
+                                    ax.elementSideBySide[i].value = value
+                                    break;
+                                case 'checkbox':
+                                    ax.elementSideBySide[i].checked = (value == '1' ? true : false)
+                                    break;
+                                case '':
+                                    { //href
+                                        ax.elementSideBySide[i].href = value
+                                        ax.elementSideBySide[i].innerHTML = value
                                         break;
-                                    case 'select-one':
-                                        ax.elementSideBySide[i].value = value
-                                        break;
-                                    case 'checkbox':
-                                        ax.elementSideBySide[i].checked = (value == '1' ? true : false)
-                                        break;
-                                    case '':
-                                        { //href
-                                            ax.elementSideBySide[i].href = value
-                                            ax.elementSideBySide[i].innerHTML = value
-                                            break;
-                                        }
-                                }
+                                    }
                             }
+                        }
                 }
             },
             getDiffTwoJson(toUpperCase = false, empty = true) {
                 let diff = { old: {}, new: {} }
-                let fieldsSideBySide = this.getElementSideBySideJson(toUpperCase, empty)
 
-                for (let i in fieldsSideBySide) {
-                    if (fieldsSideBySide[i] != this.sourceSelect[i]) {
-                        diff.old[i] = this.sourceSelect[i]
-                        diff.new[i] = fieldsSideBySide[i];
+                if (this.arg.sideBySide.vModel) {
+                    for (let i in this.arg.sideBySide.vModel) {
+                        if (this.arg.sideBySide.vModel[i] != this.sourceSelect[i]) {
+                            diff.old[i] = this.sourceSelect[i]
+                            diff.new[i] = this.arg.sideBySide.vModel[i];
+                        }
                     }
+                } else {
+
+                    let fieldsSideBySide = this.getElementSideBySideJson(toUpperCase, empty)
+
+                    for (let i in fieldsSideBySide) {
+                        if (fieldsSideBySide[i] != this.sourceSelect[i]) {
+                            diff.old[i] = this.sourceSelect[i]
+                            diff.new[i] = fieldsSideBySide[i];
+                        }
+                    }
+
                 }
 
                 return diff
-
             },
             clearElementSideBySide() {
-                ax.dataSource({})
+
+                if (this.arg.sideBySide.vModel) {
+                    for (let i in this.arg.sideBySide.vModel) {
+                        this.arg.sideBySide.vModel[i] = ''
+                    }
+                }
+
                 if (this.arg.sideBySide)
                     if (this.arg.sideBySide.el)
                         for (let i in this.elementSideBySide) {
@@ -1061,10 +1089,10 @@ let xGridV2 = (function () {
                 else
                     this.createLine(source)
             },
-            async queryOpen(param, call) {
+            queryOpen(param, call) {
                 this.paramQuery = param
                 this.tabindex = 0
-                await this.arg.query.execute({ offset: this.tabindex, page: ax.page, param: param })
+                this.arg.query.execute({ offset: this.tabindex, page: ax.page, param: param })
                 call && call()
             },
             frame() {
@@ -1080,7 +1108,7 @@ let xGridV2 = (function () {
                             this.arg.sideBySide.frame.class.split(' ').forEach((e) => elFrame.classList.add(e))
 
 
-                        if (this.arg.sideBySide.frame.buttons)
+                        if (this.arg.sideBySide.frame.buttons) {
                             for (let key in this.arg.sideBySide.frame.buttons) {
                                 // if (key == 'el' || key == 'style' || key == 'class')
                                 //     continue
@@ -1121,13 +1149,10 @@ let xGridV2 = (function () {
                                 this.buttonsFrame[key] = btn
 
                                 elFrame.appendChild(btn)
-                                ax.disableFieldsSideBySide(true)
                             }
+                            ax.disableFieldsSideBySide(true)
+                        }
                     }
-            },
-            vModel() {
-                if (this.arg.sideBySide.vModel)
-                    this.arg.sideBySide.vModel({ ...this.sourceSelect })
             },
             duplicity() {
 
@@ -1169,41 +1194,59 @@ let xGridV2 = (function () {
                 document.body.appendChild(this.messageDuplicity)
             },
             getDuplicityAll() {
+                // eslint-disable-next-line
                 return new Promise(async (res, rej) => {
-                    for (let i in this.arg.sideBySide.duplicity.dataField) {
-                        let field = this.arg.sideBySide.duplicity.dataField[i]
-                        let text = ''
-                        if (this.sourceSelect[field] != this.elementSideBySide[field].value) {
+                    // return new Promise((res, rej) => {
+                    try {
+                        for (let i in this.arg.sideBySide.duplicity.dataField) {
+                            let field = this.arg.sideBySide.duplicity.dataField[i]
+                            let text = ''
+                            if (this.sourceSelect[field] != this.elementSideBySide[field].value) {
 
-                            if (this.elementSideBySide[field].previousSibling.previousElementSibling)
-                                text = this.elementSideBySide[field].previousSibling.previousElementSibling.innerText
-                            else
-                                if (this.elementSideBySide[field].getAttribute('placeholder'))
-                                    text = this.elementSideBySide[field].getAttribute('placeholder')
+                                if (this.elementSideBySide[field].previousSibling.previousElementSibling)
+                                    text = this.elementSideBySide[field].previousSibling.previousElementSibling.innerText
                                 else
-                                    if (this.elementSideBySide[field].getAttribute('label'))
-                                        text = this.elementSideBySide[field].getAttribute('label')
+                                    if (this.elementSideBySide[field].getAttribute('placeholder'))
+                                        text = this.elementSideBySide[field].getAttribute('placeholder')
+                                    else
+                                        if (this.elementSideBySide[field].getAttribute('label'))
+                                            text = this.elementSideBySide[field].getAttribute('label')
+
+                                // tive que comentar esse codigo porque o eslite não estava aceitando
+                                let r = await this.arg.sideBySide.duplicity.execute({
+                                    field: field,
+                                    value: this.elementSideBySide[field].value.trim(),
+                                    //text: this.elementSideBySide[field].previousSibling.previousElementSibling.innerText
+                                    text: text
+                                })
+                                return res(r)
+
+                                // this.arg.sideBySide.duplicity.execute({
+                                //     field: field,
+                                //     value: this.elementSideBySide[field].value.trim(),
+                                //     //text: this.elementSideBySide[field].previousSibling.previousElementSibling.innerText
+                                //     text: text
+                                // }).then(r => {
+                                //     return res(r)
+                                // })
 
 
-                            let r = await this.arg.sideBySide.duplicity.execute({
-                                field: field,
-                                value: this.elementSideBySide[field].value.trim(),
-                                //text: this.elementSideBySide[field].previousSibling.previousElementSibling.innerText
-                                text: text
-                            })
 
-
-                            return res(r)
+                            }
                         }
-                    }
 
-                    res(false)
+                        res(false)
+
+                    } catch (error) {
+                        rej(error)
+                    }
                 })
             },
             tabToEnter(name) {
 
                 if (this.arg.sideBySide.tabToEnter != false) {
                     if (this.elementSideBySide[name] == undefined) return false
+
                     this.elementSideBySide[name].addEventListener('keydown', function (e) {
                         if (e.keyCode == 13) {
 
@@ -1221,16 +1264,37 @@ let xGridV2 = (function () {
                 }
             },
             focusField(name) {
-                if (name == undefined) {
-                    if (this.listTabForEnter[0].tagName == 'BUTTON' || this.listTabForEnter[0].tagName == 'SELECT')
-                        this.listTabForEnter[0].focus()
-                    else
-                        this.listTabForEnter[0].select()
-                } else
-                    if (this.elementSideBySide[name].tagName == 'BUTTON' || this.elementSideBySide[name].tagName == 'SELECT')
-                        this.elementSideBySide[name].focus()
-                    else
-                        this.elementSideBySide[name].select()
+
+                if (this.arg.sideBySide.vRefs) {
+                    if (name == undefined) {
+                        let index = Object.keys(this.arg.sideBySide.vRefs)[0]
+                        let element = this.arg.sideBySide.vRefs[index].$el.querySelector("input");
+                        setTimeout(() => {
+                            element.focus()
+                            element.select()
+                        }, 100);
+                    } else {
+                        let element = this.arg.sideBySide.vRefs[name].$el.querySelector("input");
+                        setTimeout(() => {
+                            element.focus()
+                            element.select()
+                        }, 100);
+                    }
+
+                } else {
+
+                    if (name == undefined) {
+                        if (this.listTabForEnter[0].tagName == 'BUTTON' || this.listTabForEnter[0].tagName == 'SELECT')
+                            this.listTabForEnter[0].focus()
+                        else
+                            this.listTabForEnter[0].select()
+                    } else
+                        if (this.elementSideBySide[name].tagName == 'BUTTON' || this.elementSideBySide[name].tagName == 'SELECT')
+                            this.elementSideBySide[name].focus()
+                        else
+                            this.elementSideBySide[name].select()
+                }
+
             },
             disableBtnsSaveCancel(disabled = true) {
 
@@ -1245,7 +1309,57 @@ let xGridV2 = (function () {
                         }
                     }
             },
+
             disableFieldsSideBySide(disable = false) {
+                // console.log(this.arg.sideBySide.vRefs, disable);
+
+                if (this.arg.sideBySide.vRefs) {
+
+                    for (let i in this.arg.sideBySide.vRefs) {
+                        // this.arg.sideBySide.vRefs[i].disabled = disable
+                        let element = this.arg.sideBySide.vRefs[i].$el.querySelector("input");
+
+                        // this.arg.sideBySide.vRefs['old'].$el.disabled = !disable
+
+                        // console.log(this.arg.sideBySide.vRefs[i].$el)
+                        console.log(element);
+
+                        let type = element.type
+
+                        switch (type) {
+                            case 'text':
+                            case 'password':
+                            case 'textarea':
+                            case 'number':
+                            case 'tel':
+                            case 'date':
+                            case 'time':
+                            case 'range':
+                            case 'hidden':
+                                element.readOnly = disable
+                                // element.disabled = disable
+                                break;
+                            case 'radio':
+                                // eslint-disable-next-line no-case-declarations
+                                let radios = { ...element }
+                                delete radios.type
+                                for (let r in radios) {
+                                    radios[r].disabled = disable
+                                    break
+                                }
+                                break;
+                            case 'select-one':
+                                element.disabled = disable
+                                break;
+                            case 'checkbox':
+                                element.disabled = disable
+                                break;
+
+                        }
+                    }
+
+                }
+
                 for (let i in this.elementSideBySide) {
                     let type = this.elementSideBySide[i].type
 
@@ -1279,6 +1393,7 @@ let xGridV2 = (function () {
 
                     }
                 }
+
             },
             resizeTitle(resizers) {
                 let fieldTitle
