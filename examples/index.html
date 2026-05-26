@@ -5,8 +5,8 @@
     <title>xGridV2</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="../xGridV2.js" type="text/javascript"></script>
-    <link rel="stylesheet" href="../xGridV2.css">
+    <script src="../xGridV2/xGridV2.js"></script>
+    <link rel="stylesheet" href="../xGridV2/xGridV2.css">
     <style>
         body {
             /* background: #083952; */
@@ -24,7 +24,7 @@
         <!-- <span>Title</span> -->
         <input type="text" name="title" placeholder="O Title" style="width: 300px">
         <span>Authors</span>
-        <input type="text" name="authors">
+        <input type="text" name="price">
 
 
     </div>
@@ -216,13 +216,14 @@
             // height: 150,
             // width: '100%',
             // count: true,
-            heightLine: 60,
+            heightLine: 40,
             // setfocus: 1,
             multiSelect: true,
             // title:false,
-            theme: 'x-darkV2',
-            // theme: 'x-whiteV2',
-            theme: 'x-opacite',
+            // theme: 'x-darkV2',
+            theme: 'x-whiteV2',
+            // theme: 'x-opacite',
+            count: true,
             onSelectLine: (r) => {
 
             },
@@ -251,9 +252,9 @@
                 theGrid.disableBtnsSaveCancel()
             },
             columns: {
-                'thumbnail': { dataField: 'thumbnail', compare: 'thumbnail', width: '5%', center: true },
+                'thumbnail': { dataField: 'thumbnail', compare: 'thumbnail', width: '10%', center: true, html: true },
                 'Title': { dataField: 'title' },
-                'authors': { dataField: 'authors', width: '40%' },
+                'Price': { dataField: 'price', width: '10%', right: true },
             },
             compare: {
                 thumbnail: (r) => {
@@ -343,16 +344,16 @@
             query: {
                 // endScroll: 0.5,
                 execute: (r) => {
-                    let fields = `&fields=items(volumeInfo(title,authors,description,publishedDate,language,imageLinks(smallThumbnail)))`
                     let data = []
-                    fetch(`https://www.googleapis.com/books/v1/volumes?q=${r.param.desc}&startIndex=${r.offset}&maxResults=10${fields}`)
+                    // https://dummyjson.com/products?limit=5&skip=5
+                    fetch(`https://dummyjson.com/products?limit=30&skip=${r.offset}`)
                         .then(response => { return response.json() })
                         .then(r => {
-                            Object.entries(r.items).forEach(el => {
+                            Object.entries(r.products).forEach(el => {
                                 let ln = {}
-                                ln.title = el[1].volumeInfo.title
-                                ln.thumbnail = el[1].volumeInfo.imageLinks ? el[1].volumeInfo.imageLinks.smallThumbnail : ''
-                                ln.authors = el[1].volumeInfo.authors
+                                ln.title = el[1].title
+                                ln.thumbnail = el[1].thumbnail
+                                ln.price = el[1].price
                                 data.push(ln)
                             })
                             theGrid.querySourceAdd(data)
@@ -362,7 +363,7 @@
         })
 
         theGrid.load()
-        theGrid.queryOpen({ desc: 'game of thrones' })
+        theGrid.queryOpen({ desc: 'sherlock' })
     </script>
 
 
