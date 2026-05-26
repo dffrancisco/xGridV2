@@ -1,0 +1,38 @@
+{
+  "name": "xgridv2",
+  "version": "2.3.0",
+  "description": "Grid robusto em JavaScript puro, sem dependências de runtime.",
+  "main": "xGridV2/xGridV2.js",
+  "types": "xGridV2/index.d.ts",
+  "files": [
+    "xGridV2"
+  ],
+  "scripts": {
+    "build": "node scripts/build.js",
+    "dev": "node scripts/build.js --watch",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "serve": "npx --yes serve . -p 8080"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dffrancisco/xGridV2.git"
+  },
+  "keywords": [
+    "grid",
+    "datagrid",
+    "table"
+  ],
+  "author": "Francisco Alves",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/dffrancisco/xGridV2/issues"
+  },
+  "homepage": "https://github.com/dffrancisco/xGridV2#readme",
+  "devDependencies": {
+    "esbuild": "^0.25.0",
+    "jsdom": "^26.0.0",
+    "typescript": "^5.7.3",
+    "vitest": "^3.0.0"
+  }
+}

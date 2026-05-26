@@ -18,22 +18,69 @@
 
 ## Instalação
 
-Clone o repositório em um diretório local.
+Clone o repositório e instale as dependências de desenvolvimento:
 
 ```sh
-    git clone git@github.com:dffrancisco/xGridV2.git
+git clone git@github.com:dffrancisco/xGridV2.git
+cd xGridV2
+npm install
+npm run build
 ```
-## Importando
 
-Em seu html declare o css:
+Artefatos gerados em `dist/`:
+
+| Arquivo | Uso |
+|---------|-----|
+| `dist/xGridV2.js` | Script do grid (browser) |
+| `dist/xGridV2.css` | Estilos e temas |
+| `dist/index.d.ts` | Tipos TypeScript |
+
+## Importando (HTML / vanilla)
+
 ```html
-    <link rel="stylesheet" href="./xGridV2.css">
+<link rel="stylesheet" href="./dist/xGridV2.css">
+<script src="./dist/xGridV2.js"></script>
 ```
 
-Para usar o xGrid você deve chamá-lo em seu arquivo .js através de import.
 ```javascript
-    import xGridV2 from './xGridV2';
+const grid = new xGridV2.create({ el: '#pnGrid' })
+grid.source(json)
 ```
+
+## Vue 3 + TypeScript
+
+Copie a pasta `dist/` para o projeto (ex.: `src/lib/xgrid/`) e importe:
+
+```typescript
+import '@/lib/xgrid/xGridV2.css'
+import '@/lib/xgrid/xGridV2.js'
+import type { ixGrid, ixGridCreate } from '@/lib/xgrid/index.d.ts'
+
+const fields = reactive({ title: '', authors: '' })
+
+onMounted(() => {
+  const grid = new xGridV2.create({
+    el: '#pnGrid',
+    sideBySide: {
+      el: '#form',
+      vModel: fields,
+    },
+  } as ixGrid)
+})
+```
+
+## Scripts npm
+
+| Comando | Descrição |
+|---------|-----------|
+| `npm run build` | Gera `dist/` |
+| `npm run dev` | Build com watch |
+| `npm run typecheck` | Verifica tipos |
+| `npm test` | Testes automatizados |
+| `npm run serve` | Servidor local (exemplo em `/examples/index.html`) |
+
+Ver também [CHANGELOG.md](./CHANGELOG.md) para mudanças da versão 2.3.
+
 ## Modo de Uso
 
 É necessário um elemento no seu html com um id ou classe para usar na instância do xGrid.
@@ -43,11 +90,11 @@ Para usar o xGrid você deve chamá-lo em seu arquivo .js através de import.
     <html lang="pt-BR">
     <head>
         <title>xGrid v2.0</title>
-        <link rel="stylesheet" href="./xGridV2.css">
+        <link rel="stylesheet" href="./dist/xGridV2.css">
     </head>
     <body>
         <div id="pnGrid"></div>
-        <script src="./xGridV2.js"></script>
+        <script src="./dist/xGridV2.js"></script>
         <script src="example.js" type="module"></script>
     </body>
     </html>
@@ -63,6 +110,32 @@ No javascript iremos instanciar o objeto da seguinte forma:
 
     grid.source(json);
 ```
+
+## Segurança (XSS)
+
+Por padrão (`escapeCells: true`), o conteúdo das células é escapado antes de ir para o DOM. Isso evita execução de HTML/script vindo de dados externos.
+
+Colunas que usam `compare` ou `render` retornando HTML (ex.: `<img>`) devem declarar `html: true`:
+
+```javascript
+columns: {
+    'Capa': { dataField: 'thumbnail', compare: 'thumbnail', html: true },
+},
+compare: {
+    thumbnail: (r) => `<img src="${r.thumbnail}" height="50">`,
+}
+```
+
+| Propriedade | Descrição | Default |
+|-------------|-----------|---------|
+| `escapeCells` | Escapa HTML em todas as células | `true` |
+| `columns[].html` | Permite HTML na coluna (compare/render) | `false` |
+| `printHeadHtml` | `print(headHTML)` trata o parâmetro como HTML confiável | `false` |
+
+Para restaurar o comportamento legado (sem escape): `escapeCells: false`.
+
+`setPrintHead()` continua aceitando HTML definido pelo desenvolvedor (conteúdo confiável).
+
 ## Temas
 
 <p>O xGrid vem com 4 estilos de temas que podem ser informado dentro do create, os temas são: </p>
@@ -138,8 +211,8 @@ Create é responsável por instanciar o xGrid. Recebe um objeto como parâmetro 
         <td align="center">30</td>
     </tr>
     <tr>
-        <td>setFocus</td>
-        <td>Inicia o grid focado na linha informada.</td>
+        <td>setfocus</td>
+        <td>Inicia o grid focado na linha informada (1-based). Documentação legada: setFocus.</td>
         <td align="center">Numeric</td>
         <td align="center"></td>
     </tr>
@@ -165,6 +238,24 @@ Create é responsável por instanciar o xGrid. Recebe um objeto como parâmetro 
         <td>multiSelect</td>
         <td>Possibilita a seleção de múltiplas colunas ao segurar a tecla CTRL.</td>
         <td align="center">Boolean</td>
+        <td align="center">false</td>
+    </tr>
+    <tr>
+        <td>escapeCells</td>
+        <td>Escapa HTML nas células do grid (proteção XSS).</td>
+        <td align="center">Boolean</td>
+        <td align="center">true</td>
+    </tr>
+    <tr>
+        <td>printHeadHtml</td>
+        <td>Quando true, o parâmetro de <code>print(headHTML)</code> é HTML confiável (não escapado).</td>
+        <td align="center">Boolean</td>
+        <td align="center">false</td>
+    </tr>
+    <tr>
+        <td>filterDelay</td>
+        <td>Atraso em ms antes de executar <code>filter()</code> (ex.: 300). <code>false</code> = imediato.</td>
+        <td align="center">Number | false</td>
         <td align="center">false</td>
     </tr>
     <tr>
@@ -357,6 +448,12 @@ columns: {
                     <td align="center">String</td>
                     <td align="center"></td>
                 </tr>
+                <tr>
+                    <td>html</td>
+                    <td>Permite HTML na coluna (use com <code>compare</code> ou <code>render</code>). Ex.: thumbnails com <code>&lt;img&gt;</code>.</td>
+                    <td align="center">Boolean</td>
+                    <td align="center">false</td>
+                </tr>
             </table>
         </td>
     </tr>
@@ -441,6 +538,7 @@ grid = new xGridV2.create({
 grid.queryOpen({ desc: 'sherlock', maxItem: 20 })</pre>
             <blockquote> ** Ao usar o query iniciar a busca dos dados com o método <a hreF="#queryOpen">queryOpen()</a> .</blockquote>
             <blockquote>A função chamada em execute quando processada tem que adicionar os dados no grid através do método <a href="#querySourceAdd">querySourceAdd()</a> .</blockquote>
+            <blockquote>Quando não houver mais registros, chame <code>querySourceAdd([])</code> — o grid para de consultar o servidor no scroll.</blockquote>
             <table>
                 <tr>
                     <th>Propriedade</th>
@@ -500,29 +598,28 @@ grid.queryOpen({ desc: 'sherlock', maxItem: 20 })</pre>
                     <td align="center">Undefined</td>
                 </tr>
                 <tr>
-                    <td>vModel</strong></td>
-                    <td>Recebe um objeto com os campos que seram injetodos nos campos v-text do vuetify
+                    <td>vModel</td>
+                    <td>Objeto reativo (Vue 3: <code>reactive()</code>) sincronizado ao selecionar linha.
                     <pre>
-                    #exemplo do vue#
-                    data() {
-                        return {
-                            fields: {
-                                name: "",
-                                cpf: ""
-                            },
-                        }
-                    ###
-                    vModel: this.fields,
+// Vue 3 + script setup
+const fields = reactive({ name: '', cpf: '' })
+
+sideBySide: {
+  el: '#form',
+  vModel: fields,
+}
                     </pre>
                     </td>
                     <td align="center">Object</td>
                     <td align="center"></td>
                 </tr>
                 <tr>
-                    <td>vRefs</strong></td>
-                    <td>Os refs do vue onde o xgrid fará o controle do fields
+                    <td>vRefs</td>
+                    <td>Template refs do Vue 3 para <code>focusField</code> e <code>disableFieldsSideBySide</code>.
                     <pre>
-                     vRefs: this.$refs
+const inputTitle = ref(null)
+
+vRefs: { title: { $el: inputTitle } }
                     </pre>
                     </td>
                     <td align="center">Object</td>
@@ -980,7 +1077,6 @@ Esses métodos serão utilizados no grid instanciado. Ex.:<br>
     </tr>
 </table>
 
-## Desenvolvedores
+## Desenvolvedor
 
-[Francisco Alves](https://github.com/dffrancisco)<br>
-[Guilherme Trindade](https://github.com/guigagb)
+[Francisco Alves](https://github.com/dffrancisco)
