@@ -253,7 +253,7 @@
             },
             columns: {
                 'thumbnail': { dataField: 'thumbnail', compare: 'thumbnail', width: '10%', center: true, html: true },
-                'Title': { dataField: 'title' },
+                'Title': { dataField: 'title', left:true },
                 'Price': { dataField: 'price', width: '10%', right: true },
             },
             compare: {
@@ -345,8 +345,9 @@
                 // endScroll: 0.5,
                 execute: (r) => {
                     let data = []
+                    let limit = 100
                     // https://dummyjson.com/products?limit=5&skip=5
-                    fetch(`https://dummyjson.com/products?limit=30&skip=${r.offset}`)
+                    fetch(`https://dummyjson.com/products?limit=${limit}&skip=${r.offset}`)
                         .then(response => { return response.json() })
                         .then(r => {
                             Object.entries(r.products).forEach(el => {
