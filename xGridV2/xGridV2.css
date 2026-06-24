@@ -120,15 +120,19 @@
   0% {
     margin-left: 0;
   }
+
   25% {
     margin-left: 5px;
   }
+
   50% {
     margin-left: 0;
   }
+
   75% {
     margin-left: -5px;
   }
+
   100% {
     margin-left: 0;
   }
@@ -155,6 +159,7 @@
     top: -100px;
     opacity: 0;
   }
+
   to {
     top: 0;
     opacity: 1;
@@ -166,6 +171,7 @@
     top: -100px;
     opacity: 0;
   }
+
   to {
     top: 0;
     opacity: 1;
@@ -173,8 +179,7 @@
 }
 
 .xGridV2Asc {
-  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAQAAADZc7J/AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAIGNIUk0AAHolAACAgwAA+f8AAIDoAABSCAABFVgAADqXAAAXb9daH5AAAADGSURBVHjaYvzPQBlgYhg1YHgasKV1y5ctS7dIE2cAI2ZC2vKHgZmBgeELQytDn88vcrzAzMDAwMDAw9DOcHWLB2VhoMKwfcvGLSqkegFd6DtDH0Orz3fyY4GToZrhxpYQ8l0AA/sYMn1uUZIOnBh2DHBKPMCAJVJZiNT8iKHUZxU2CWIM+MHQy9Dm8w27JGEDNjMU+dzBLY3fgDsMuT47SA/EvwwMDAwMXxgqGbQJacfugk6GAoYNDGU+T8nMzqNl4gg0ADAATzAzTDMWcgQAAAAASUVORK5CYII=)
-    no-repeat;
+  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAQAAADZc7J/AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAIGNIUk0AAHolAACAgwAA+f8AAIDoAABSCAABFVgAADqXAAAXb9daH5AAAADGSURBVHjaYvzPQBlgYhg1YHgasKV1y5ctS7dIE2cAI2ZC2vKHgZmBgeELQytDn88vcrzAzMDAwMDAw9DOcHWLB2VhoMKwfcvGLSqkegFd6DtDH0Orz3fyY4GToZrhxpYQ8l0AA/sYMn1uUZIOnBh2DHBKPMCAJVJZiNT8iKHUZxU2CWIM+MHQy9Dm8w27JGEDNjMU+dzBLY3fgDsMuT47SA/EvwwMDAwMXxgqGbQJacfugk6GAoYNDGU+T8nMzqNl4gg0ADAATzAzTDMWcgQAAAAASUVORK5CYII=) no-repeat;
   background-size: 17px;
   padding-bottom: 13px;
   padding-left: 12px;
@@ -184,8 +189,7 @@
 }
 
 .xGridV2Desc {
-  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAQAAADZc7J/AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAIGNIUk0AAHolAACAgwAA+f8AAIDoAABSCAABFVgAADqXAAAXb9daH5AAAADGSURBVHjaYvzPQBlgYhg1YHgasKV1y5ctS7dIE2cAI2ZC2vKHgZmBgeELQytDn88vcrzAzMDAwMDAw9DOcHWLB2VhoMKwfcvGLSqkegFd6DtDH0Orz3fyY4GToZrhxpYQ8l0AA/sYMn1uUZIOnBh2DHBKPMCAJVJZiNT8iKHUZxU2CWIM+MHQy9Dm8w27JGEDNjMU+dzBLY3fgDsMuT47SA/EvwwMDAwMXxgqGbQJacfugk6GAoYNDGU+T8nMzqNl4gg0ADAATzAzTDMWcgQAAAAASUVORK5CYII=)
-    no-repeat;
+  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAQAAADZc7J/AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAIGNIUk0AAHolAACAgwAA+f8AAIDoAABSCAABFVgAADqXAAAXb9daH5AAAADGSURBVHjaYvzPQBlgYhg1YHgasKV1y5ctS7dIE2cAI2ZC2vKHgZmBgeELQytDn88vcrzAzMDAwMDAw9DOcHWLB2VhoMKwfcvGLSqkegFd6DtDH0Orz3fyY4GToZrhxpYQ8l0AA/sYMn1uUZIOnBh2DHBKPMCAJVJZiNT8iKHUZxU2CWIM+MHQy9Dm8w27JGEDNjMU+dzBLY3fgDsMuT47SA/EvwwMDAwMXxgqGbQJacfugk6GAoYNDGU+T8nMzqNl4gg0ADAATzAzTDMWcgQAAAAASUVORK5CYII=) no-repeat;
   background-size: 17px;
   padding-bottom: 13px;
   padding-left: 12px;
@@ -334,15 +338,13 @@
 .x-grayV2 .xGridV2-title {
   color: #131313;
   border-bottom: 1px solid #8e8e97;
-  background: -webkit-gradient(
-    linear,
-    left top,
-    left bottom,
-    color-stop(0%, #ffffff),
-    color-stop(1%, #efeff1),
-    color-stop(4%, #ededf0),
-    color-stop(100%, #d2d2d8)
-  );
+  background: -webkit-gradient(linear,
+      left top,
+      left bottom,
+      color-stop(0%, #ffffff),
+      color-stop(1%, #efeff1),
+      color-stop(4%, #ededf0),
+      color-stop(100%, #d2d2d8));
 }
 
 /* borda do titulo*/
@@ -392,15 +394,13 @@
 
 .x-grayV2 .xGridV2-Selected {
   background: #058cf5;
-  background: -webkit-gradient(
-    linear,
-    left top,
-    left bottom,
-    color-stop(0%, #058cf5),
-    color-stop(19%, #0385f3),
-    color-stop(72%, #0167e9),
-    color-stop(100%, #015de6)
-  );
+  background: -webkit-gradient(linear,
+      left top,
+      left bottom,
+      color-stop(0%, #058cf5),
+      color-stop(19%, #0385f3),
+      color-stop(72%, #0167e9),
+      color-stop(100%, #015de6));
   border-color: #014ab8;
   color: #ffffff !important;
   outline: 0;
@@ -545,6 +545,7 @@
   background: rgba(0, 0, 0, 0.15);
   border-radius: 5px;
 }
+
 .x-darkV2::-webkit-scrollbar-thumb:vertical:hover,
 .x-darkV2::-webkit-scrollbar-thumb:horizontal:hover,
 .x-darkV2 .xGridV2-content::-webkit-scrollbar-thumb:vertical:hover,
@@ -629,6 +630,7 @@
 .x-opacite .xGridV2-content::-webkit-scrollbar {
   width: 10px;
 }
+
 .x-opacite::-webkit-scrollbar {
   border: 1px solid #565167;
 }
@@ -663,6 +665,7 @@
   font-family: "Roboto", Verdana, Arial, sans-serif;
   background: #ffffff;
   margin: auto !important;
+  border-radius: 5px;
 }
 
 .x-whiteV2 .xGridV2-title {
@@ -671,6 +674,8 @@
   background: #ffffff;
   cursor: pointer;
   font-size: 10px;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
 }
 
 .x-whiteV2 .xGridV2-title .xGridV2-col {
@@ -689,6 +694,8 @@
 .x-whiteV2 .xGridV2-content {
   background: #f8f8f8;
   height: calc(100% - 24px);
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
 }
 
 .x-whiteV2 .xGridV2-content .xGridV2-col {
@@ -707,8 +714,8 @@
 }
 
 .x-whiteV2 .xGridV2-Selected {
-    background: rgb(0 161 236 / 11%) !important;
-    box-shadow: 0 0 0 1px #00aeff52 inset;
+  background: rgba(0, 161, 236, 0.2) !important;
+  box-shadow: 0 0 0 1px #00aeff inset;
   outline: 0;
   border-radius: 4px;
 }
@@ -740,6 +747,7 @@
 .x-whiteV2 .xGridV2-content::-webkit-scrollbar {
   width: 10px;
   background: #ffffff;
+  border-bottom-right-radius: 5px;
 }
 
 .x-whiteV2::-webkit-scrollbar-corner {
@@ -816,13 +824,11 @@
 
 .x-blue .xGridV2-Selected {
   background: #058cf5;
-  background: -webkit-gradient(
-    linear,
-    left top,
-    left bottom,
-    color-stop(0.05, #0086c9),
-    color-stop(1, #006ca1)
-  ) !important;
+  background: -webkit-gradient(linear,
+      left top,
+      left bottom,
+      color-stop(0.05, #0086c9),
+      color-stop(1, #006ca1)) !important;
   /*border-color:#014ab8;*/
   color: #ffffff !important;
   outline: 0;
