@@ -21,8 +21,11 @@ const buildOptions = {
 
 function copyAssets() {
   fs.mkdirSync(distDir, { recursive: true })
+  fs.mkdirSync(path.join(distDir, 'examples'), { recursive: true })
   fs.copyFileSync(path.join(root, 'index.css'), path.join(distDir, 'xGridV2.css'))
   fs.copyFileSync(path.join(root, 'index.d.ts'), path.join(distDir, 'index.d.ts'))
+  fs.copyFileSync(path.join(root, 'index.ts'), path.join(distDir, 'index.ts'))
+  fs.copyFileSync(path.join(root, 'examples/index.html'), path.join(distDir, 'examples/index.html'))
 }
 
 async function run() {
