@@ -1,4 +1,4 @@
-export interface ixGridCreate {
+interface ixGridCreate {
     getAx: Function;
     source: (field: object | Array<any>) => void;
     sourceAdd: (field: object | Array<any>) => void;
@@ -45,7 +45,7 @@ export interface ixGridCreate {
     setFilterConditional: Function;
 }
 
-export interface ixGrid {
+interface ixGrid {
     el: string;
     height?: string | number;
     width?: string | number;

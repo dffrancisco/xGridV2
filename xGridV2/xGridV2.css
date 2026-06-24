@@ -707,20 +707,8 @@
 }
 
 .x-whiteV2 .xGridV2-Selected {
-  /* background: -webkit-gradient(
-    linear,
-    left top,
-    left bottom,
-    color-stop(0%, #058cf5),
-    color-stop(19%, #0385f3),
-    color-stop(72%, #0167e9),
-    color-stop(100%, #015de6)
-  );
-  border-color: #014ab8;
-  color: #ffffff !important;
-  outline: 0; */
-  background: rgba(0, 161, 236, 0.2) !important;
-  box-shadow: 0 0 0 1px #00aeff inset;
+    background: rgb(0 161 236 / 11%) !important;
+    box-shadow: 0 0 0 1px #00aeff52 inset;
   outline: 0;
   border-radius: 4px;
 }

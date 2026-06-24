@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>xGridV2</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="../xGridV2/xGridV2.js"></script>
+    <link rel="stylesheet" href="../xGridV2/xGridV2.css">
+    <style>
+        body {
+            /* background: #083952; */
+            color: #f8f8f8;
+            font: 12px/1.3 'Lucida Sans Unicode', 'Trebuchet MS', Arial, Helvetica;
+            background: #546e7a;
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <div class="campos">
+        <!-- <span>Title</span> -->
+        <input type="text" name="title" placeholder="O Title" style="width: 300px">
+        <span>Authors</span>
+        <input type="text" name="price">
+
+
+    </div>
+    <hr>
+
+    <div style="height: 400px">
+
+        <div id="theGrid"></div>
+    </div>
+    <div id="myGridFrame"></div>
+
+
+    <script>
+        var json = [{
+            name: '#################################',
+            login: 'Meire <br>Legal',
+            cpf: '444',
+            old: 40,
+            tel: '845-453',
+            qto: 13,
+            cidade: 'SIA',
+            casado: 1
+        }, {
+            name: 'Kallebe Alves',
+            login: 'Kallebe',
+            cpf: '654654',
+            old: 16,
+            tel: '888-345',
+            qto: 98,
+            cidade: 'Recando da Emas',
+            casado: 0
+
+        }, {
+            name: 'Alves Xico',
+            login: 'Alves',
+            cpf: '11577',
+            old: 37,
+            tel: '466-664',
+            qto: 8,
+            cidade: 'Taguatinga',
+            casado: 0
+        }, {
+            name: 'Sousa Alves',
+            login: 'Sousa',
+            cpf: '874465',
+            old: 22,
+            tel: '858-999',
+            qto: 21,
+            cidade: 'Setor O',
+            casado: 0
+        }, {
+            name: 'Kalline Rocha',
+            login: 'Kalline',
+            cpf: '1111',
+            old: 11,
+            tel: '787-995',
+            qto: 11,
+            cidade: 'Gura',
+            casado: 1
+        }, {
+            name: 'Francisco Alves',
+            login: 'Francisco',
+            cpf: '778.583.951-48',
+            old: 37,
+            tel: '999-999',
+            qto: 7,
+            cidade: 'Brasilia',
+            casado: 1
+        }, {
+            name: 'Meire Clecia',
+            login: 'Meire <br>Legal',
+            cpf: '222',
+            old: 40,
+            tel: '845-453',
+            qto: 13,
+            cidade: 'SIA',
+            casado: 1
+        }, {
+            name: 'Kallebe Alves',
+            login: 'Kallebe',
+            cpf: '654654',
+            old: 16,
+            tel: '888-345',
+            qto: 98,
+            cidade: 'Recando da Emas',
+            casado: 1
+        }, {
+            name: 'Alves Xico',
+            login: 'Alves',
+            cpf: '11577',
+            old: 37,
+            tel: '466-664',
+            qto: 8,
+            cidade: 'Taguatinga',
+            casado: 1
+        }, {
+            name: 'Sousa Alves',
+            login: 'Sousa',
+            cpf: '874465',
+            old: 22,
+            tel: '858-999',
+            qto: 21,
+            cidade: 'Setor O',
+            casado: 1
+        }, {
+            name: 'Kalline Rocha',
+            login: 'Kalline',
+            cpf: '1111',
+            old: 11,
+            tel: '787-995',
+            qto: 11,
+            cidade: 'Gura',
+            casado: 1
+        }, {
+            name: 'Francisco Alves',
+            login: 'Francisco',
+            cpf: '778.583.951-48',
+            old: 37,
+            tel: '999-999',
+            qto: 7,
+            cidade: 'Brasilia',
+            casado: 1
+        }, {
+            name: 'Meire Clecia',
+            login: 'Meire <br>Legal',
+            cpf: '222',
+            old: 40,
+            tel: '845-453',
+            qto: 13,
+            cidade: 'SIA',
+            casado: 1
+        }, {
+            name: 'Kallebe Alves',
+            login: 'Kallebe',
+            cpf: '654654',
+            old: 16,
+            tel: '888-345',
+            qto: 98,
+            cidade: 'Recando da Emas',
+            casado: 1
+        }, {
+            name: 'Alves Xico',
+            login: 'Alves',
+            cpf: '11577',
+            old: 37,
+            tel: '466-664',
+            qto: 8,
+            cidade: 'Taguatinga',
+            casado: 1
+        }, {
+            name: 'Sousa Alves',
+            login: 'Sousa',
+            cpf: '874465',
+            old: 22,
+            tel: '858-999',
+            qto: 21,
+            cidade: 'Setor O',
+            casado: 1
+        }, {
+            name: 'Kalline Rocha',
+            login: 'Kalline',
+            cpf: '1111',
+            old: 11,
+            tel: '787-995',
+            qto: 11,
+            cidade: 'Gura',
+            casado: 1
+        }, {
+            name: 'Francisco Alves',
+            login: 'Francisco',
+            cpf: '778.583.951-48',
+            old: 37,
+            tel: '999-999',
+            qto: 7,
+            cidade: 'Brasilia',
+            casado: 1
+        }];
+
+        xGridV2.setNotFound('not Found')
+        xGridV2.setPrintHead('<div>Minha cabeça</div>')
+
+        function reveter(value) {
+            return value.split('').reverse('').join('')
+        }
+
+
+        const theGrid = new xGridV2.create({
+            el: '#theGrid',
+            // height: 150,
+            // width: '100%',
+            // count: true,
+            heightLine: 40,
+            // setfocus: 1,
+            multiSelect: true,
+            // title:false,
+            // theme: 'x-darkV2',
+            theme: 'x-whiteV2',
+            // theme: 'x-opacite',
+            count: true,
+            onSelectLine: (r) => {
+
+            },
+            complete: () => {
+                console.log('complete');
+            },
+            filter: {
+                // filterBegin: false, //quando true ele pesquisa igual a palavra
+                // fields: ['DESC_PRODUTO', 'MARCA'],
+                // condicional: 'AND'
+            },
+            keySelectUp: 87,
+            keySelectDown: [68, 83],
+            onKeyDown: {
+                13: (ln, e) => {
+                    console.log(ln);
+                    console.log('o Enter ta funcionado')
+                },
+                'ctrl+13': (objectLine, e) => {
+                    console.log('ctrl+enter pressionado')
+                },
+            },
+            enter: () => {
+                theGrid.focusField()
+                theGrid.disable()
+                theGrid.disableBtnsSaveCancel()
+            },
+            columns: {
+                'thumbnail': { dataField: 'thumbnail', compare: 'thumbnail', width: '10%', center: true, html: true },
+                'Title': { dataField: 'title', left:true },
+                'Price': { dataField: 'price', width: '10%', right: true },
+            },
+            compare: {
+                thumbnail: (r) => {
+                    return `<img height="50px" src="${r.thumbnail}" >`
+                }
+            },
+            sideBySide: {
+                el: '.campos',
+                // tabToEnter: true,
+                render: {
+                    //  'name': reveter
+                },
+                compare: {
+                    // DESC_PRODUTO: 'junta'
+                },
+                duplicity: {
+                    dataField: ['authors', 'title'],
+                    execute: (r) => {
+                        console.log(r);
+                        // getServidor
+                        // repostar
+                        let valueBanco = 'valor que vem do banco de dados'
+
+                        if (r.value != valueBanco) {
+                            theGrid.showMessageDuplicity(r.text + ' já esta em uso ok')
+                            return false
+                        }
+                    }
+                },
+                // se chamar o qeuryOpen verificar se o query foi setado
+                frame: {
+                    el: '#myGridFrame',
+                    class: 'texte novo',
+                    style: 'text-align: center;',
+                    buttons: {
+                        print: {
+                            html: '<i class="fa fa-edit"></i> imprimir',
+                            style: 'background: red;',
+                            class: 'mybtn',
+                            click: () => {
+                                theGrid.print()
+                            }
+                        },
+                        insert: {
+                            html: 'Novo',
+                            state: xGridV2.state.insert,
+                            click: (ln, e) => {
+                                console.warn(e, 'novo');
+                                /*esse retorno falso bloquea a açao do do click*/
+                                // theGrid.focusField()
+                                //return false
+                            }
+                        },
+                        editar: {
+                            html: 'Alterar',
+                            state: xGridV2.state.update,
+                            click: () => {
+                                console.warn('Alterar')
+                                theGrid.focusField('qto')
+                            }
+                        },
+                        delete: {
+                            html: 'Excluir',
+                            state: xGridV2.state.delete,
+                            click: () => console.warn('Excluir')
+                        },
+                        salvarBtn: {
+                            html: 'Salvar',
+                            state: xGridV2.state.save,
+                            click: () => {
+                                theGrid.enable()
+                                theGrid.focus()
+                                console.warn('salvar')
+                            }
+                        },
+                        cancel: {
+                            html: 'Cancel',
+                            state: xGridV2.state.cancel,
+                            click: () => {
+                                theGrid.enable()
+                                console.warn('cancelar')
+                            }
+                        }
+                    }
+                }
+            },
+            query: {
+                // endScroll: 0.5,
+                execute: (r) => {
+                    let data = []
+                    let limit = 100
+                    // https://dummyjson.com/products?limit=5&skip=5
+                    fetch(`https://dummyjson.com/products?limit=${limit}&skip=${r.offset}`)
+                        .then(response => { return response.json() })
+                        .then(r => {
+                            Object.entries(r.products).forEach(el => {
+                                let ln = {}
+                                ln.title = el[1].title
+                                ln.thumbnail = el[1].thumbnail
+                                ln.price = el[1].price
+                                data.push(ln)
+                            })
+                            theGrid.querySourceAdd(data)
+                        })
+                }
+            }
+        })
+
+        theGrid.load()
+        theGrid.queryOpen({ desc: 'sherlock' })
+    </script>
+
+
+</body>
+
+</html>
