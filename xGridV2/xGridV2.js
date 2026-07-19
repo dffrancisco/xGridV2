@@ -983,8 +983,12 @@ var xGridV2 = (() => {
             this.queryLoading = false;
             this.loadMore(false);
             this.closeLoad();
-            if (this.tabindex == 0)
+            if (this.tabindex == 0) {
+              this.arg.source = [];
+              this.indexSelect = 0;
+              this.sourceSelect = false;
               this.showNotFound();
+            }
             return;
           }
           if (this.tabindex == 0)
