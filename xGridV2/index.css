@@ -691,7 +691,7 @@
 
 .x-whiteV2 .xGridV2-content {
   background: #f8f8f8;
-  height: calc(100% - 24px);
+  height: calc(100% - 17px);
     border-bottom-left-radius: 5px;
   border-bottom-right-radius: 5px;
 }

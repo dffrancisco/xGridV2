@@ -1569,7 +1569,13 @@ export default (function xGridV2Module() {
                     if (this.elementSideBySide[name] == undefined) return false
                     this.elementSideBySide[name].addEventListener('keydown', function (e) {
                         if (e.keyCode == 13) {
-                            let next = ax.listTabForEnter[ax.listTabForEnter.indexOf(this as HTMLElement) + 1]
+                            let idx = ax.listTabForEnter.indexOf(this as HTMLElement)
+                            let next: HTMLElement | undefined
+                            do {
+                                idx++
+                                next = ax.listTabForEnter[idx]
+                            } while (next != undefined && next.getAttribute('tabindex') === '-1')
+
                             if (next != undefined)
                                 if (next.tagName == 'BUTTON' || next.tagName == 'SELECT')
                                     next.focus()

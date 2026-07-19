@@ -1167,7 +1167,12 @@ var xGridV2 = (() => {
             if (this.elementSideBySide[name] == void 0) return false;
             this.elementSideBySide[name].addEventListener("keydown", function(e) {
               if (e.keyCode == 13) {
-                let next = ax.listTabForEnter[ax.listTabForEnter.indexOf(this) + 1];
+                let idx = ax.listTabForEnter.indexOf(this);
+                let next;
+                do {
+                  idx++;
+                  next = ax.listTabForEnter[idx];
+                } while (next != void 0 && next.getAttribute("tabindex") === "-1");
                 if (next != void 0) {
                   if (next.tagName == "BUTTON" || next.tagName == "SELECT")
                     next.focus();
