@@ -1,4 +1,4 @@
-interface ixGridCreate {
+export interface ixGridCreate {
     getAx: Function;
     source: (field: object | Array<any>) => void;
     sourceAdd: (field: object | Array<any>) => void;
@@ -45,7 +45,7 @@ interface ixGridCreate {
     setFilterConditional: Function;
 }
 
-interface ixGrid {
+export interface ixGrid {
     el: string;
     height?: string | number;
     width?: string | number;
@@ -107,7 +107,7 @@ interface ixGrid {
     // },
     sideBySide?: {
         el: string;
-        vModel?: Record<string, any>;
+        vModel?: Record<string, any> | ((dataField: any) => void);
         vRefs?: Record<string, { $el: HTMLElement }>;
         render?: Function;
         compare?: { [name: string]: (dataField: any) => void; }
@@ -150,6 +150,10 @@ export default (function xGridV2Module() {
             .replace(/</g, '&lt;')
             .replace(/>/g, '&gt;')
             .replace(/"/g, '&quot;')
+    }
+
+    function isVModelFn(vm: unknown): vm is (dataField: any) => void {
+        return typeof vm === 'function'
     }
 
     function create(param: ixGrid) {
@@ -1150,8 +1154,10 @@ export default (function xGridV2Module() {
                 if (!this.arg.sideBySide || !this.sourceSelect)
                     return
 
-                if (this.arg.sideBySide.vModel) {
-                    for (let i in this.arg.sideBySide.vModel) {
+                const vm = this.arg.sideBySide.vModel
+
+                if (vm && !isVModelFn(vm)) {
+                    for (let i in vm) {
                         let value = this.sourceSelect[i];
 
                         if (this.arg.sideBySide.render)
@@ -1168,9 +1174,12 @@ export default (function xGridV2Module() {
                                     value = this.arg.compare[this.arg.sideBySide.compare[i]](_source)
                                 } catch (error) { throw 'erro see your function compare' }
 
-                        this.arg.sideBySide.vModel[i] = value
+                        vm[i] = value
                     }
                 }
+
+                if (this.arg.sideBySide.el && isVModelFn(vm))
+                    return
 
                 if (this.arg.sideBySide.el)
                     for (let i in this.elementSideBySide) {
@@ -1239,12 +1248,13 @@ export default (function xGridV2Module() {
             },
             getDiffTwoJson(toUpperCase = false, empty = true) {
                 let diff = { old: {}, new: {}, diff: true }
+                const vm = this.arg.sideBySide?.vModel
 
-                if (this.arg.sideBySide && this.arg.sideBySide.vModel) {
-                    for (let i in this.arg.sideBySide.vModel) {
-                        if (this.arg.sideBySide.vModel[i] != this.sourceSelect[i]) {
+                if (vm && !isVModelFn(vm)) {
+                    for (let i in vm) {
+                        if (vm[i] != this.sourceSelect[i]) {
                             diff.old[i] = this.sourceSelect[i]
-                            diff.new[i] = this.arg.sideBySide.vModel[i];
+                            diff.new[i] = vm[i];
                         }
                     }
                 } else {
@@ -1267,9 +1277,11 @@ export default (function xGridV2Module() {
             clearElementSideBySide() {
                 ax.dataSource({})
 
-                if (this.arg.sideBySide && this.arg.sideBySide.vModel) {
-                    for (let i in this.arg.sideBySide.vModel) {
-                        this.arg.sideBySide.vModel[i] = ''
+                const vm = this.arg.sideBySide?.vModel
+
+                if (vm && !isVModelFn(vm)) {
+                    for (let i in vm) {
+                        vm[i] = ''
                     }
                 }
 
@@ -1329,6 +1341,8 @@ export default (function xGridV2Module() {
                     this.queryLoading = false
                     this.loadMore(false)
                     this.closeLoad()
+                    if (this.tabindex == 0)
+                        this.showNotFound()
                     return
                 }
 
@@ -1443,7 +1457,14 @@ export default (function xGridV2Module() {
                 if (!this.arg.sideBySide?.vModel || !this.sourceSelect)
                     return
 
-                for (let i in this.arg.sideBySide.vModel) {
+                const vm = this.arg.sideBySide.vModel
+
+                if (isVModelFn(vm)) {
+                    vm({ ...this.sourceSelect })
+                    return
+                }
+
+                for (let i in vm) {
                     let value = this.sourceSelect[i];
 
                     if (this.arg.sideBySide.render)
@@ -1460,7 +1481,7 @@ export default (function xGridV2Module() {
                                 value = this.arg.compare[this.arg.sideBySide.compare[i]](_source)
                             } catch (error) { throw 'erro see your function compare' }
 
-                    this.arg.sideBySide.vModel[i] = value
+                    vm[i] = value
                 }
             },
             duplicity() {

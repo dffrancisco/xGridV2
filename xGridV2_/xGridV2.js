@@ -32,6 +32,9 @@ var xGridV2 = (() => {
       if (value == null) return "";
       return String(value).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
     }
+    function isVModelFn(vm) {
+      return typeof vm === "function";
+    }
     function create(param) {
       let argDefault = {
         source: [],
@@ -801,8 +804,9 @@ var xGridV2 = (() => {
         setElementSideBySide() {
           if (!this.arg.sideBySide || !this.sourceSelect)
             return;
-          if (this.arg.sideBySide.vModel) {
-            for (let i in this.arg.sideBySide.vModel) {
+          const vm = this.arg.sideBySide.vModel;
+          if (vm && !isVModelFn(vm)) {
+            for (let i in vm) {
               let value = this.sourceSelect[i];
               if (this.arg.sideBySide.render) {
                 if (this.arg.sideBySide.render[i])
@@ -822,9 +826,11 @@ var xGridV2 = (() => {
                     throw "erro see your function compare";
                   }
               }
-              this.arg.sideBySide.vModel[i] = value;
+              vm[i] = value;
             }
           }
+          if (this.arg.sideBySide.el && isVModelFn(vm))
+            return;
           if (this.arg.sideBySide.el)
             for (let i in this.elementSideBySide) {
               let value = this.sourceSelect[i];
@@ -891,12 +897,14 @@ var xGridV2 = (() => {
             }
         },
         getDiffTwoJson(toUpperCase = false, empty = true) {
+          var _a;
           let diff = { old: {}, new: {}, diff: true };
-          if (this.arg.sideBySide && this.arg.sideBySide.vModel) {
-            for (let i in this.arg.sideBySide.vModel) {
-              if (this.arg.sideBySide.vModel[i] != this.sourceSelect[i]) {
+          const vm = (_a = this.arg.sideBySide) == null ? void 0 : _a.vModel;
+          if (vm && !isVModelFn(vm)) {
+            for (let i in vm) {
+              if (vm[i] != this.sourceSelect[i]) {
                 diff.old[i] = this.sourceSelect[i];
-                diff.new[i] = this.arg.sideBySide.vModel[i];
+                diff.new[i] = vm[i];
               }
             }
           } else {
@@ -913,10 +921,12 @@ var xGridV2 = (() => {
           return diff;
         },
         clearElementSideBySide() {
+          var _a;
           ax.dataSource({});
-          if (this.arg.sideBySide && this.arg.sideBySide.vModel) {
-            for (let i in this.arg.sideBySide.vModel) {
-              this.arg.sideBySide.vModel[i] = "";
+          const vm = (_a = this.arg.sideBySide) == null ? void 0 : _a.vModel;
+          if (vm && !isVModelFn(vm)) {
+            for (let i in vm) {
+              vm[i] = "";
             }
           }
           if (this.arg.sideBySide) {
@@ -973,6 +983,8 @@ var xGridV2 = (() => {
             this.queryLoading = false;
             this.loadMore(false);
             this.closeLoad();
+            if (this.tabindex == 0)
+              this.showNotFound();
             return;
           }
           if (this.tabindex == 0)
@@ -1057,7 +1069,12 @@ var xGridV2 = (() => {
           var _a;
           if (!((_a = this.arg.sideBySide) == null ? void 0 : _a.vModel) || !this.sourceSelect)
             return;
-          for (let i in this.arg.sideBySide.vModel) {
+          const vm = this.arg.sideBySide.vModel;
+          if (isVModelFn(vm)) {
+            vm({ ...this.sourceSelect });
+            return;
+          }
+          for (let i in vm) {
             let value = this.sourceSelect[i];
             if (this.arg.sideBySide.render) {
               if (this.arg.sideBySide.render[i])
@@ -1077,7 +1094,7 @@ var xGridV2 = (() => {
                   throw "erro see your function compare";
                 }
             }
-            this.arg.sideBySide.vModel[i] = value;
+            vm[i] = value;
           }
         },
         duplicity() {

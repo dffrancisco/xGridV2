@@ -8,7 +8,7 @@
     "xGridV2"
   ],
   "scripts": {
-    "build": "node scripts/build.js",
+    "build": "npm version patch && rimraf xGridV2 && node scripts/build.js",
     "dev": "node scripts/build.js --watch",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
