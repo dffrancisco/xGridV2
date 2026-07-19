@@ -1,48 +1,59 @@
-const esbuild = require('esbuild')
-const fs = require('fs')
-const path = require('path')
+const esbuild = require("esbuild");
+const fs = require("fs");
+const path = require("path");
 
-const watch = process.argv.includes('--watch')
-const root = path.join(__dirname, '..')
-const distDir = path.join(root, 'xGridV2')
+const watch = process.argv.includes("--watch");
+const root = path.join(__dirname, "..");
+const distDir = path.join(root, "xGridV2");
 
 const buildOptions = {
-  entryPoints: [path.join(root, 'index.ts')],
+  entryPoints: [path.join(root, "index.ts")],
   bundle: true,
-  format: 'iife',
-  globalName: 'xGridV2',
-  outfile: path.join(distDir, 'xGridV2.js'),
-  target: 'es2018',
+  format: "iife",
+  globalName: "xGridV2",
+  outfile: path.join(distDir, "xGridV2.js"),
+  target: "es2018",
   sourcemap: true,
   footer: {
-    js: 'if (xGridV2 && xGridV2.default) { xGridV2 = xGridV2.default; }',
+    js: "if (xGridV2 && xGridV2.default) { xGridV2 = xGridV2.default; }",
   },
-}
+};
 
 function copyAssets() {
-  fs.mkdirSync(distDir, { recursive: true })
-  fs.mkdirSync(path.join(distDir, 'examples'), { recursive: true })
-  fs.copyFileSync(path.join(root, 'index.css'), path.join(distDir, 'xGridV2.css'))
-  fs.copyFileSync(path.join(root, 'index.d.ts'), path.join(distDir, 'index.d.ts'))
-  fs.copyFileSync(path.join(root, 'index.ts'), path.join(distDir, 'index.ts'))
-  fs.copyFileSync(path.join(root, 'examples/index.html'), path.join(distDir, 'examples/index.html'))
+  fs.mkdirSync(distDir, { recursive: true });
+  fs.mkdirSync(path.join(distDir, "examples"), { recursive: true });
+  fs.copyFileSync(
+    path.join(root, "index.css"),
+    path.join(distDir, "index.css"),
+  );
+  fs.copyFileSync(
+    path.join(root, "index.d.ts"),
+    path.join(distDir, "index.d.ts"),
+  );
+  fs.copyFileSync(path.join(root, "index.ts"), path.join(distDir, "index.ts"));
+  fs.copyFileSync(
+    path.join(root, "examples/index.html"),
+    path.join(distDir, "examples/index.html"),
+  );
 }
 
 async function run() {
-  copyAssets()
+  copyAssets();
 
   if (watch) {
-    const ctx = await esbuild.context(buildOptions)
-    await ctx.watch()
-    console.log('xGridV2: watch em xGridV2/xGridV2.js')
-    return
+    const ctx = await esbuild.context(buildOptions);
+    await ctx.watch();
+    console.log("xGridV2: watch em xGridV2/xGridV2.js");
+    return;
   }
 
-  await esbuild.build(buildOptions)
-  console.log('xGridV2: build concluído → xGridV2/xGridV2.js, xGridV2/xGridV2.css, xGridV2/index.d.ts')
+  await esbuild.build(buildOptions);
+  console.log(
+    "xGridV2: build concluído → xGridV2/xGridV2.js, xGridV2/xGridV2.css, xGridV2/index.d.ts",
+  );
 }
 
 run().catch((err) => {
-  console.error(err)
-  process.exit(1)
-})
+  console.error(err);
+  process.exit(1);
+});
