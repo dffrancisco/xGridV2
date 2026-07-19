@@ -30,6 +30,11 @@
     </div>
     <hr>
 
+    <div class="busca">
+        <input type="text" id="buscaProduto" placeholder="Pesquisar produto..." value="phone" style="width: 300px">
+        <button id="btnBuscar">Pesquisar</button>
+    </div>
+
     <div style="height: 400px">
 
         <div id="theGrid"></div>
@@ -203,7 +208,7 @@
             casado: 1
         }];
 
-        xGridV2.setNotFound('not Found')
+        xGridV2.setNotFound('Produto Não Localizado')
         xGridV2.setPrintHead('<div>Minha cabeça</div>')
 
         function reveter(value) {
@@ -346,8 +351,12 @@
                 execute: (r) => {
                     let data = []
                     let limit = 100
-                    // https://dummyjson.com/products?limit=5&skip=5
-                    fetch(`https://dummyjson.com/products?limit=${limit}&skip=${r.offset}`)
+                    let desc = r.param && r.param.desc
+                    // https://dummyjson.com/products/search?q=sherlock&limit=5&skip=5
+                    let url = desc
+                        ? `https://dummyjson.com/products/search?q=${encodeURIComponent(desc)}&limit=${limit}&skip=${r.offset}`
+                        : `https://dummyjson.com/products?limit=${limit}&skip=${r.offset}`
+                    fetch(url)
                         .then(response => { return response.json() })
                         .then(r => {
                             Object.entries(r.products).forEach(el => {
@@ -364,7 +373,20 @@
         })
 
         theGrid.load()
-        theGrid.queryOpen({ desc: 'sherlock' })
+
+        const buscaProduto = document.querySelector('#buscaProduto')
+        const btnBuscar = document.querySelector('#btnBuscar')
+
+        function pesquisar() {
+            theGrid.queryOpen({ desc: buscaProduto.value })
+        }
+
+        btnBuscar.addEventListener('click', pesquisar)
+        buscaProduto.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') pesquisar()
+        })
+
+        pesquisar()
     </script>
 
 

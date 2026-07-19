@@ -1341,6 +1341,8 @@ export default (function xGridV2Module() {
                     this.queryLoading = false
                     this.loadMore(false)
                     this.closeLoad()
+                    if (this.tabindex == 0)
+                        this.showNotFound()
                     return
                 }
 
