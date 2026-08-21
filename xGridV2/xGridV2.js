@@ -618,9 +618,13 @@ var xGridV2 = (() => {
           }
           if (typeof field == "object" && Object.keys(field).length == 0) {
             let columns = Object.keys(this.arg.columns).length > 0 ? this.arg.columns : this.columnsAutoCreate;
-            for (let i in columns) {
-              if (typeof ax.sourceSelect[columns[i].dataField] == "string")
-                ax.sourceSelect[columns[i].dataField] = "";
+            if (ax.sourceSelect) {
+              let blank = { ...ax.sourceSelect };
+              for (let i in columns) {
+                if (typeof blank[columns[i].dataField] == "string")
+                  blank[columns[i].dataField] = "";
+              }
+              ax.sourceSelect = blank;
             }
           }
           return ax.sourceSelect;
@@ -924,9 +928,13 @@ var xGridV2 = (() => {
           var _a;
           ax.dataSource({});
           const vm = (_a = this.arg.sideBySide) == null ? void 0 : _a.vModel;
-          if (vm && !isVModelFn(vm)) {
-            for (let i in vm) {
-              vm[i] = "";
+          if (vm) {
+            if (isVModelFn(vm)) {
+              vm({});
+            } else {
+              for (let i in vm) {
+                vm[i] = "";
+              }
             }
           }
           if (this.arg.sideBySide) {
