@@ -1,6 +1,6 @@
 {
   "name": "xgridv2",
-  "version": "2.3.5",
+  "version": "2.3.6",
   "description": "Grid robusto em JavaScript puro, sem dependências de runtime.",
   "main": "xGridV2/xGridV2.js",
   "types": "xGridV2/index.d.ts",
