@@ -81,7 +81,7 @@ export interface ixGrid {
         [name: string]: (row: any) => any;
     };
     onSelectLine?: (dataField: any) => void;
-    enter?: (dataField: any) => void;
+    enter?: (dataField: any, e?: any) => void;
     click?: (dataField: any) => void;
     dblClick?: (dataField: any) => void;
     complete?: () => void;

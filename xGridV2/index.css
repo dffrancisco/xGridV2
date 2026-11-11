@@ -261,6 +261,23 @@
   color: #fbfbfb;
 }
 
+/* #4da3ff (primary escuro) é claro demais para texto branco; usa um tom mais fechado */
+.dark .btn-Frame-blue {
+  border-color: #3a8fe8;
+  background: #2f78c4;
+}
+
+.dark .btn-Frame-blue:focus {
+  box-shadow: 0 0 0 2px #4da3ff inset;
+  background: #2f78c4;
+}
+
+.dark .btn-Frame-blue:hover:not(:disabled),
+.dark .btn-Frame-blue:active:not(:disabled) {
+  border-color: #3a8fe8;
+  background: #3a8fe8;
+}
+
 /*-----------Print------------------*/
 
 .xGridV2-main .x-print {
@@ -885,25 +902,25 @@
 /*-------------- bocatan ------------------*/
 
 .x-bocatan {
-  color: #a6b1c0;
-  border: 1px solid #1a1b1b;
+  color: #a9bac7;
+  border: 1px solid #3a4a55;
   font-size: 12px;
   font-weight: 600;
   font-family: "Roboto", Verdana, Arial, sans-serif;
-  background: #2a3338;
+  background: #26343f;
   margin: auto !important;
 }
 
 .x-bocatan .xGridV2-title {
-  border-bottom: 1px solid #1c2026;
-  color: #a6b1c0;
-  background: #202020;
+  border-bottom: 1px solid #3a4a55;
+  color: #a9bac7;
+  background: #26343f;
   cursor: pointer;
   font-size: 10px;
 }
 
 .x-bocatan .xGridV2-title .xGridV2-col {
-  border-right: 1px solid #0d1117;
+  border-right: 1px solid #3a4a55;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -917,12 +934,12 @@
 }
 
 .x-bocatan .xGridV2-content {
-  background: #121212;
+  background: #26343f;
   height: calc(100% - 18px);
 }
 
 .x-bocatan .xGridV2-content .xGridV2-col {
-  border-right: 1px solid #1c2026;
+  border-right: 1px solid #3a4a55;
   cursor: pointer;
   /* padding: 1px; */
   /* text-align: center; */
@@ -935,11 +952,11 @@
 }
 
 .x-bocatan .xGridV2-content .xGridV2-row:nth-child(odd) {
-  background-color: #171717;
+  background-color: rgb(77 105 134 / 7%);
 }
 
 .x-bocatan .xGridV2-Selected {
-  background: rgba(101, 189, 255, 0.2) !important;
+  background: rgba(0, 161, 236, 0.2) !important;
   box-shadow: 0 0 0 1px #00aeff inset;
   outline: 0;
   border-radius: 4px;
@@ -948,16 +965,16 @@
 .x-bocatan .xGridV2-load {
   height: 35px;
   width: 160px;
-  background-color: #1d2027bd;
+  background-color: rgba(31, 42, 51, 0.88);
 }
 
 .x-bocatan .xGridV2-SelectedFocusOut {
-  background: rgba(101, 189, 255, 0.2) !important;
+  background: #00eedb1f !important;
   outline: 0;
 }
 
 .x-bocatan .xGridV2-content nav {
-  color: #c6bdcd;
+  color: #7c8c97;
 }
 
 /*****scrollbar*****/
@@ -971,18 +988,18 @@
 .x-bocatan::-webkit-scrollbar,
 .x-bocatan .xGridV2-content::-webkit-scrollbar {
   width: 10px;
-  background: #171717;
+  background: #26343f;
 }
 
 .x-bocatan::-webkit-scrollbar-corner {
-  background: #171717;
+  background: #26343f;
 }
 
 .x-bocatan::-webkit-scrollbar-thumb:vertical,
 .x-bocatan::-webkit-scrollbar-thumb:horizontal,
 .x-bocatan .xGridV2-content::-webkit-scrollbar-thumb:vertical,
 .x-bocatan .xGridV2-content::-webkit-scrollbar-thumb:horizontal {
-  background: #252525;
+  background: rgba(128, 128, 128, 0.35);
   border-radius: 5px;
 }
 
@@ -991,7 +1008,7 @@
 .x-bocatan .xGridV2-content::-webkit-scrollbar-thumb:vertical:hover,
 .x-bocatan .xGridV2-content::-webkit-scrollbar-thumb:horizontal:hover {
   box-shadow: none;
-  background: #d7dada;
+  background: rgba(128, 128, 128, 0.6);
 }
 
 /*-------------- x-modern-dark ------------------*/

@@ -24,7 +24,14 @@ var xGridV2 = (() => {
   });
   var index_default = /* @__PURE__ */ (function xGridV2Module() {
     const version = 2.3;
-    const state = { save: "save", insert: "insert", update: "update", select: "select", cancel: "cancel", delete: "delete" };
+    const state = {
+      save: "save",
+      insert: "insert",
+      update: "update",
+      select: "select",
+      cancel: "cancel",
+      delete: "delete"
+    };
     let notFound = "Nada Localizado";
     let defaultTheme = "x-grayV2";
     let printHead = "";
@@ -118,25 +125,29 @@ var xGridV2 = (() => {
           this.element = this.arg.el.tagName == "DIV" ? this.arg.el : document.querySelector(this.arg.el);
           this.idElment = this.element.id;
           this.element.classList.add("xGridV2-main");
-          this.element.classList.add(this.arg.theme ? this.arg.theme : defaultTheme);
+          this.element.classList.add(
+            this.arg.theme ? this.arg.theme : defaultTheme
+          );
           let pxHeight = this.arg.height.toString().indexOf("%") > 0 ? "" : this.arg.height.toString().indexOf("px") > 0 ? "" : "px";
           let pxWidth = this.arg.width.toString().indexOf("%") > 0 ? "" : this.arg.width.toString().indexOf("px") > 0 ? "" : "px";
           this.element.style.height = this.arg.height != "100%" ? this.arg.height + pxHeight : this.arg.height;
-          if (this.arg.width != "default") this.element.style.width = this.arg.width + pxWidth;
+          if (this.arg.width != "default")
+            this.element.style.width = this.arg.width + pxWidth;
           this.element.appendChild(this.createTitle());
           this.element.appendChild(this.setContent());
           this.onKeyDown();
           if (this.arg.sideBySide) {
             if (this.arg.sideBySide.el) {
               this.listTabForEnter = [
-                ...document.querySelector(this.arg.sideBySide.el).querySelectorAll("input[name], select[name],button[name],textarea[name]")
+                ...document.querySelector(this.arg.sideBySide.el).querySelectorAll(
+                  "input[name], select[name],button[name],textarea[name]"
+                )
               ];
               let qto = 0;
               document.querySelectorAll(this.arg.sideBySide.el).forEach((el) => {
                 el.querySelectorAll("[name]").forEach((field) => {
                   if (this.elementSideBySide[field.name]) {
-                    if (field.nodeName == "DIV")
-                      return;
+                    if (field.nodeName == "DIV") return;
                     if (qto == 0) {
                       let _el_ = this.elementSideBySide[field.name];
                       this.elementSideBySide[field.name] = [];
@@ -156,33 +167,38 @@ var xGridV2 = (() => {
             this.duplicity();
             this.tabToEnter();
           }
-          if (this.arg.complete)
-            this.arg.complete();
+          if (this.arg.complete) this.arg.complete();
         },
         createTitle() {
           this.gridTitle = document.createElement("div");
           this.gridTitle.classList.add("xGridV2-title");
           this.gridTitle.classList.add("xGridV2-row");
+          if (this.arg.title == false) this.gridTitle.style.display = "none";
           if (Object.keys(this.arg.columns).length > 0) {
             this.checkWidthColumns();
-            this.widthAll = Object.values(this.arg.columns).reduce((total, b) => total + parseInt(b.width), 0);
+            this.widthAll = Object.values(this.arg.columns).reduce(
+              (total, b) => total + parseInt(b.width),
+              0
+            );
             this.setColumnsTitle(this.arg.columns);
-          } else
-            this.setColumnsTitle({ "-": { dataField: "-", width: "100%" } });
+          } else this.setColumnsTitle({ "-": { dataField: "-", width: "100%" } });
           return this.gridTitle;
         },
         setTitle(source) {
           if (Object.keys(this.arg.columns).length == 0) {
-            while (this.gridTitle.firstChild) this.gridTitle.removeChild(this.gridTitle.firstChild);
+            while (this.gridTitle.firstChild)
+              this.gridTitle.removeChild(this.gridTitle.firstChild);
             this.columnsAutoCreate = [];
             this.autoColumns(source);
-            this.widthAll = Object.values(this.columnsAutoCreate).reduce((total, b) => total + parseInt(b.width), 0);
+            this.widthAll = Object.values(this.columnsAutoCreate).reduce(
+              (total, b) => total + parseInt(b.width),
+              0
+            );
             this.setColumnsTitle(this.columnsAutoCreate);
           }
         },
         setColumnsTitle(columns) {
-          if (this.arg.title == false)
-            return;
+          if (this.arg.title == false) return;
           for (let id in columns) {
             let col = document.createElement("div");
             let label = document.createElement("label");
@@ -192,12 +208,9 @@ var xGridV2 = (() => {
             col.setAttribute("name", columns[id].dataField);
             col.classList.add("xGridV2-col");
             col.style.width = columns[id].width;
-            if (columns[id].dataField == "_count_")
-              span.innerHTML = "&nbsp;";
-            else if (this.widthAll > 100)
-              span.innerHTML = columns[id].dataField;
-            else
-              span.innerHTML = id;
+            if (columns[id].dataField == "_count_") span.innerHTML = "&nbsp;";
+            else if (this.widthAll > 100) span.innerHTML = columns[id].dataField;
+            else span.innerHTML = id;
             col.appendChild(span);
             col.appendChild(resize);
             col.appendChild(label);
@@ -228,8 +241,7 @@ var xGridV2 = (() => {
         },
         source(sourceData) {
           this.onEvent.removeEventListenerAndRemoveElement();
-          if (this.filterControl == false)
-            this.arg.source = [];
+          if (this.filterControl == false) this.arg.source = [];
           this.setTitle(sourceData);
           this.tabindex = 0;
           this.indexSelect = 0;
@@ -246,10 +258,8 @@ var xGridV2 = (() => {
               const chunk = items.slice(pos, pos + chunkSize);
               pos += chunkSize;
               axSelf.createLine(chunk, "BOTTOM", pos >= items.length);
-              if (pos < items.length)
-                requestAnimationFrame(next);
-              else
-                axSelf.afterSourceLayout();
+              if (pos < items.length) requestAnimationFrame(next);
+              else axSelf.afterSourceLayout();
             };
             requestAnimationFrame(next);
           } else {
@@ -268,8 +278,7 @@ var xGridV2 = (() => {
             if (this.arg.query.execute)
               this.element.addEventListener("scroll", this.eventListenerScroll);
           }
-          if (this.arg.setfocus)
-            this.focus(this.arg.setfocus - 1);
+          if (this.arg.setfocus) this.focus(this.arg.setfocus - 1);
         },
         checkWidthColumns() {
           let valPercente = 0;
@@ -280,8 +289,7 @@ var xGridV2 = (() => {
             this.arg.columns = Object.assign(obj, this.arg.columns);
           }
           for (let i in this.arg.columns) {
-            if (this.arg.columns[i].width == void 0)
-              qtoColumn++;
+            if (this.arg.columns[i].width == void 0) qtoColumn++;
             let wd = this.arg.columns[i].width != void 0 ? parseInt(this.arg.columns[i].width) : 0;
             valPercente += wd;
           }
@@ -298,7 +306,10 @@ var xGridV2 = (() => {
             let wid = 100 / Object.keys(source[0]).length;
             for (let i in source[0]) {
               let lengthString = source[0][i].length == void 0 ? wid : source[0][i].trim().length * 85 / 100;
-              this.columnsAutoCreate.push({ dataField: i, width: lengthString + "%" });
+              this.columnsAutoCreate.push({
+                dataField: i,
+                width: lengthString + "%"
+              });
             }
           }
         },
@@ -307,20 +318,16 @@ var xGridV2 = (() => {
             let _source = { ...source };
             _source.value = _source[col.dataField];
             let value = this.arg.compare[col.compare](_source);
-            if (value == void 0)
-              return false;
+            if (value == void 0) return false;
             else
               return value;
           }
         },
         createLine(source, order, finish = true) {
-          if (order == void 0)
-            order = "BOTTOM";
+          if (order == void 0) order = "BOTTOM";
           let col;
-          if (Object.keys(this.arg.columns).length > 0)
-            col = this.arg.columns;
-          else
-            col = this.columnsAutoCreate;
+          if (Object.keys(this.arg.columns).length > 0) col = this.arg.columns;
+          else col = this.columnsAutoCreate;
           let fragment = document.createDocumentFragment();
           let rows = [];
           for (let i in source) {
@@ -331,11 +338,14 @@ var xGridV2 = (() => {
               div.style.height = `${this.arg.heightLine}px`;
             div.setAttribute("tabindex", this.tabindex);
             this.tabindex++;
-            if (this.arg.count)
-              source[i]._count_ = this.tabindex;
+            if (this.arg.count) source[i]._count_ = this.tabindex;
             for (let c in col) {
               let divCol = document.createElement("div");
-              let value = this.formatColumnValue(col[c], source[i], source[i][col[c].dataField]);
+              let value = this.formatColumnValue(
+                col[c],
+                source[i],
+                source[i][col[c].dataField]
+              );
               if (this.arg.count) {
                 if (col[c].dataField == "_count_")
                   value = `<span style="width:100%;text-align: center;opacity: 0.5;">${value}</span>`;
@@ -348,16 +358,14 @@ var xGridV2 = (() => {
             }
             rows.push(div);
             this.onEvent.setEventListener(div);
-            if (this.arg.count)
-              delete source[i]._count_;
+            if (this.arg.count) delete source[i]._count_;
           }
           if (order.toUpperCase() == "TOP") {
             for (let r = rows.length - 1; r >= 0; r--)
               fragment.appendChild(rows[r]);
             this.gridContent.insertBefore(fragment, this.gridContent.firstChild);
           } else {
-            for (let r = 0; r < rows.length; r++)
-              fragment.appendChild(rows[r]);
+            for (let r = 0; r < rows.length; r++) fragment.appendChild(rows[r]);
             this.gridContent.appendChild(fragment);
           }
           if (Object.keys(source).length > 0) {
@@ -395,20 +403,15 @@ var xGridV2 = (() => {
               ax.element.scrollTop = scroll - rowHeight;
             }
           }
-          if (e.target.previousSibling)
-            e.target.previousSibling.focus();
-          if (e.preventDefault)
-            e.preventDefault();
-          if (e.stopPropagation)
-            e.stopPropagation();
+          if (e.target.previousSibling) e.target.previousSibling.focus();
+          if (e.preventDefault) e.preventDefault();
+          if (e.stopPropagation) e.stopPropagation();
         },
         setaForDown(e) {
           if (ax.widthAll <= 100)
             ax.gridContent.scrollTop = ax.gridContent.scrollTop + 1;
-          else
-            ax.element.scrollTop = ax.element.scrollTop + 1;
-          if (e.target.nextSibling)
-            e.target.nextSibling.focus();
+          else ax.element.scrollTop = ax.element.scrollTop + 1;
+          if (e.target.nextSibling) e.target.nextSibling.focus();
           e.preventDefault();
           e.stopPropagation();
         },
@@ -423,30 +426,24 @@ var xGridV2 = (() => {
             }
           },
           keydown(e) {
-            if (e.keyCode == 38)
-              ax.setaForUp(e);
+            if (e.keyCode == 38) ax.setaForUp(e);
             if (ax.arg.keySelectUp) {
               if (typeof ax.arg.keySelectUp == "object") {
                 ax.arg.keySelectUp.forEach((ln) => {
-                  if (e.keyCode == ln)
-                    ax.setaForUp(e);
+                  if (e.keyCode == ln) ax.setaForUp(e);
                 });
               } else {
-                if (e.keyCode == ax.arg.keySelectUp)
-                  ax.setaForUp(e);
+                if (e.keyCode == ax.arg.keySelectUp) ax.setaForUp(e);
               }
             }
-            if (e.keyCode == 40)
-              ax.setaForDown(e);
+            if (e.keyCode == 40) ax.setaForDown(e);
             if (ax.arg.keySelectDown) {
               if (typeof ax.arg.keySelectDown == "object") {
                 ax.arg.keySelectDown.forEach((ln) => {
-                  if (e.keyCode == ln)
-                    ax.setaForDown(e);
+                  if (e.keyCode == ln) ax.setaForDown(e);
                 });
               } else {
-                if (e.keyCode == ax.arg.keySelectDown)
-                  ax.setaForDown(e);
+                if (e.keyCode == ax.arg.keySelectDown) ax.setaForDown(e);
               }
             }
             if (e.keyCode == 33) {
@@ -455,10 +452,8 @@ var xGridV2 = (() => {
               } catch (error) {
                 return;
               }
-              if (e.preventDefault)
-                e.preventDefault();
-              if (e.stopPropagation)
-                e.stopPropagation();
+              if (e.preventDefault) e.preventDefault();
+              if (e.stopPropagation) e.stopPropagation();
             }
             if (e.keyCode == 34) {
               try {
@@ -466,26 +461,27 @@ var xGridV2 = (() => {
               } catch (error) {
                 return;
               }
-              if (e.preventDefault)
-                e.preventDefault();
-              if (e.stopPropagation)
-                e.stopPropagation();
+              if (e.preventDefault) e.preventDefault();
+              if (e.stopPropagation) e.stopPropagation();
             }
             if (e.keyCode == 35) {
-              let lastRow = ax.gridContent.querySelector('[tabindex="' + (ax.tabindex - 1) + '"]');
+              let lastRow = ax.gridContent.querySelector(
+                '[tabindex="' + (ax.tabindex - 1) + '"]'
+              );
               if (lastRow) lastRow.focus();
               e.preventDefault();
               e.stopPropagation();
             }
             if (e.keyCode == 36) {
-              let firstRow = ax.gridContent.querySelector('[tabindex="0"]');
+              let firstRow = ax.gridContent.querySelector(
+                '[tabindex="0"]'
+              );
               if (firstRow) firstRow.focus();
               e.preventDefault();
               e.stopPropagation();
             }
             if (ax.arg.multiSelect) {
-              if (e.keyCode == 17)
-                ax.onEvent._control = true;
+              if (e.keyCode == 17) ax.onEvent._control = true;
             }
           },
           focusin(e) {
@@ -494,7 +490,9 @@ var xGridV2 = (() => {
             let selectOut = el.querySelectorAll(".xGridV2-SelectedFocusOut");
             if (ax.onEvent._control == false) {
               select.forEach((r) => r.classList.remove("xGridV2-Selected"));
-              selectOut.forEach((r) => r.classList.remove("xGridV2-SelectedFocusOut"));
+              selectOut.forEach(
+                (r) => r.classList.remove("xGridV2-SelectedFocusOut")
+              );
               ax.indexSelect = e.currentTarget.getAttribute("tabindex");
               ax.sourceSelect = ax.arg.source[ax.indexSelect];
               ax.setElementSideBySide();
@@ -521,21 +519,25 @@ var xGridV2 = (() => {
             el.addEventListener("keyup", this.keyup);
           },
           removeEventListenerAndRemoveElement() {
-            Object.values(ax.gridContent.querySelectorAll(".xGridV2-row")).map((el) => {
-              el.removeEventListener("focusin", this.focusin);
-              el.removeEventListener("keydown", this.keydown);
-              el.removeEventListener("focusout", this.focusout);
-              el.removeEventListener("keyup", this.keyup);
-              el.remove();
-            });
+            Object.values(ax.gridContent.querySelectorAll(".xGridV2-row")).map(
+              (el) => {
+                el.removeEventListener("focusin", this.focusin);
+                el.removeEventListener("keydown", this.keydown);
+                el.removeEventListener("focusout", this.focusout);
+                el.removeEventListener("keyup", this.keyup);
+                el.remove();
+              }
+            );
           },
           removeEventListener() {
-            Object.values(ax.gridContent.querySelectorAll(".xGridV2-row")).map((el) => {
-              el.removeEventListener("focusin", this.focusin);
-              el.removeEventListener("keydown", this.keydown);
-              el.removeEventListener("focusout", this.focusout);
-              el.removeEventListener("keyup", this.keyup);
-            });
+            Object.values(ax.gridContent.querySelectorAll(".xGridV2-row")).map(
+              (el) => {
+                el.removeEventListener("focusin", this.focusin);
+                el.removeEventListener("keydown", this.keydown);
+                el.removeEventListener("focusout", this.focusout);
+                el.removeEventListener("keyup", this.keyup);
+              }
+            );
           },
           removeEventListenerElement(el) {
             el.removeEventListener("focusin", this.focusin);
@@ -545,26 +547,30 @@ var xGridV2 = (() => {
           },
           setEventListenerAll() {
             this.removeEventListener();
-            Object.values(ax.gridContent.querySelectorAll(".xGridV2-row")).map((el) => {
-              el.addEventListener("focusin", this.focusin);
-              el.addEventListener("keydown", this.keydown);
-              el.addEventListener("focusout", this.focusout);
-              el.addEventListener("keyup", this.keyup);
-            });
+            Object.values(ax.gridContent.querySelectorAll(".xGridV2-row")).map(
+              (el) => {
+                el.addEventListener("focusin", this.focusin);
+                el.addEventListener("keydown", this.keydown);
+                el.addEventListener("focusout", this.focusout);
+                el.addEventListener("keyup", this.keyup);
+              }
+            );
           }
         },
         elementSpanConfig(col, value) {
           let span = document.createElement("span");
-          if (col.style || col.class || col.center || col.right) {
-            if (col.style) span.style.cssText = String(col.style);
+          if (col.style || col.class || col.left || col.center || col.right) {
+            if (col.style)
+              span.style.cssText = String(col.style);
             span.style.width = "100%";
-            if (col.class) col.class.split(" ").forEach((e) => span.classList.add(e));
+            if (col.class)
+              col.class.split(" ").forEach((e) => span.classList.add(e));
+            if (col.left) span.style.textAlign = "left";
             if (col.center) span.style.textAlign = "center";
             if (col.right) span.style.textAlign = "right";
             if (col.html === true)
               span.innerHTML = value == null ? "" : String(value);
-            else
-              span.textContent = value == null ? "" : String(value);
+            else span.textContent = value == null ? "" : String(value);
             return span.outerHTML;
           }
           return value;
@@ -590,7 +596,11 @@ var xGridV2 = (() => {
               for (let i in columns) {
                 if (columns[i].dataField == field) {
                   ax.sourceSelect[field] = value;
-                  value = this.formatColumnValue(columns[i], ax.sourceSelect, value);
+                  value = this.formatColumnValue(
+                    columns[i],
+                    ax.sourceSelect,
+                    value
+                  );
                 }
               }
               if (cell) cell.innerHTML = value;
@@ -600,7 +610,9 @@ var xGridV2 = (() => {
           }
           if (typeof field == "object" && Object.keys(field).length > 0) {
             let columns = Object.keys(this.arg.columns).length > 0 ? this.arg.columns : this.columnsAutoCreate;
-            let linha = this.gridContent.querySelector('[tabindex="' + this.indexSelect + '"]');
+            let linha = this.gridContent.querySelector(
+              '[tabindex="' + this.indexSelect + '"]'
+            );
             let cell;
             for (let x in field) {
               let _field = x;
@@ -610,7 +622,11 @@ var xGridV2 = (() => {
                 ax.sourceSelect[_field] = _value;
               for (let i in columns) {
                 if (columns[i].dataField == _field) {
-                  _value = this.formatColumnValue(columns[i], ax.sourceSelect, _value);
+                  _value = this.formatColumnValue(
+                    columns[i],
+                    ax.sourceSelect,
+                    _value
+                  );
                 }
               }
               if (cell) cell.innerHTML = _value;
@@ -638,15 +654,17 @@ var xGridV2 = (() => {
               ax.loadMore();
               ax.page++;
               ax.controlScroll = false;
-              ax.arg.query.execute({ offset: ax.tabindex, page: ax.page, param: ax.paramQuery });
+              ax.arg.query.execute({
+                offset: ax.tabindex,
+                page: ax.page,
+                param: ax.paramQuery
+              });
             }
           }
         },
         focus(numLine) {
-          if (this.gridDisable)
-            return false;
-          if (!this.arg.source || !this.arg.source.length)
-            return false;
+          if (this.gridDisable) return false;
+          if (!this.arg.source || !this.arg.source.length) return false;
           let line = numLine != void 0 ? numLine : this.indexSelect;
           let el = this.gridContent.querySelector('[tabindex="' + line + '"]');
           if (el) el.focus();
@@ -656,9 +674,11 @@ var xGridV2 = (() => {
           this.onEvent.divDisable[0] = document.createElement("div");
           this.onEvent.divDisable[0].classList.add("xGridV2-disable");
           this.onEvent.removeEventListener();
-          if (this.widthAll > 100)
-            this.element.style.overflow = "hidden";
-          this.element.insertBefore(this.onEvent.divDisable[0], this.element.firstChild);
+          if (this.widthAll > 100) this.element.style.overflow = "hidden";
+          this.element.insertBefore(
+            this.onEvent.divDisable[0],
+            this.element.firstChild
+          );
           this.gridDisable = true;
           call && call();
         },
@@ -666,8 +686,7 @@ var xGridV2 = (() => {
           if (this.onEvent.divDisable[0]) {
             this.onEvent.divDisable[0].remove();
             this.onEvent.setEventListenerAll();
-            if (this.widthAll > 100)
-              this.element.style.overflow = "auto";
+            if (this.widthAll > 100) this.element.style.overflow = "auto";
             this.gridDisable = false;
             call && call();
           }
@@ -683,13 +702,11 @@ var xGridV2 = (() => {
             this.divLoadMore.innerHTML = '<i class="fa fa-spinner fa-pulse fa-fw fa-lg"></i> Carregando';
             this.element.insertBefore(this.divLoadMore, this.element.firstChild);
           } else {
-            if (this.divLoadMore)
-              this.divLoadMore.remove();
+            if (this.divLoadMore) this.divLoadMore.remove();
           }
         },
         load(text, call) {
-          if (text == void 0)
-            text = "Carregando . . .";
+          if (text == void 0) text = "Carregando . . .";
           this.divLoad = document.createElement("div");
           this.divLoad.classList.add("xGridV2-load");
           this.divLoad.innerHTML = '<i class="fa fa-spinner fa-pulse fa-fw fa-lg"></i> ' + escapeHtml(text);
@@ -697,8 +714,7 @@ var xGridV2 = (() => {
           call && call();
         },
         closeLoad(call) {
-          if (this.divLoad)
-            this.divLoad.remove();
+          if (this.divLoad) this.divLoad.remove();
           call && call();
         },
         getIndex() {
@@ -706,15 +722,14 @@ var xGridV2 = (() => {
         },
         deleteLine(index) {
           index = index == void 0 ? this.indexSelect : index;
-          if (!index)
-            return;
+          if (!index) return;
           let del = this.arg.source[index];
           delete this.arg.source[index];
-          let target = this.gridContent.querySelector('[tabindex="' + index + '"]');
-          if (target.nextSibling)
-            target.nextSibling.focus();
-          else if (target.previousSibling)
-            target.previousSibling.focus();
+          let target = this.gridContent.querySelector(
+            '[tabindex="' + index + '"]'
+          );
+          if (target.nextSibling) target.nextSibling.focus();
+          else if (target.previousSibling) target.previousSibling.focus();
           this.onEvent.removeEventListenerElement(target);
           target.classList.add("xGridV2-deleteLine");
           setTimeout(() => {
@@ -730,12 +745,14 @@ var xGridV2 = (() => {
           setTimeout(() => {
             this.focus(this.tabindex - 1);
           }, 100);
-          if (call != void 0)
-            call();
+          if (call != void 0) call();
           return param2;
         },
         sumDataField(dataField) {
-          return Object.values(this.arg.source).reduce((sum, field) => sum + parseFloat(field[dataField]), 0);
+          return Object.values(this.arg.source).reduce(
+            (sum, field) => sum + parseFloat(field[dataField]),
+            0
+          );
         },
         onKeyDown() {
           this.element.addEventListener("keydown", (e) => {
@@ -761,8 +778,7 @@ var xGridV2 = (() => {
         },
         onSelectLine() {
           this.vModel();
-          if (this.arg.onSelectLine)
-            this.arg.onSelectLine(this.sourceSelect);
+          if (this.arg.onSelectLine) this.arg.onSelectLine(this.sourceSelect);
         },
         getElementSideBySideJson(toUpperCase = false, empty = true) {
           let date_regex = /^[0-3]?[0-9][- /.][0-3]?[0-9][- /.](?:[0-9]{2})?[0-9]{2}$/;
@@ -771,16 +787,13 @@ var xGridV2 = (() => {
             let value = this.elementSideBySide[name].value;
             let type = this.elementSideBySide[name].type;
             if (type == void 0) {
-              if (this.elementSideBySide[name].localName == "img")
-                continue;
+              if (this.elementSideBySide[name].localName == "img") continue;
             }
             if (type == "") {
-              if (this.elementSideBySide[name].localName == "a")
-                continue;
+              if (this.elementSideBySide[name].localName == "a") continue;
             }
             if (empty) {
-              if (value == "")
-                continue;
+              if (value == "") continue;
             }
             if (!isNaN(parseFloat(value))) {
               if (value.indexOf(",") > -1) {
@@ -806,8 +819,7 @@ var xGridV2 = (() => {
           return json;
         },
         setElementSideBySide() {
-          if (!this.arg.sideBySide || !this.sourceSelect)
-            return;
+          if (!this.arg.sideBySide || !this.sourceSelect) return;
           const vm = this.arg.sideBySide.vModel;
           if (vm && !isVModelFn(vm)) {
             for (let i in vm) {
@@ -833,8 +845,7 @@ var xGridV2 = (() => {
               vm[i] = value;
             }
           }
-          if (this.arg.sideBySide.el && isVModelFn(vm))
-            return;
+          if (this.arg.sideBySide.el && isVModelFn(vm)) return;
           if (this.arg.sideBySide.el)
             for (let i in this.elementSideBySide) {
               let value = this.sourceSelect[i];
@@ -862,8 +873,7 @@ var xGridV2 = (() => {
                   var typeEle = this.elementSideBySide[i].localName;
                   if (typeEle == "img") {
                     this.elementSideBySide[i].src = value;
-                  } else
-                    this.elementSideBySide[i].innerHTML = value;
+                  } else this.elementSideBySide[i].innerHTML = value;
                   break;
                 case "text":
                 case "password":
@@ -912,7 +922,10 @@ var xGridV2 = (() => {
               }
             }
           } else {
-            let fieldsSideBySide = this.getElementSideBySideJson(toUpperCase, empty);
+            let fieldsSideBySide = this.getElementSideBySideJson(
+              toUpperCase,
+              empty
+            );
             for (let i in fieldsSideBySide) {
               if (fieldsSideBySide[i] != this.sourceSelect[i]) {
                 diff.old[i] = this.sourceSelect[i];
@@ -946,8 +959,7 @@ var xGridV2 = (() => {
                     var typeEle = this.elementSideBySide[i].localName;
                     if (typeEle == "img") {
                       this.elementSideBySide[i].src = "";
-                    } else
-                      this.elementSideBySide[i].innerHTML = "";
+                    } else this.elementSideBySide[i].innerHTML = "";
                     break;
                   case "text":
                   case "password":
@@ -999,10 +1011,8 @@ var xGridV2 = (() => {
             }
             return;
           }
-          if (this.tabindex == 0)
-            this.source(source);
-          else
-            this.createLine(source);
+          if (this.tabindex == 0) this.source(source);
+          else this.createLine(source);
         },
         async queryOpen(param2, call) {
           this.paramQuery = param2;
@@ -1011,7 +1021,11 @@ var xGridV2 = (() => {
           this.queryComplete = false;
           this.queryLoading = true;
           this.controlScroll = false;
-          await this.arg.query.execute({ offset: this.tabindex, page: this.page, param: param2 });
+          await this.arg.query.execute({
+            offset: this.tabindex,
+            page: this.page,
+            param: param2
+          });
           call && call();
         },
         frame() {
@@ -1038,7 +1052,10 @@ var xGridV2 = (() => {
                       }
                       if (btnTarget.getAttribute("state") == "save" || btnTarget.getAttribute("state") == "delete")
                         btn.disabled = !btn.disabled;
-                      if (await ax.arg.sideBySide.frame.buttons[key].click(this.sourceSelect, e) == false) {
+                      if (await ax.arg.sideBySide.frame.buttons[key].click(
+                        this.sourceSelect,
+                        e
+                      ) == false) {
                         if (btnTarget.getAttribute("state") == "save" || btnTarget.getAttribute("state") == "delete")
                           btn.disabled = !btn.disabled;
                         if (innerHTMLbtn != "")
@@ -1047,29 +1064,39 @@ var xGridV2 = (() => {
                       }
                       if (btnTarget.getAttribute("state") == "save" || btnTarget.getAttribute("state") == "delete")
                         btn.disabled = !btn.disabled;
-                      if (innerHTMLbtn != "")
-                        btnTarget.innerHTML = innerHTMLbtn;
+                      if (innerHTMLbtn != "") btnTarget.innerHTML = innerHTMLbtn;
                       if (btnTarget.getAttribute("state") == "insert")
                         ax.sourceSelect = false;
-                      if ([state.insert, state.update].indexOf(btnTarget.getAttribute("state")) >= 0) {
+                      if ([state.insert, state.update].indexOf(
+                        btnTarget.getAttribute("state")
+                      ) >= 0) {
                         this.disableFieldsSideBySide(true);
                         this.disableBtnsSaveCancel(true);
                       }
-                      if ([state.save, state.cancel].indexOf(btnTarget.getAttribute("state")) >= 0) {
+                      if ([state.save, state.cancel].indexOf(
+                        btnTarget.getAttribute("state")
+                      ) >= 0) {
                         this.disableFieldsSideBySide(false);
                         this.disableBtnsSaveCancel(false);
                       }
                     });
-                  if (this.arg.sideBySide.frame.buttons[key].class) this.arg.sideBySide.frame.buttons[key].class.split(" ").forEach((e) => btn.classList.add(e));
-                  if (this.arg.sideBySide.frame.buttons[key].id) btn.id = this.arg.sideBySide.frame.buttons[key].id;
-                  if (this.arg.sideBySide.frame.buttons[key].style) btn.style.cssText = this.arg.sideBySide.frame.buttons[key].style;
+                  if (this.arg.sideBySide.frame.buttons[key].class)
+                    this.arg.sideBySide.frame.buttons[key].class.split(" ").forEach((e) => btn.classList.add(e));
+                  if (this.arg.sideBySide.frame.buttons[key].id)
+                    btn.id = this.arg.sideBySide.frame.buttons[key].id;
+                  if (this.arg.sideBySide.frame.buttons[key].style)
+                    btn.style.cssText = this.arg.sideBySide.frame.buttons[key].style;
                   if (this.arg.sideBySide.frame.buttons[key].state) {
-                    btn.setAttribute("state", this.arg.sideBySide.frame.buttons[key].state);
+                    btn.setAttribute(
+                      "state",
+                      this.arg.sideBySide.frame.buttons[key].state
+                    );
                     btns[key] = this.arg.sideBySide.frame.buttons[key].state;
                     if (this.arg.sideBySide.frame.buttons[key].state == "save")
                       this.listTabForEnter.push(btn);
                   }
-                  if (this.arg.sideBySide.frame.buttons[key].state == state.save || this.arg.sideBySide.frame.buttons[key].state == state.cancel) btn.disabled = true;
+                  if (this.arg.sideBySide.frame.buttons[key].state == state.save || this.arg.sideBySide.frame.buttons[key].state == state.cancel)
+                    btn.disabled = true;
                   this.buttonsFrame[key] = btn;
                   elFrame.appendChild(btn);
                   ax.disableFieldsSideBySide(true);
@@ -1079,8 +1106,7 @@ var xGridV2 = (() => {
         },
         vModel() {
           var _a;
-          if (!((_a = this.arg.sideBySide) == null ? void 0 : _a.vModel) || !this.sourceSelect)
-            return;
+          if (!((_a = this.arg.sideBySide) == null ? void 0 : _a.vModel) || !this.sourceSelect) return;
           const vm = this.arg.sideBySide.vModel;
           if (isVModelFn(vm)) {
             vm({ ...this.sourceSelect });
@@ -1114,26 +1140,29 @@ var xGridV2 = (() => {
             this.messageDuplicity = document.createElement("div");
             if (this.arg.sideBySide.duplicity.dataField)
               this.arg.sideBySide.duplicity.dataField.forEach((field) => {
-                if (this.elementSideBySide[field] == void 0)
-                  return;
-                this.elementSideBySide[field].addEventListener("focusout", (e) => {
-                  if (e.target.value == "")
-                    return false;
-                  if (this.sourceSelect[field] != e.target.value) {
-                    let text = field;
-                    if (this.elementSideBySide[field].previousSibling)
-                      text = this.elementSideBySide[field].previousSibling.innerText;
-                    else if (this.elementSideBySide[field].getAttribute("placeholder"))
-                      text = this.elementSideBySide[field].getAttribute("placeholder");
-                    else if (this.elementSideBySide[field].getAttribute("label"))
-                      text = this.elementSideBySide[field].getAttribute("label");
-                    this.arg.sideBySide.duplicity.execute({
-                      field,
-                      value: e.target.value,
-                      text
-                    });
+                if (this.elementSideBySide[field] == void 0) return;
+                this.elementSideBySide[field].addEventListener(
+                  "focusout",
+                  (e) => {
+                    if (e.target.value == "") return false;
+                    if (this.sourceSelect[field] != e.target.value) {
+                      let text = field;
+                      if (this.elementSideBySide[field].previousSibling)
+                        text = this.elementSideBySide[field].previousSibling.innerText;
+                      else if (this.elementSideBySide[field].getAttribute("placeholder"))
+                        text = this.elementSideBySide[field].getAttribute(
+                          "placeholder"
+                        );
+                      else if (this.elementSideBySide[field].getAttribute("label"))
+                        text = this.elementSideBySide[field].getAttribute("label");
+                      this.arg.sideBySide.duplicity.execute({
+                        field,
+                        value: e.target.value,
+                        text
+                      });
+                    }
                   }
-                });
+                );
               });
           }
         },
@@ -1162,8 +1191,7 @@ var xGridV2 = (() => {
                       value: this.elementSideBySide[field].value.trim(),
                       text
                     });
-                    if (r)
-                      return res(r);
+                    if (r) return res(r);
                   }
                 }
                 res(false);
@@ -1177,24 +1205,27 @@ var xGridV2 = (() => {
         tabToEnter(name) {
           if (this.arg.sideBySide.tabToEnter != false) {
             if (this.elementSideBySide[name] == void 0) return false;
-            this.elementSideBySide[name].addEventListener("keydown", function(e) {
-              if (e.keyCode == 13) {
-                let idx = ax.listTabForEnter.indexOf(this);
-                let next;
-                do {
-                  idx++;
-                  next = ax.listTabForEnter[idx];
-                } while (next != void 0 && next.getAttribute("tabindex") === "-1");
-                if (next != void 0) {
-                  if (next.tagName == "BUTTON" || next.tagName == "SELECT")
-                    next.focus();
-                  else if (next instanceof HTMLInputElement || next instanceof HTMLTextAreaElement)
-                    next.select();
+            this.elementSideBySide[name].addEventListener(
+              "keydown",
+              function(e) {
+                if (e.keyCode == 13) {
+                  let idx = ax.listTabForEnter.indexOf(this);
+                  let next;
+                  do {
+                    idx++;
+                    next = ax.listTabForEnter[idx];
+                  } while (next != void 0 && (next.getAttribute("tabindex") === "-1" || next.disabled || next.type === "hidden"));
+                  if (next != void 0) {
+                    if (next.tagName == "BUTTON" || next.tagName == "SELECT")
+                      next.focus();
+                    else if (next instanceof HTMLInputElement || next instanceof HTMLTextAreaElement)
+                      next.select();
+                  }
+                  e.preventDefault();
+                  e.stopPropagation();
                 }
-                e.preventDefault();
-                e.stopPropagation();
               }
-            });
+            );
           }
         },
         focusField(name) {
@@ -1214,16 +1245,17 @@ var xGridV2 = (() => {
             return;
           }
           if (name == void 0) {
-            if (!((_b = this.listTabForEnter) == null ? void 0 : _b.length)) return;
-            if (this.listTabForEnter[0].tagName == "BUTTON" || this.listTabForEnter[0].tagName == "SELECT")
-              this.listTabForEnter[0].focus();
-            else
-              this.listTabForEnter[0].select();
+            const first = (_b = this.listTabForEnter) == null ? void 0 : _b.find(
+              (el) => !(el.getAttribute("tabindex") === "-1" || el.disabled || el.type === "hidden")
+            );
+            if (!first) return;
+            if (first.tagName == "BUTTON" || first.tagName == "SELECT")
+              first.focus();
+            else first.select();
           } else if (this.elementSideBySide[name]) {
             if (this.elementSideBySide[name].tagName == "BUTTON" || this.elementSideBySide[name].tagName == "SELECT")
               this.elementSideBySide[name].focus();
-            else
-              this.elementSideBySide[name].select();
+            else this.elementSideBySide[name].select();
           }
         },
         disableBtnsSaveCancel(disabled = true) {
@@ -1311,9 +1343,17 @@ var xGridV2 = (() => {
           let text;
           let width;
           resizers.addEventListener("mousedown", function(e) {
-            fieldTitle = ax.gridTitle.querySelector('[name="' + this.parentElement.getAttribute("name") + '"]');
-            text = ax.gridTitle.querySelector('[name="' + this.parentElement.getAttribute("name") + '"]').querySelector("span").innerHTML;
-            listContent = Array.from(ax.gridContent.querySelectorAll('[name="' + this.parentElement.getAttribute("name") + '"]'));
+            fieldTitle = ax.gridTitle.querySelector(
+              '[name="' + this.parentElement.getAttribute("name") + '"]'
+            );
+            text = ax.gridTitle.querySelector(
+              '[name="' + this.parentElement.getAttribute("name") + '"]'
+            ).querySelector("span").innerHTML;
+            listContent = Array.from(
+              ax.gridContent.querySelectorAll(
+                '[name="' + this.parentElement.getAttribute("name") + '"]'
+              )
+            );
             ax.gridTitle.style.cursor = "col-resize";
             document.querySelector("html").style.cursor = "col-resize";
             e.preventDefault();
@@ -1359,20 +1399,24 @@ var xGridV2 = (() => {
             el.removeAttribute("order");
           });
           let newArray = this.arg.source.sort(function(a, b) {
-            if (a[field] == null || a[field] == void 0)
-              a[field] = "";
-            if (b[field] == null || b[field] == void 0)
-              b[field] = "";
+            if (a[field] == null || a[field] == void 0) a[field] = "";
+            if (b[field] == null || b[field] == void 0) b[field] = "";
             if (order == void 0) {
               try {
-                return a[field].localeCompare(b[field], void 0, { numeric: true, sensitivity: "base" });
+                return a[field].localeCompare(b[field], void 0, {
+                  numeric: true,
+                  sensitivity: "base"
+                });
               } catch (error) {
                 return a[field] > b[field] ? 1 : a[field] == b[field] ? a[field].size > b[field].size ? 1 : -1 : -1;
               }
             }
             if (order == "asc")
               try {
-                return b[field].localeCompare(a[field], void 0, { numeric: true, sensitivity: "base" });
+                return b[field].localeCompare(a[field], void 0, {
+                  numeric: true,
+                  sensitivity: "base"
+                });
               } catch (error) {
                 return a[field] < b[field] ? 1 : a[field] == b[field] ? a[field].size < b[field].size ? 1 : -1 : -1;
               }
@@ -1403,8 +1447,7 @@ var xGridV2 = (() => {
             newData = this.arg.source.filter((el) => {
               let concat = "";
               let filterFields = this.arg.filter.fields;
-              if (!filterFields)
-                filterFields = Object.keys(el);
+              if (!filterFields) filterFields = Object.keys(el);
               filterFields.forEach((ln) => {
                 concat += el[ln] + " ";
               });
@@ -1420,12 +1463,10 @@ var xGridV2 = (() => {
                 }
               });
               if (this.arg.filter.conditional == "AND") {
-                if (filter.length == retorno)
-                  return true;
+                if (filter.length == retorno) return true;
               }
               if (this.arg.filter.conditional == "OR") {
-                if (retorno > 0)
-                  return true;
+                if (retorno > 0) return true;
               }
             });
           } else if (typeof filter == "object") {
@@ -1434,8 +1475,7 @@ var xGridV2 = (() => {
               for (let i in filter) {
                 let field = i;
                 let value = filter[i].toString().toUpperCase();
-                if (el[field] == void 0)
-                  continue;
+                if (el[field] == void 0) continue;
                 if (this.arg.filter.filterBegin) {
                   if (el[field].toString().toUpperCase().indexOf(value) == 0)
                     retorno++;
@@ -1446,12 +1486,10 @@ var xGridV2 = (() => {
                 }
               }
               if (this.arg.filter.conditional == "AND") {
-                if (Object.keys(filter).length == retorno)
-                  return true;
+                if (Object.keys(filter).length == retorno) return true;
               }
               if (this.arg.filter.conditional == "OR") {
-                if (retorno > 0)
-                  return true;
+                if (retorno > 0) return true;
               }
             });
           }
@@ -1471,7 +1509,10 @@ var xGridV2 = (() => {
         filter(filter, call) {
           if (this.arg.filterDelay > 0) {
             clearTimeout(this.filterTimer);
-            this.filterTimer = setTimeout(() => this.runFilter(filter, call), this.arg.filterDelay);
+            this.filterTimer = setTimeout(
+              () => this.runFilter(filter, call),
+              this.arg.filterDelay
+            );
             return;
           }
           this.runFilter(filter, call);
@@ -1489,7 +1530,9 @@ var xGridV2 = (() => {
           document.querySelector("body").appendChild(iframe);
           let frameDoc = iframe.contentWindow ? iframe.contentWindow : iframe.contentDocument.document ? iframe.contentDocument.document : iframe.contentDocument;
           frameDoc.document.open();
-          frameDoc.document.write("<html><head><title>Impress\xE3o de Documento</title>");
+          frameDoc.document.write(
+            "<html><head><title>Impress\xE3o de Documento</title>"
+          );
           frameDoc.document.write(`<style>
                 *{border: 0;margin: 0;}
                     body{
@@ -1508,10 +1551,13 @@ var xGridV2 = (() => {
           frameDoc.document.write("</head>");
           frameDoc.document.write("<body>");
           if (headHTML != "")
-            frameDoc.document.write(this.arg.printHeadHtml ? headHTML : escapeHtml(headHTML));
-          else
-            frameDoc.document.write(printHead);
-          frameDoc.document.write(`<div class="xGridV2-main x-print">${ax.element.innerHTML.trim()}</div>`);
+            frameDoc.document.write(
+              this.arg.printHeadHtml ? headHTML : escapeHtml(headHTML)
+            );
+          else frameDoc.document.write(printHead);
+          frameDoc.document.write(
+            `<div class="xGridV2-main x-print">${ax.element.innerHTML.trim()}</div>`
+          );
           frameDoc.document.write("</body></html>");
           frameDoc.document.close();
           setTimeout(function() {
@@ -1559,7 +1605,14 @@ var xGridV2 = (() => {
     }
     function changeTheme(_theme) {
       defaultTheme = _theme;
-      const themeClasses = ["x-grayV2", "x-darkV2", "x-opacite", "x-whiteV2", "x-blue"];
+      const themeClasses = [
+        "x-grayV2",
+        "x-darkV2",
+        "x-opacite",
+        "x-whiteV2",
+        "x-blue",
+        "x-bocatan"
+      ];
       document.querySelectorAll(".xGridV2-main").forEach((node) => {
         themeClasses.forEach((t) => node.classList.remove(t));
         node.classList.add("xGridV2-main", _theme);
