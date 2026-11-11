@@ -89,7 +89,7 @@ export interface ixGrid {
     [name: string]: (dataField: any) => void;
   };
   onSelectLine?: (dataField: any) => void;
-  enter?: (dataField: any) => void;
+  enter?: (dataField: any, e?: any) => void;
   click?: (dataField: any) => void;
   dblClick?: (dataField: any) => void;
   onKeyDown?: {
@@ -823,12 +823,13 @@ export default (function xGridV2Module() {
 
       elementSpanConfig(col, value) {
         let span = document.createElement("span");
-        if (col.style || col.class || col.center || col.right) {
+        if (col.style || col.class || col.left || col.center || col.right) {
           if (col.style)
             (span as HTMLElement).style.cssText = String(col.style);
           span.style.width = "100%";
           if (col.class)
             col.class.split(" ").forEach((e) => span.classList.add(e));
+          if (col.left) span.style.textAlign = "left";
           if (col.center) span.style.textAlign = "center";
           if (col.right) span.style.textAlign = "right";
           if (col.html === true)
@@ -1679,7 +1680,9 @@ export default (function xGridV2Module() {
                   next = ax.listTabForEnter[idx];
                 } while (
                   next != undefined &&
-                  next.getAttribute("tabindex") === "-1"
+                  (next.getAttribute("tabindex") === "-1" ||
+                    (next as HTMLInputElement).disabled ||
+                    (next as HTMLInputElement).type === "hidden")
                 );
 
                 if (next != undefined)
@@ -1718,13 +1721,18 @@ export default (function xGridV2Module() {
         }
 
         if (name == undefined) {
-          if (!this.listTabForEnter?.length) return;
-          if (
-            this.listTabForEnter[0].tagName == "BUTTON" ||
-            this.listTabForEnter[0].tagName == "SELECT"
-          )
-            this.listTabForEnter[0].focus();
-          else this.listTabForEnter[0].select();
+          const first = this.listTabForEnter?.find(
+            (el) =>
+              !(
+                el.getAttribute("tabindex") === "-1" ||
+                (el as HTMLInputElement).disabled ||
+                (el as HTMLInputElement).type === "hidden"
+              ),
+          );
+          if (!first) return;
+          if (first.tagName == "BUTTON" || first.tagName == "SELECT")
+            first.focus();
+          else (first as HTMLInputElement).select();
         } else if (this.elementSideBySide[name]) {
           if (
             this.elementSideBySide[name].tagName == "BUTTON" ||
@@ -2201,6 +2209,7 @@ export default (function xGridV2Module() {
       "x-opacite",
       "x-whiteV2",
       "x-blue",
+      "x-bocatan",
     ];
     document.querySelectorAll(".xGridV2-main").forEach((node) => {
       themeClasses.forEach((t) => node.classList.remove(t));
