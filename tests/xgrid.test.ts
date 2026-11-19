@@ -63,6 +63,90 @@ describe('xGridV2', () => {
     expect(ax.controlScroll).toBe(false)
   })
 
+  describe('filtro mantém a lista completa', () => {
+    const rows = () => document.querySelectorAll('#grid .xGridV2-content .xGridV2-row').length
+    const novo = () => {
+      const grid = new xGridV2.create({ el: '#grid', columns: { N: { dataField: 'n' } } })
+      grid.source([{ n: 'alpha' }, { n: 'beta' }, { n: 'alphabet' }])
+      return grid
+    }
+
+    it('um filtro depois do outro busca na lista completa', () => {
+      const grid = novo()
+      grid.filter('alpha', () => {})
+      let count = -1
+      grid.filter('beta', (c) => { count = c })
+      expect(count).toBe(1)
+    })
+
+    it('limpar o filtro volta todas as linhas, sem duplicar', () => {
+      const grid = novo()
+      grid.filter('alpha', () => {})
+      grid.filter('', () => {})
+      expect(grid.data().map((r) => r.n)).toEqual(['alpha', 'beta', 'alphabet'])
+      expect(rows()).toBe(3)
+    })
+
+    it('data() durante o filtro devolve só as linhas exibidas', () => {
+      const grid = novo()
+      grid.filter('alpha', () => {})
+      expect(grid.data().map((r) => r.n)).toEqual(['alpha', 'alphabet'])
+    })
+
+    it('filtro sem resultado esvazia data()', () => {
+      const grid = novo()
+      grid.filter('zzz', () => {})
+      expect(grid.data()).toEqual([])
+    })
+
+    it('ordenar um resultado filtrado não perde a lista completa', () => {
+      const grid = novo()
+      grid.filter('alpha', () => {})
+      ;(document.querySelector('#grid .xGridV2-title .xGridV2-col') as HTMLElement).click()
+      let count = -1
+      grid.filter('beta', (c) => { count = c })
+      expect(count).toBe(1)
+    })
+
+    it('grid preenchida só com sourceAdd também filtra', () => {
+      const grid = new xGridV2.create({ el: '#grid', columns: { N: { dataField: 'n' } } })
+      grid.sourceAdd([{ n: 'alpha' }, { n: 'beta' }])
+      let count = -1
+      grid.filter('beta', (c) => { count = c })
+      expect(count).toBe(1)
+    })
+
+    it('querySourceAdd vazio não deixa o filtro achar dados antigos', () => {
+      const grid = new xGridV2.create({
+        el: '#grid',
+        columns: { N: { dataField: 'n' } },
+        query: { execute: () => {} },
+      })
+      grid.source([{ n: 'alpha' }])
+      grid.queryOpen({})
+      grid.querySourceAdd([])
+      let count = -1
+      grid.filter('alpha', (c) => { count = c })
+      expect(count).toBe(0)
+    })
+  })
+
+  it('source() novo cancela a renderização em blocos do anterior (>200 linhas)', async () => {
+    const grid = new xGridV2.create({ el: '#grid', columns: { N: { dataField: 'n' } } })
+    grid.source(Array.from({ length: 450 }, (_, i) => ({ n: 'a' + i })))
+    grid.source([{ n: 'x' }, { n: 'y' }])
+    await new Promise((r) => setTimeout(r, 300))
+    expect(document.querySelectorAll('#grid .xGridV2-content .xGridV2-row').length).toBe(2)
+    expect(grid.data().map((r) => r.n)).toEqual(['x', 'y'])
+    expect(document.querySelector('#grid .xGridV2-load')).toBeNull()
+  })
+
+  it('title: false faz o conteúdo ocupar a altura toda', () => {
+    new xGridV2.create({ el: '#grid', title: false, columns: { N: { dataField: 'n' } } })
+    const content = document.querySelector('#grid .xGridV2-content') as HTMLElement
+    expect(content.style.height).toBe('100%')
+  })
+
   describe('seleção de texto no duplo clique', () => {
     const mousedown = (target: Element, detail: number) => {
       const ev = new MouseEvent('mousedown', { bubbles: true, cancelable: true, detail })

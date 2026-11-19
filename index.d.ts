@@ -61,7 +61,7 @@ export interface ixGrid {
     printHeadHtml?: boolean;
     /** Atraso em ms antes de executar filter() (ex.: 300). Default false = imediato. */
     filterDelay?: number | false;
-    theme?: 'x-grayV2' | 'x-darkV2' | 'x-opacite' | 'x-whiteV2' | 'x-blue';
+    theme?: 'x-grayV2' | 'x-darkV2' | 'x-opacite' | 'x-whiteV2' | 'x-blue' | 'x-bocatan' | 'x-modern-dark' | 'x-Vyzo';
     columns?: {
         [titleColumn: string]: {
             dataField?: string;

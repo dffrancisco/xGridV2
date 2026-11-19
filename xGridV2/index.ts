@@ -70,7 +70,15 @@ export interface ixGrid {
   printHeadHtml?: boolean;
   /** Atraso em ms antes de executar filter() (ex.: 300). Default false = imediato. */
   filterDelay?: number | false;
-  theme?: "x-grayV2" | "x-darkV2" | "x-opacite" | "x-whiteV2" | "x-blue";
+  theme?:
+    | "x-grayV2"
+    | "x-darkV2"
+    | "x-opacite"
+    | "x-whiteV2"
+    | "x-blue"
+    | "x-bocatan"
+    | "x-modern-dark"
+    | "x-Vyzo";
   columns?: {
     [titleColumn: string]: {
       dataField?: string;
@@ -254,8 +262,15 @@ export default (function xGridV2Module() {
       listTabForEnter: <HTMLElement[]>[],
       filterControl: false,
       filterTimer: <any>null,
+      // lista completa, base do filter(); arg.source guarda só as linhas exibidas (indexadas por tabindex)
+      sourceAll: <any[]>[],
+      // incrementado a cada source(): invalida os blocos pendentes de uma renderização anterior
+      renderAtual: 0,
 
       constructor() {
+        // sem filtro os dois apontam para o mesmo array (vale também para grids montadas só com sourceAdd)
+        this.sourceAll = this.arg.source;
+
         this.element =
           this.arg.el.tagName == "DIV"
             ? this.arg.el
@@ -404,6 +419,9 @@ export default (function xGridV2Module() {
         this.gridContent = document.createElement("div");
         this.gridContent.classList.add("xGridV2-content");
 
+        // sem título o conteúdo ocupa a altura toda (os temas descontam o título com calc(100% - Npx))
+        if (this.arg.title == false) this.gridContent.style.height = "100%";
+
         // this.gridContent.style.width = `${this.widthAll}%`
 
         if (this.arg.query.execute)
@@ -435,7 +453,19 @@ export default (function xGridV2Module() {
       source(sourceData) {
         this.onEvent.removeEventListenerAndRemoveElement();
 
-        if (this.filterControl == false) this.arg.source = [];
+        // invalida os blocos ainda pendentes de um source() anterior (>200 linhas), senão eles se anexam a este
+        const render = ++this.renderAtual;
+        this.closeLoad();
+
+        let items = Array.isArray(sourceData)
+          ? sourceData
+          : Object.keys(sourceData).map((k) => sourceData[k]);
+
+        // já nasce completo (createLine só regrava as mesmas posições), para um render cancelado não deixar buraco.
+        // Sem filtro, sourceAll aponta para o mesmo array (sourceAdd/delete/paginação mantêm os dois iguais);
+        // com filtro, só arg.source é trocado e sourceAll segue com a lista completa
+        this.arg.source = [...items];
+        if (this.filterControl == false) this.sourceAll = this.arg.source;
 
         this.setTitle(sourceData);
 
@@ -445,16 +475,13 @@ export default (function xGridV2Module() {
         this.sourceSelect = false;
         this.gridContent.scrollTop = 0;
 
-        let items = Array.isArray(sourceData)
-          ? sourceData
-          : Object.keys(sourceData).map((k) => sourceData[k]);
-
         if (items.length > 200) {
           this.load("Carregando...");
           let pos = 0;
           const chunkSize = 100;
           const axSelf = this;
           const next = () => {
+            if (axSelf.renderAtual !== render) return;
             const chunk = items.slice(pos, pos + chunkSize);
             pos += chunkSize;
             axSelf.createLine(chunk, "BOTTOM", pos >= items.length);
@@ -1403,6 +1430,7 @@ export default (function xGridV2Module() {
           this.closeLoad();
           if (this.tabindex == 0) {
             this.arg.source = [];
+            this.sourceAll = this.arg.source;
             this.indexSelect = 0;
             this.sourceSelect = false;
             this.showNotFound();
@@ -1964,9 +1992,14 @@ export default (function xGridV2Module() {
           label.classList.add("xGridV2Desc");
         }
 
+        // ordenando um resultado filtrado: não troca a lista completa (sourceAll) pela filtrada
+        this.filterControl = this.arg.source !== this.sourceAll;
         this.source(newArray);
+        this.filterControl = false;
       },
       showNotFound() {
+        this.renderAtual++;
+        this.closeLoad();
         this.onEvent.removeEventListenerAndRemoveElement();
         while (this.gridContent.firstChild)
           this.gridContent.removeChild(this.gridContent.firstChild);
@@ -1982,7 +2015,7 @@ export default (function xGridV2Module() {
         if (typeof filter == "string") {
           filter = filter.trim().split(" ");
 
-          newData = this.arg.source.filter((el) => {
+          newData = this.sourceAll.filter((el) => {
             let concat = "";
 
             let filterFields = this.arg.filter.fields;
@@ -2015,7 +2048,7 @@ export default (function xGridV2Module() {
               if (retorno > 0) return true;
           });
         } else if (typeof filter == "object") {
-          newData = this.arg.source.filter((el) => {
+          newData = this.sourceAll.filter((el) => {
             let retorno = 0;
 
             for (let i in filter) {
@@ -2042,6 +2075,7 @@ export default (function xGridV2Module() {
         }
 
         if (!newData || newData.length === 0) {
+          this.arg.source = [];
           this.tabindex = 0;
           this.indexSelect = 0;
           this.sourceSelect = false;
@@ -2220,6 +2254,8 @@ export default (function xGridV2Module() {
       "x-whiteV2",
       "x-blue",
       "x-bocatan",
+      "x-modern-dark",
+      "x-Vyzo",
     ];
     document.querySelectorAll(".xGridV2-main").forEach((node) => {
       themeClasses.forEach((t) => node.classList.remove(t));

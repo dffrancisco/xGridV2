@@ -1118,3 +1118,156 @@
   box-shadow: none;
   background: #282c30;
 }
+
+/*-------------- Vyzo ------------------*/
+/*
+ * Combina com o balcão (.cardBalcao / xModal-Vyzo): fundo de card, borda fina, cantos de 8px.
+ * Usa --matdash-* e o primary do Vuetify (--v-theme-primary é "r,g,b") quando a página define;
+ * sem eles, cai nos valores padrão abaixo (claro e, com html.dark, escuro).
+ * Zebra e hover usam cinza/azul translúcido para funcionar sobre qualquer fundo.
+ */
+
+.x-Vyzo {
+  --xg-vyzo-bg: var(--matdash-bg-card, #ffffff);
+  --xg-vyzo-text: var(--matdash-text-primary, #2b2e30);
+  --xg-vyzo-text-secondary: var(--matdash-text-secondary, #6c757d);
+  --xg-vyzo-text-muted: var(--matdash-text-muted, #adb5bd);
+  --xg-vyzo-border: var(--matdash-border, #e1eef4);
+  --xg-vyzo-primary: var(--v-theme-primary, 40, 136, 213);
+}
+
+.dark .x-Vyzo {
+  --xg-vyzo-bg: var(--matdash-bg-card, #26343f);
+  --xg-vyzo-text: var(--matdash-text-primary, #a9bac7);
+  --xg-vyzo-text-secondary: var(--matdash-text-secondary, #a9bac7);
+  --xg-vyzo-text-muted: var(--matdash-text-muted, #7c8c97);
+  --xg-vyzo-border: var(--matdash-border, #3a4a55);
+  --xg-vyzo-primary: var(--v-theme-primary, 77, 163, 255);
+}
+
+.x-Vyzo {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  color: var(--xg-vyzo-text);
+  background: var(--xg-vyzo-bg);
+  border: 1px solid var(--xg-vyzo-border);
+  border-radius: 8px;
+  font-family: "Roboto", Verdana, Arial, sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  margin: auto !important;
+  box-sizing: border-box;
+}
+
+.x-Vyzo .xGridV2-title {
+  flex: none;
+  min-height: 16px;
+  background: var(--xg-vyzo-bg);
+  color: var(--xg-vyzo-text-secondary);
+  border-bottom: 1px solid var(--xg-vyzo-border);
+  font-size: 9px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0.2px;
+  cursor: pointer;
+}
+
+.x-Vyzo .xGridV2-title .xGridV2-col {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 1px 4px;
+  border-right: 1px solid var(--xg-vyzo-border);
+}
+
+.x-Vyzo .xGridV2-title .xGridV2-col:hover {
+  color: rgb(var(--xg-vyzo-primary));
+}
+
+/* compensa a barra de rolagem do conteúdo */
+.x-Vyzo .xGridV2-title .xGridV2-col:last-child {
+  margin-right: 10px;
+}
+
+/* o título define a própria altura; o conteúdo ocupa o resto (sem o calc(100% - 17px) dos outros temas) */
+.x-Vyzo .xGridV2-content {
+  flex: 1;
+  min-height: 0;
+  height: auto;
+  background: var(--xg-vyzo-bg);
+}
+
+.x-Vyzo .xGridV2-content .xGridV2-row:nth-child(odd) {
+  background-color: rgb(243 249 255);
+}
+
+.dark .x-Vyzo .xGridV2-content .xGridV2-row:nth-child(odd) {
+  background-color: rgb(77 105 134 / 7%);
+}
+
+.x-Vyzo .xGridV2-content .xGridV2-col {
+  padding: 3px 6px;
+  border-right: 1px solid var(--xg-vyzo-border);
+  cursor: pointer;
+}
+
+/* linha selecionada: fundo azul + barra à esquerda */
+.x-Vyzo .xGridV2-Selected {
+  background: rgba(0, 161, 236, 0.2) !important;
+  box-shadow: 3px 0 0 1px #00aeff inset;
+  outline: 0;
+}
+
+/* seleção com o grid sem foco: mesma ideia, mais apagada */
+.x-Vyzo .xGridV2-SelectedFocusOut {
+  background: #00eedb1f !important;
+  outline: 0;
+}
+
+.x-Vyzo .xGridV2-load {
+  height: 35px;
+  width: 160px;
+  background-color: rgba(31, 42, 51, 0.88);
+  border-radius: 6px;
+}
+
+.x-Vyzo .xGridV2-content nav {
+  color: var(--xg-vyzo-text-muted);
+  font-weight: 500;
+}
+
+/*****scrollbar*****/
+
+.x-Vyzo::-webkit-scrollbar-track-piece,
+.x-Vyzo .xGridV2-content::-webkit-scrollbar-track-piece {
+  border-left: none;
+  background: transparent;
+}
+
+.x-Vyzo::-webkit-scrollbar,
+.x-Vyzo .xGridV2-content::-webkit-scrollbar {
+  width: 10px;
+  background: transparent;
+}
+
+.x-Vyzo::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+.x-Vyzo::-webkit-scrollbar-thumb:vertical,
+.x-Vyzo::-webkit-scrollbar-thumb:horizontal,
+.x-Vyzo .xGridV2-content::-webkit-scrollbar-thumb:vertical,
+.x-Vyzo .xGridV2-content::-webkit-scrollbar-thumb:horizontal {
+  background: rgba(128, 128, 128, 0.35);
+  border-radius: 5px;
+}
+
+.x-Vyzo::-webkit-scrollbar-thumb:vertical:hover,
+.x-Vyzo::-webkit-scrollbar-thumb:horizontal:hover,
+.x-Vyzo .xGridV2-content::-webkit-scrollbar-thumb:vertical:hover,
+.x-Vyzo .xGridV2-content::-webkit-scrollbar-thumb:horizontal:hover {
+  box-shadow: none;
+  background: rgba(128, 128, 128, 0.6);
+}

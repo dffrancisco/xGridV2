@@ -121,7 +121,12 @@ var xGridV2 = (() => {
         listTabForEnter: [],
         filterControl: false,
         filterTimer: null,
+        // lista completa, base do filter(); arg.source guarda só as linhas exibidas (indexadas por tabindex)
+        sourceAll: [],
+        // incrementado a cada source(): invalida os blocos pendentes de uma renderização anterior
+        renderAtual: 0,
         constructor() {
+          this.sourceAll = this.arg.source;
           this.element = this.arg.el.tagName == "DIV" ? this.arg.el : document.querySelector(this.arg.el);
           this.idElment = this.element.id;
           this.element.classList.add("xGridV2-main");
@@ -227,6 +232,7 @@ var xGridV2 = (() => {
         setContent() {
           this.gridContent = document.createElement("div");
           this.gridContent.classList.add("xGridV2-content");
+          if (this.arg.title == false) this.gridContent.style.height = "100%";
           if (this.arg.query.execute)
             this.gridContent.addEventListener("scroll", this.eventListenerScroll);
           this.gridContent.addEventListener("mousedown", (e) => {
@@ -249,20 +255,24 @@ var xGridV2 = (() => {
         },
         source(sourceData) {
           this.onEvent.removeEventListenerAndRemoveElement();
-          if (this.filterControl == false) this.arg.source = [];
+          const render = ++this.renderAtual;
+          this.closeLoad();
+          let items = Array.isArray(sourceData) ? sourceData : Object.keys(sourceData).map((k) => sourceData[k]);
+          this.arg.source = [...items];
+          if (this.filterControl == false) this.sourceAll = this.arg.source;
           this.setTitle(sourceData);
           this.tabindex = 0;
           this.indexSelect = 0;
           this.page = 1;
           this.sourceSelect = false;
           this.gridContent.scrollTop = 0;
-          let items = Array.isArray(sourceData) ? sourceData : Object.keys(sourceData).map((k) => sourceData[k]);
           if (items.length > 200) {
             this.load("Carregando...");
             let pos = 0;
             const chunkSize = 100;
             const axSelf = this;
             const next = () => {
+              if (axSelf.renderAtual !== render) return;
               const chunk = items.slice(pos, pos + chunkSize);
               pos += chunkSize;
               axSelf.createLine(chunk, "BOTTOM", pos >= items.length);
@@ -1013,6 +1023,7 @@ var xGridV2 = (() => {
             this.closeLoad();
             if (this.tabindex == 0) {
               this.arg.source = [];
+              this.sourceAll = this.arg.source;
               this.indexSelect = 0;
               this.sourceSelect = false;
               this.showNotFound();
@@ -1437,9 +1448,13 @@ var xGridV2 = (() => {
             label.setAttribute("order", "desc");
             label.classList.add("xGridV2Desc");
           }
+          this.filterControl = this.arg.source !== this.sourceAll;
           this.source(newArray);
+          this.filterControl = false;
         },
         showNotFound() {
+          this.renderAtual++;
+          this.closeLoad();
           this.onEvent.removeEventListenerAndRemoveElement();
           while (this.gridContent.firstChild)
             this.gridContent.removeChild(this.gridContent.firstChild);
@@ -1452,7 +1467,7 @@ var xGridV2 = (() => {
           let newData;
           if (typeof filter == "string") {
             filter = filter.trim().split(" ");
-            newData = this.arg.source.filter((el) => {
+            newData = this.sourceAll.filter((el) => {
               let concat = "";
               let filterFields = this.arg.filter.fields;
               if (!filterFields) filterFields = Object.keys(el);
@@ -1478,7 +1493,7 @@ var xGridV2 = (() => {
               }
             });
           } else if (typeof filter == "object") {
-            newData = this.arg.source.filter((el) => {
+            newData = this.sourceAll.filter((el) => {
               let retorno = 0;
               for (let i in filter) {
                 let field = i;
@@ -1502,6 +1517,7 @@ var xGridV2 = (() => {
             });
           }
           if (!newData || newData.length === 0) {
+            this.arg.source = [];
             this.tabindex = 0;
             this.indexSelect = 0;
             this.sourceSelect = false;
@@ -1619,7 +1635,9 @@ var xGridV2 = (() => {
         "x-opacite",
         "x-whiteV2",
         "x-blue",
-        "x-bocatan"
+        "x-bocatan",
+        "x-modern-dark",
+        "x-Vyzo"
       ];
       document.querySelectorAll(".xGridV2-main").forEach((node) => {
         themeClasses.forEach((t) => node.classList.remove(t));
