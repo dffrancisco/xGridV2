@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import xGridV2 from '../index.ts'
+import pkg from '../package.json'
 
 beforeEach(() => {
   document.body.innerHTML = '<div id="grid"></div>'
@@ -178,5 +179,45 @@ describe('xGridV2', () => {
       const input = document.querySelector('#grid .xGridV2-content input')!
       expect(mousedown(input, 2).defaultPrevented).toBe(false)
     })
+  })
+
+  describe('deleteLine', () => {
+    const criar = () => {
+      const grid = new xGridV2.create({ el: '#grid', columns: { N: { dataField: 'n' } } })
+      grid.source([{ n: 'a' }, { n: 'b' }, { n: 'c' }])
+      return grid
+    }
+    const linha = (i: number) => document.querySelector(`#grid .xGridV2-content [tabindex="${i}"]`)
+
+    it('deleteLine(0) remove a primeira linha e devolve os dados dela', () => {
+      const grid = criar()
+      expect(grid.deleteLine(0)).toEqual({ n: 'a' })
+      expect(linha(0)!.classList.contains('xGridV2-deleteLine')).toBe(true)
+      expect(grid.data().filter(Boolean)).toEqual([{ n: 'b' }, { n: 'c' }])
+    })
+
+    it('sem índice remove a linha selecionada, mesmo sendo a primeira', () => {
+      const grid = criar()
+      grid.focus(0)
+      expect(grid.deleteLine()).toEqual({ n: 'a' })
+      expect(grid.data().filter(Boolean)).toEqual([{ n: 'b' }, { n: 'c' }])
+    })
+
+    it('continua removendo as outras linhas', () => {
+      const grid = criar()
+      expect(grid.deleteLine(1)).toEqual({ n: 'b' })
+    })
+
+    it('com a grid vazia ou índice inexistente não lança erro', () => {
+      const vazia = new xGridV2.create({ el: '#grid', columns: { N: { dataField: 'n' } } })
+      expect(() => vazia.deleteLine()).not.toThrow()
+      const grid = criar()
+      expect(() => grid.deleteLine(99)).not.toThrow()
+      expect(grid.data().filter(Boolean)).toHaveLength(3)
+    })
+  })
+
+  it('version é a versão do package.json', () => {
+    expect(xGridV2.version).toBe(pkg.version)
   })
 })

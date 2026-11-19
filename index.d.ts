@@ -148,7 +148,8 @@ export interface ixGridState {
 export interface ixGridV2Module {
     create: new (param: ixGrid) => ixGridCreate;
     state: ixGridState;
-    version: number;
+    /** Versão do pacote, por exemplo "2.4.1" */
+    version: string;
     setNotFound: (value: string) => void;
     getNotFound: () => string;
     getPrintHead: () => string;
@@ -161,7 +162,7 @@ declare const xGridV2: ixGridV2Module;
 
 export default xGridV2;
 
-/** Uso global no browser após incluir dist/xGridV2.js */
+/** Uso global no browser após incluir xGridV2/xGridV2.js */
 declare global {
     const xGridV2: ixGridV2Module;
 }

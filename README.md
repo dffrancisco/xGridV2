@@ -1,1082 +1,504 @@
-# xGrid v2.0
+# xGridV2
 
-<p>O xGrid é um grid robusto, possui inúmeras funcionalidades, com uma alta performance. É um componente desenvolvido apenas com javascript sem uso de bibliotecas externas.</p>
+Grid de dados em JavaScript puro, sem dependências de runtime. Escrito em TypeScript e distribuído pelo npm como [`xgridv2`](https://www.npmjs.com/package/xgridv2).
 
-<h4>Principais Funcionalidades</h4>
-<ul>
-    <li>Carregar os dados através de um objeto JSON.</li>
-    <li>Pesquisar com mecanismo de paginação.</li>
-    <li>Redimensionar tamanho das colunas.</li>
-    <li>Vincular campos do formulário com os dados do grid.</li>
-    <li>Ordenação dos dados.</li>
-    <li>Diversas possibilidade de filtragem dos dados.</li>
-    <li>Totalizar valores de uma coluna.</li>
-    <li>É possível vincular botões (inserir,alterar,deletar,salvar, cancelar, entre outros).</li>
-    <li>Fácil inserção, alteração e remoção de dados</li>
-    <li>Dentre outras funcionalidades...
-</ul>
+- Carrega os dados de um array de objetos (JSON).
+- Ordena ao clicar no título da coluna e redimensiona colunas arrastando a borda do título.
+- Filtra por texto ou por campo, sempre sobre a lista completa.
+- Pagina por rolagem (scroll infinito) com consulta ao servidor.
+- Liga as colunas a um formulário (`sideBySide`), com botões de incluir, alterar, salvar e cancelar.
+- Soma valores de uma coluna, imprime a lista e navega pelo teclado.
+- Escapa o HTML das células por padrão (proteção contra XSS).
+- Oito temas, entre eles o `x-Vyzo`, que segue as cores da página.
 
 ## Instalação
 
-Clone o repositório e instale as dependências de desenvolvimento:
+```sh
+npm install xgridv2
+```
+
+## Uso
+
+### Com bundler (Vite, Vue, webpack…)
+
+```typescript
+import xGridV2 from 'xgridv2'
+import type { ixGrid, ixGridCreate } from 'xgridv2'
+import 'xgridv2/index.css'
+```
+
+Em um componente Vue, o CSS também pode entrar pelo `<style>`:
+
+```css
+@import "xgridv2/index.css";
+```
+
+```typescript
+const grid: ixGridCreate = new xGridV2.create({
+  el: '#pnGrid',
+  columns: {
+    Código: { dataField: 'id', width: '15%', center: true },
+    Nome: { dataField: 'nome', width: '85%' },
+  },
+  dblClick: (linha) => abrir(linha.id),
+})
+
+grid.source([
+  { id: 1, nome: 'Ana' },
+  { id: 2, nome: 'Bruno' },
+])
+```
+
+O elemento precisa existir antes do `create`. No Vue, crie o grid no `onMounted`:
+
+```typescript
+import { onMounted, reactive } from 'vue'
+
+const fields = reactive({ title: '', authors: '' })
+let grid: ixGridCreate
+
+onMounted(() => {
+  grid = new xGridV2.create({
+    el: '#pnGrid',
+    sideBySide: {
+      el: '#form',
+      vModel: fields, // recebe a linha selecionada
+    },
+  })
+})
+```
+
+### Sem bundler (tag `<script>`)
+
+O pacote também traz uma versão que cria a variável global `xGridV2`:
+
+```html
+<link rel="stylesheet" href="node_modules/xgridv2/xGridV2/index.css">
+<script src="node_modules/xgridv2/xGridV2/xGridV2.js"></script>
+
+<div id="pnGrid" style="height: 400px"></div>
+
+<script>
+  const grid = new xGridV2.create({ el: '#pnGrid' })
+  grid.source(dados)
+</script>
+```
+
+Os mesmos arquivos estão no unpkg: `https://unpkg.com/xgridv2/xGridV2/xGridV2.js` e `https://unpkg.com/xgridv2/xGridV2/index.css`.
+
+### O que o pacote traz
+
+| Caminho no import | Arquivo | Uso |
+|---|---|---|
+| `xgridv2` | `xGridV2/xGridV2.mjs` | Módulo ES (`import`) |
+| `xgridv2/index.css` | `xGridV2/index.css` | Estilos e temas |
+| `xgridv2/xGridV2.js` | `xGridV2/xGridV2.js` | Script com a global `xGridV2` |
+| (tipos) | `xGridV2/index.d.ts` | Tipos TypeScript (`ixGrid`, `ixGridCreate`…) |
+
+## Comportamento
+
+- **Seleção de texto:** clique e arraste sobre as células para selecionar o texto e copie com Ctrl+C. O duplo clique não seleciona a palavra, para não atrapalhar o `dblClick`. Em campos editáveis dentro da grid, o duplo clique funciona normalmente.
+- **Teclado:** as setas mudam a linha selecionada e o Enter chama `enter`. Veja também `onKeyDown`, `keySelectUp` e `keySelectDown`.
+- **Filtro:** `filter()` sempre busca na lista completa que veio do `source`. Filtrar de novo troca o resultado, e `filter('')` mostra todas as linhas outra vez.
+- **Ordenação:** clicar no título ordena pela coluna; clicar de novo inverte. Com um filtro ativo, a ordenação vale só para o resultado filtrado.
+- **Sem resultado:** a grid mostra o texto de `xGridV2.setNotFound()` (padrão: "Nada Localizado").
+- **Carregando:** `load()` usa as classes do Font Awesome 4 (`fa fa-spinner`) no ícone. Sem o Font Awesome na página, aparece só o texto.
+
+## Segurança (XSS)
+
+Por padrão (`escapeCells: true`), o conteúdo das células é escapado antes de ir para o DOM. Assim um dado vindo do servidor não executa HTML nem script.
+
+A coluna que usa `compare` ou `render` para gerar HTML de propósito (uma imagem, por exemplo) precisa declarar `html: true`:
+
+```javascript
+columns: {
+  Capa: { dataField: 'thumbnail', compare: 'thumbnail', html: true },
+},
+compare: {
+  thumbnail: (r) => `<img src="${r.thumbnail}" height="50">`,
+},
+```
+
+| Opção | Efeito | Padrão |
+|---|---|---|
+| `escapeCells` | Escapa o HTML de todas as células | `true` |
+| `columns[].html` | Deixa a coluna renderizar HTML | `false` |
+| `printHeadHtml` | Trata o parâmetro de `print(headHTML)` como HTML confiável | `false` |
+
+`escapeCells: false` volta ao comportamento antigo, sem escape. O cabeçalho definido por `xGridV2.setPrintHead()` é sempre tratado como HTML confiável.
+
+## Temas
+
+| Classe | Aparência |
+|---|---|
+| `x-grayV2` | Cinza claro (padrão) |
+| `x-darkV2` | Cinza-azulado escuro |
+| `x-opacite` | Gradiente escuro, roxo e verde-petróleo |
+| `x-whiteV2` | Branco |
+| `x-blue` | Tons de azul |
+| `x-bocatan` | Escuro azulado |
+| `x-modern-dark` | Grafite escuro |
+| `x-Vyzo` | Segue as cores da página, no modo claro ou escuro |
+
+| x-grayV2 | x-darkV2 |
+|---|---|
+| ![x-grayV2](images/x-grayV2.png) | ![x-darkV2](images/x-darkV2.png) |
+
+| x-opacite | x-whiteV2 |
+|---|---|
+| ![x-opacite](images/x-opaciteV2.png) | ![x-whiteV2](images/x-whiteV2.png) |
+
+Há três formas de escolher o tema:
+
+```javascript
+new xGridV2.create({ el: '#pnGrid', theme: 'x-darkV2' }) // só neste grid
+xGridV2.setTheme('x-Vyzo')     // padrão dos grids criados daqui em diante
+xGridV2.changeTheme('x-Vyzo')  // troca nos grids já criados e vira o padrão
+```
+
+### Cores do x-Vyzo
+
+O `x-Vyzo` lê as variáveis CSS abaixo quando a página as define. Sem elas, usa os valores padrão. Com a classe `dark` em um elemento acima da grid (por exemplo `<html class="dark">`), usa os padrões do modo escuro.
+
+| Variável | Uso | Padrão claro | Padrão escuro |
+|---|---|---|---|
+| `--matdash-bg-card` | Fundo | `#ffffff` | `#26343f` |
+| `--matdash-text-primary` | Texto | `#2b2e30` | `#a9bac7` |
+| `--matdash-text-secondary` | Títulos das colunas | `#6c757d` | `#a9bac7` |
+| `--matdash-text-muted` | Aviso de "Nada Localizado" | `#adb5bd` | `#7c8c97` |
+| `--matdash-border` | Bordas | `#e1eef4` | `#3a4a55` |
+| `--v-theme-primary` | Destaque, no formato `r, g, b` (como no Vuetify) | `40, 136, 213` | `77, 163, 255` |
+
+## Opções do `create`
+
+```javascript
+const grid = new xGridV2.create({ el: '#pnGrid', ...opções })
+```
+
+| Opção | Tipo | Padrão | Descrição |
+|---|---|---|---|
+| `el` | `string` ou `HTMLDivElement` | | Seletor ou elemento onde a grid é montada. **Obrigatório.** |
+| `source` | `object[]` | `[]` | Dados iniciais. |
+| `width` | `number` ou `string` | definido pelo CSS | Número vira px; string com `%` ou `px` é usada como está. |
+| `height` | `number` ou `string` | `'100%'` | Mesma regra de `width`. |
+| `heightLine` | `number` | definido pelo tema | Altura de cada linha, em px. |
+| `setfocus` | `number` | | Linha que recebe o foco ao carregar, contando a partir de 1. |
+| `theme` | `string` | `'x-grayV2'` | Classe do [tema](#temas). |
+| `title` | `boolean` | `true` | `false` esconde a barra de títulos, e as linhas ocupam toda a altura. |
+| `count` | `boolean` | `false` | Mostra a numeração das linhas na primeira coluna. |
+| `multiSelect` | `boolean` | `false` | Com Ctrl pressionado, clicar em outras linhas mantém as anteriores marcadas. |
+| `escapeCells` | `boolean` | `true` | Veja [Segurança](#segurança-xss). |
+| `printHeadHtml` | `boolean` | `false` | Veja [Segurança](#segurança-xss). |
+| `filterDelay` | `number` ou `false` | `false` | Espera, em ms, antes de executar `filter()`. Útil para filtrar enquanto a pessoa digita. |
+| `columns` | `object` | todas as chaves dos dados | Veja [columns](#columns). |
+| `compare` | `object` | | Veja [compare](#compare). |
+| `filter` | `object` | | Veja [filter](#filter). |
+| `query` | `object` | | Veja [query](#query-paginação). |
+| `sideBySide` | `object` | | Veja [sideBySide](#sidebyside-formulário). |
+| `onSelectLine` | `(linha) => void` | | Chamada quando uma linha é selecionada. |
+| `click` | `(linha) => void` | | Chamada ao clicar em uma linha. |
+| `dblClick` | `(linha) => void` | | Chamada no duplo clique em uma linha. |
+| `enter` | `(linha, evento) => void` | | Chamada ao pressionar Enter em uma linha. |
+| `onKeyDown` | `object` | | Veja [onKeyDown](#onkeydown). |
+| `keySelectUp` | `number` ou `number[]` | | `keyCode` de teclas que, além da seta, sobem a seleção. |
+| `keySelectDown` | `number` ou `number[]` | | `keyCode` de teclas que, além da seta, descem a seleção. |
+| `complete` | `() => void` | | Chamada quando a grid termina de ser montada. |
+
+### columns
+
+Cada chave é o título da coluna. Sem `columns`, a grid mostra todas as chaves dos dados.
+
+```javascript
+columns: {
+  Nome: { dataField: 'NOME', width: '70%' },
+  Data: { dataField: 'DATA', width: '30%', center: true, render: formatDateBR },
+}
+```
+
+| Propriedade | Tipo | Descrição |
+|---|---|---|
+| `dataField` | `string` | Chave do objeto de dados mostrada na coluna. |
+| `width` | `string` | Largura, por exemplo `'15%'`. |
+| `left` / `center` / `right` | `boolean` | Alinhamento do texto. |
+| `class` | `string` | Classes aplicadas ao conteúdo da célula, separadas por espaço. |
+| `style` | `string` | CSS aplicado ao conteúdo da célula, por exemplo `'color: red; font-size: 16px'`. |
+| `render` | `(valor) => any` | Recebe o valor da célula e devolve o que será mostrado. |
+| `compare` | `string` | Nome de uma função de [compare](#compare). |
+| `html` | `boolean` | Permite HTML no resultado de `render`/`compare`. Padrão `false`. |
+
+### compare
+
+Funções reutilizáveis entre colunas. Cada função recebe a linha inteira, com uma propriedade extra `value` contendo o valor da coluna.
+
+```javascript
+new xGridV2.create({
+  el: '#pnGrid',
+  compare: {
+    nomeCompleto: (r) => r.firstName + ' ' + r.lastName,
+    invertido: (r) => r.value.split('').reverse().join(''),
+  },
+  columns: {
+    Nome: { dataField: 'firstName', compare: 'nomeCompleto' },
+  },
+})
+```
+
+### onKeyDown
+
+Funções disparadas por teclas pressionadas na grid. A chave do objeto é o `keyCode`, precedido dos modificadores nesta ordem: `ctrl+`, `shift+`, `alt+`. A função recebe a linha selecionada e o evento. Depois dela, a grid chama `preventDefault()` e `stopPropagation()` no evento.
+
+```javascript
+onKeyDown: {
+  70: (linha, e) => alert('F pressionada'),
+  'ctrl+13': (linha, e) => alert('Ctrl + Enter'),
+  'ctrl+shift+46': (linha, e) => excluir(linha),
+}
+```
+
+### filter
+
+Regras usadas por `grid.filter()`.
+
+```javascript
+filter: {
+  filterBegin: false,
+  fields: ['NOME', 'CPF'],
+  conditional: 'AND',
+}
+```
+
+| Propriedade | Tipo | Padrão | Descrição |
+|---|---|---|---|
+| `filterBegin` | `boolean` | `false` | `true` exige que o texto apareça no começo do conteúdo. `false` aceita em qualquer posição. |
+| `fields` | `string[]` | todas as colunas | Campos (`dataField`) onde a busca acontece. |
+| `conditional` | `'OR'` ou `'AND'` | `'OR'` | Com um texto de várias palavras, `OR` aceita a linha que tiver qualquer uma delas, e `AND` exige todas. Com um objeto, vale o mesmo para os campos. |
+
+A busca não diferencia maiúsculas de minúsculas.
+
+### query (paginação)
+
+Busca os dados aos poucos, conforme a pessoa rola a lista.
+
+```javascript
+const grid = new xGridV2.create({
+  el: '#pnGrid',
+  query: {
+    endScroll: 0.1,
+    execute: async ({ offset, page, param }) => {
+      const r = await fetch(`/api/livros?q=${param.desc}&offset=${offset}&limit=${param.limite}`)
+      grid.querySourceAdd(await r.json())
+    },
+  },
+})
+
+grid.queryOpen({ desc: 'sherlock', limite: 20 })
+```
+
+| Propriedade | Tipo | Padrão | Descrição |
+|---|---|---|---|
+| `endScroll` | `number` | `0.1` | Fração final da rolagem que dispara a próxima consulta (0.1 = faltando 10%). |
+| `execute` | `({ offset, page, param }) => void` | | Busca a próxima página. `offset` é o número de linhas já carregadas, `page` começa em 1 e `param` é o objeto passado a `queryOpen`. |
+
+- Comece a busca com `queryOpen(param)`, que reinicia a paginação e chama `execute` para a primeira página. As linhas dessa página substituem as que estavam na grid.
+- Dentro de `execute`, entregue as linhas com `querySourceAdd(linhas)`.
+- Quando não houver mais registros, chame `querySourceAdd([])`. A grid para de consultar ao rolar.
+
+### sideBySide (formulário)
+
+Liga a linha selecionada a um formulário: ao selecionar uma linha, os campos recebem os valores dela.
+
+```javascript
+sideBySide: {
+  el: '#form',
+}
+```
+
+```html
+<form id="form">
+  <input name="nome">
+  <input name="cpf">
+</form>
+```
+
+A ligação é feita pelo atributo `name` dos campos (`input`, `select`, `textarea`), que precisa ser igual ao `dataField` da coluna. Um `vModel` objeto recebe os mesmos valores; com `vModel` função, a ligação por `name` não acontece.
+
+| Propriedade | Tipo | Descrição |
+|---|---|---|
+| `el` | `string` | Seletor do formulário ou da div com os campos. **Obrigatório.** |
+| `vModel` | `object` ou `(linha) => void` | Objeto reativo (Vue 3 `reactive()`) que recebe os valores da linha selecionada, ou uma função que recebe uma cópia da linha. |
+| `vRefs` | `object` | Template refs do Vue usados por `focusField` e `disableFieldsSideBySide`, no formato `{ title: { $el: inputTitle } }`. |
+| `render` | `object` | Por campo, função que transforma o valor antes de ir para o formulário: `{ preco: (v) => formatMoney(v) }`. |
+| `compare` | `object` | Por campo, nome de uma função de [compare](#compare): `{ nome: 'nomeCompleto' }`. |
+| `tabToEnter` | `boolean` | Padrão `true`: Enter passa para o próximo campo do formulário. |
+| `frame` | `object` | Veja [frame](#frame-botões). |
+| `duplicity` | `object` | Veja [duplicity](#duplicity). |
+
+#### frame (botões)
+
+Cria botões ligados ao formulário.
+
+```javascript
+sideBySide: {
+  el: '#form',
+  frame: {
+    el: '#botoes',
+    buttons: {
+      incluir: { html: 'Incluir', state: xGridV2.state.insert, click: () => grid.focusField() },
+      alterar: { html: 'Alterar', state: xGridV2.state.update, click: (linha) => {} },
+      salvar: { html: 'Salvar', state: xGridV2.state.save, preLoad: 'Salvando…', click: salvar },
+      cancelar: { html: 'Cancelar', state: xGridV2.state.cancel, click: () => {} },
+    },
+  },
+}
+```
+
+| Propriedade | Tipo | Descrição |
+|---|---|---|
+| `el` | `string` | Seletor do elemento onde os botões são criados. **Obrigatório.** |
+| `class` | `string` | Classes do elemento dos botões. |
+| `style` | `string` | CSS do elemento dos botões. |
+| `buttons` | `object` | Um objeto por botão, com as propriedades abaixo. |
+
+| Propriedade do botão | Tipo | Descrição |
+|---|---|---|
+| `html` | `string` | Conteúdo do botão. |
+| `state` | `string` | Papel do botão: `xGridV2.state.insert`, `update`, `delete`, `save`, `cancel` ou `select`. |
+| `click` | `(linha, evento) => any` | Executada no clique. Pode ser `async`. Se devolver `false`, o modo do formulário não muda. |
+| `preLoad` | `string` | HTML mostrado no botão enquanto o `click` executa. |
+| `class`, `style`, `id` | `string` | Classes, CSS e id do botão. |
+
+O formulário começa somente leitura, com Salvar e Cancelar desabilitados. Os botões `insert` e `update` entram no modo de edição: liberam os campos, habilitam Salvar e Cancelar e desabilitam os outros botões com `state`. Os botões `save` e `cancel` saem do modo de edição. Salvar e Excluir ficam desabilitados enquanto o `click` executa.
+
+#### duplicity
+
+Verifica, ao sair de um campo, se o valor digitado já existe em outro registro.
+
+```javascript
+sideBySide: {
+  el: '#form',
+  duplicity: {
+    dataField: ['cpf'],
+    execute: async ({ field, value, text }) => {
+      const existe = await consultarCpf(value)
+      if (existe) {
+        grid.showMessageDuplicity(`O campo ${text} já está cadastrado`)
+        grid.focusField(field)
+        return true
+      }
+    },
+  },
+}
+```
+
+| Propriedade | Tipo | Descrição |
+|---|---|---|
+| `dataField` | `string[]` | Campos verificados. |
+| `execute` | `({ field, value, text }) => any` | Executada quando o campo perde o foco com um valor diferente do registro e não vazio. `field` é o nome do campo, `value` o valor digitado e `text` o rótulo: o texto do elemento anterior ao campo, o `placeholder` ou o atributo `label`. |
+
+## Métodos da instância
+
+```javascript
+grid.filter('ana')
+```
+
+### Dados
+
+| Método | Descrição |
+|---|---|
+| `source(linhas)` | Substitui os dados da grid. |
+| `sourceAdd(linhas)` | Acrescenta linhas ao final. |
+| `data()` | Devolve as linhas da grid. Com um filtro ativo, só as filtradas. |
+| `dataSource()` | Devolve a linha selecionada, ou `false` se nenhuma estiver selecionada. |
+| `dataSource(campo)` | Devolve o valor do campo na linha selecionada. |
+| `dataSource(campo, valor)` | Altera o valor do campo na linha selecionada e atualiza a célula. |
+| `dataSource({ campo: valor, … })` | Altera vários campos da linha selecionada. |
+| `insertLine(linha, ordem?, callback?)` | Insere uma ou mais linhas no fim (`'BOTTOM'`, padrão) ou no começo (`'TOP'`). |
+| `deleteLine(índice?)` | Remove a linha do índice informado (a partir de 0) ou a selecionada, e devolve os dados dela. |
+| `sumDataField(campo)` | Soma os valores do campo em todas as linhas. |
+| `getColumns()` | Devolve a configuração das colunas. |
+| `getCompare` | Propriedade (não é função) com as funções de `compare`. |
+
+### Seleção e estado
+
+| Método | Descrição |
+|---|---|
+| `focus(índice?)` | Foca a linha do índice, contando a partir de 0. Sem índice, foca a selecionada. |
+| `getIndex()` | Índice da linha selecionada, a partir de 0. |
+| `disable(callback?)` | Bloqueia a grid. |
+| `enable(callback?)` | Desbloqueia a grid. |
+| `clear(callback?)` | Limpa as linhas da tela. Os dados continuam em `data()`. |
+| `load(texto?, callback?)` | Mostra o aviso de carregando (padrão "Carregando . . ."). |
+| `closeLoad(callback?)` | Esconde o aviso de carregando. |
+| `print(cabeçalho?)` | Imprime a grid. O cabeçalho é texto, ou HTML com `printHeadHtml: true`. Sem ele, usa o de `xGridV2.setPrintHead()`. |
+| `setKeySelectUp(keyCodes)` | Troca as teclas de `keySelectUp`. |
+| `setKeySelectDown(keyCodes)` | Troca as teclas de `keySelectDown`. |
+
+### Filtro e paginação
+
+| Método | Descrição |
+|---|---|
+| `filter(texto, callback?)` | Filtra pelo texto, seguindo as regras de [filter](#filter). O callback recebe o número de linhas encontradas. |
+| `filter({ campo: valor }, callback?)` | Filtra pelos campos informados, por exemplo `grid.filter({ nome: 'Robert', sobrenome: 'Drummond' })`. |
+| `setFilterBegin(boolean)` | Troca `filter.filterBegin`. |
+| `setFilterConditional('OR' \| 'AND')` | Troca `filter.conditional`. |
+| `queryOpen(param, callback?)` | Começa uma busca paginada. Veja [query](#query-paginação). |
+| `querySourceAdd(linhas)` | Entrega as linhas buscadas pelo `execute`. Um array vazio encerra a paginação. |
+
+### Formulário (sideBySide)
+
+| Método | Descrição |
+|---|---|
+| `focusField(nome?)` | Foca e seleciona o campo. Sem nome, o primeiro campo editável. |
+| `disableFieldsSideBySide(boolean)` | `true` deixa os campos somente leitura; `false` libera. |
+| `disableBtnsSaveCancel(boolean)` | `true` entra no modo de edição (Salvar e Cancelar habilitados, campos liberados) e `false` sai dele. Os outros botões com `state` ficam no estado oposto. |
+| `getElementSideBySideJson(maiúsculas?, ignorarVazios?)` | Devolve os valores dos campos como objeto. Números com vírgula viram número, datas `dd/mm/aaaa` viram `aaaa-mm-dd` e checkbox vira `'1'` ou `'0'`. Padrões: `false` e `true`. |
+| `getDiffTwoJson(maiúsculas?, ignorarVazios?)` | Compara o formulário com a linha selecionada e devolve `{ old, new, diff }`, em que `diff` é `false` quando nada mudou. |
+| `clearElementSideBySide()` | Limpa os campos do formulário. |
+| `getDuplicityAll()` | Executa o `duplicity.execute` de todos os campos alterados. Devolve uma Promise com o primeiro retorno verdadeiro, ou `false`. |
+| `showMessageDuplicity(texto, tempo?)` | Mostra um aviso por `tempo` ms (padrão 5000). |
+
+## Funções globais
+
+| Função | Descrição |
+|---|---|
+| `xGridV2.create` | Construtor da grid: `new xGridV2.create({ … })`. |
+| `xGridV2.version` | Versão do pacote, por exemplo `"2.4.1"`. |
+| `xGridV2.state` | Papéis dos botões de `frame`: `insert`, `update`, `delete`, `save`, `cancel`, `select`. |
+| `xGridV2.setTheme(tema)` | Define o tema padrão dos próximos grids. |
+| `xGridV2.changeTheme(tema)` | Troca o tema dos grids já criados e define o padrão. |
+| `xGridV2.setNotFound(texto)` / `getNotFound()` | Texto mostrado quando não há linhas. |
+| `xGridV2.setPrintHead(html)` / `getPrintHead()` | Cabeçalho padrão da impressão. |
+
+## Desenvolvimento
 
 ```sh
 git clone git@github.com:dffrancisco/xGridV2.git
 cd xGridV2
 npm install
-npm run build
 ```
 
-Artefatos gerados em `dist/`:
+| Comando | O que faz |
+|---|---|
+| `npm test` | Roda os testes (Vitest + jsdom). |
+| `npm run typecheck` | Verifica os tipos. |
+| `node scripts/build.js` | Gera a pasta `xGridV2/` sem mudar a versão. |
+| `npm run dev` | Gera `xGridV2/` e refaz a cada alteração. |
+| `npm run build` | Atalho para `npm version patch`. |
+| `npm run serve` | Serve o projeto em `http://localhost:8080`. O exemplo fica em `/examples/index.html` e usa a pasta `xGridV2/` gerada. |
 
-| Arquivo | Uso |
-|---------|-----|
-| `dist/xGridV2.js` | Script do grid (browser) |
-| `dist/xGridV2.css` | Estilos e temas |
-| `dist/index.d.ts` | Tipos TypeScript |
+O código está em `index.ts` e os estilos em `index.css`. Os tipos públicos ficam em `index.d.ts`, escrito à mão: ao mudar uma opção ou método, atualize os dois arquivos. A pasta `xGridV2/` é gerada pelo build e vai para o npm.
 
-## Importando (HTML / vanilla)
+### Publicar uma versão
 
-```html
-<link rel="stylesheet" href="./dist/xGridV2.css">
-<script src="./dist/xGridV2.js"></script>
-```
+1. `npm test` e `npm run typecheck`.
+2. Commit das mudanças (o `npm version` exige o git limpo).
+3. `npm version patch` (ou `minor` / `major`). Ele sobe a versão, gera a pasta `xGridV2/` já com o número novo e cria o commit e a tag com tudo junto.
+4. `npm publish`. A conta usa autenticação em dois fatores: `npm publish --otp=<código>`.
+5. `git push --follow-tags`.
+6. Nos projetos que usam a grid: `npm install xgridv2@latest`.
 
-```javascript
-const grid = new xGridV2.create({ el: '#pnGrid' })
-grid.source(json)
-```
+As mudanças de cada versão estão no [CHANGELOG.md](./CHANGELOG.md).
 
-## Vue 3 + TypeScript
+## Licença
 
-Copie a pasta `dist/` para o projeto (ex.: `src/lib/xgrid/`) e importe:
-
-```typescript
-import '@/lib/xgrid/xGridV2.css'
-import '@/lib/xgrid/xGridV2.js'
-import type { ixGrid, ixGridCreate } from '@/lib/xgrid/index.d.ts'
-
-const fields = reactive({ title: '', authors: '' })
-
-onMounted(() => {
-  const grid = new xGridV2.create({
-    el: '#pnGrid',
-    sideBySide: {
-      el: '#form',
-      vModel: fields,
-    },
-  } as ixGrid)
-})
-```
-
-## Scripts npm
-
-| Comando | Descrição |
-|---------|-----------|
-| `npm run build` | Gera `dist/` |
-| `npm run dev` | Build com watch |
-| `npm run typecheck` | Verifica tipos |
-| `npm test` | Testes automatizados |
-| `npm run serve` | Servidor local (exemplo em `/examples/index.html`) |
-
-Ver também [CHANGELOG.md](./CHANGELOG.md) para mudanças da versão 2.3.
-
-## Modo de Uso
-
-É necessário um elemento no seu html com um id ou classe para usar na instância do xGrid.
-
-```html
-    <!DOCTYPE html>
-    <html lang="pt-BR">
-    <head>
-        <title>xGrid v2.0</title>
-        <link rel="stylesheet" href="./dist/xGridV2.css">
-    </head>
-    <body>
-        <div id="pnGrid"></div>
-        <script src="./dist/xGridV2.js"></script>
-        <script src="example.js" type="module"></script>
-    </body>
-    </html>
-```
-No javascript iremos instanciar o objeto da seguinte forma:
-
-<h4>Create</h4>
-
-```javascript
-    const grid = new xGridV2.create({
-        el: '#pnGrid'
-    })
-
-    grid.source(json);
-```
-
-## Segurança (XSS)
-
-Por padrão (`escapeCells: true`), o conteúdo das células é escapado antes de ir para o DOM. Isso evita execução de HTML/script vindo de dados externos.
-
-Colunas que usam `compare` ou `render` retornando HTML (ex.: `<img>`) devem declarar `html: true`:
-
-```javascript
-columns: {
-    'Capa': { dataField: 'thumbnail', compare: 'thumbnail', html: true },
-},
-compare: {
-    thumbnail: (r) => `<img src="${r.thumbnail}" height="50">`,
-}
-```
-
-| Propriedade | Descrição | Default |
-|-------------|-----------|---------|
-| `escapeCells` | Escapa HTML em todas as células | `true` |
-| `columns[].html` | Permite HTML na coluna (compare/render) | `false` |
-| `printHeadHtml` | `print(headHTML)` trata o parâmetro como HTML confiável | `false` |
-
-Para restaurar o comportamento legado (sem escape): `escapeCells: false`.
-
-`setPrintHead()` continua aceitando HTML definido pelo desenvolvedor (conteúdo confiável).
-
-## Temas
-
-<p>O xGrid vem com 4 estilos de temas que podem ser informado dentro do create, os temas são: </p>
-
-<table>
-    <tr>
-        <th>Gray</th>
-        <th>Dark</th>
-    </tr>
-    <tr>
-        <td><img src="images/x-grayV2.png"></td>
-        <td><img src="images/x-darkV2.png"></td>
-    </tr>
-    <tr>
-        <td style="font-size: 10px; text-align:center; padding: 0px">x-grayV2</td>
-        <td style="font-size: 10px; text-align:center; padding: 0px">x-darkV2</td>
-    </tr>
-</table>
-<table>
-     <tr>
-        <th>Opacity</th>
-        <th>White</th>
-    </tr>
-    <tr>
-        <td><img src="images/x-opaciteV2.png"></td>
-        <td><img src="images/x-whiteV2.png"></td>
-    </tr>
-    <tr>
-        <td style="font-size: 10px; text-align:center; padding: 0px">x-opaciteV2</td>
-        <td style="font-size: 10px; text-align:center; padding: 0px">x-whiteV2</td>
-    </tr>
-</table>
-
-## Parâmetro Create
-
-Create é responsável por instanciar o xGrid. Recebe um objeto como parâmetro que pode ter as seguintes propriedades passadas:
-
-<table>
-    <tr>
-        <th align="center" width="20%">Propriedade</th>
-        <th align="center" width="50%">Descrição</th>
-        <th align="center" width="15%">Tipo</th>
-        <th align="center" width="15%">Default</th>
-    </tr>
-    <tr>
-        <td>el</td>
-        <td>Id ou classe do elemento onde será instanciado o xGrid. <strong>(Obrigatório)</strong></td>
-        <td align="center">String</td>
-        <td align="center"></td>
-    </tr>
-    <tr>
-        <td>source</td>
-        <td>Dados que irão popular o grid.</td>
-        <td align="center">Array of Object (JSON)</td>
-        <td align="center">[empty]</td>
-    </tr>
-    <tr>
-        <td>width</td>
-        <td>Largura do grid.</td>
-        <td align="center">Numeric</td>
-        <td align="center"></td>
-    </tr>
-    <tr>
-        <td>height</td>
-        <td>Altura do grid.</td>
-        <td align="center">Numeric</td>
-        <td align="center"></td>
-    </tr>
-    <tr>
-        <td>heightLine</td>
-        <td>Altura da linha do grid.</td>
-        <td align="center">Numeric</td>
-        <td align="center">30</td>
-    </tr>
-    <tr>
-        <td>setfocus</td>
-        <td>Inicia o grid focado na linha informada (1-based). Documentação legada: setFocus.</td>
-        <td align="center">Numeric</td>
-        <td align="center"></td>
-    </tr>
-    <tr>
-        <td>theme</td>
-        <td>Informe a classe do tema que deseja utilizar. Lista de <a href=#temas>temas</a> disponíves acima.</td>
-        <td align="center">String</td>
-        <td align="center">x-grayV2</td>
-    </tr>
-    <tr>
-        <td>title</td>
-        <td>Visibilidade da barra de título</td>
-        <td align="center">Boolean</td>
-        <td align="center">true</td>
-    </tr>
-    <tr>
-        <td>count</td>
-        <td>Visibilidade do contador/índice na primeira coluna.</td>
-        <td align="center">Boolean</td>
-        <td align="center">false</td>
-    </tr>
-    <tr>
-        <td>multiSelect</td>
-        <td>Possibilita a seleção de múltiplas colunas ao segurar a tecla CTRL.</td>
-        <td align="center">Boolean</td>
-        <td align="center">false</td>
-    </tr>
-    <tr>
-        <td>escapeCells</td>
-        <td>Escapa HTML nas células do grid (proteção XSS).</td>
-        <td align="center">Boolean</td>
-        <td align="center">true</td>
-    </tr>
-    <tr>
-        <td>printHeadHtml</td>
-        <td>Quando true, o parâmetro de <code>print(headHTML)</code> é HTML confiável (não escapado).</td>
-        <td align="center">Boolean</td>
-        <td align="center">false</td>
-    </tr>
-    <tr>
-        <td>filterDelay</td>
-        <td>Atraso em ms antes de executar <code>filter()</code> (ex.: 300). <code>false</code> = imediato.</td>
-        <td align="center">Number | false</td>
-        <td align="center">false</td>
-    </tr>
-    <tr>
-        <td>onSelectLine</td>
-        <td>Define uma função que será executada ao selecionar alguma linha.<br>
-        Callback retorna os dados da linha selecionada.
-        </td>
-        <td align="center">Function<br>(Callback)</td>
-        <td align="center"></td>
-    </tr>
-    <tr>
-        <td>click</td>
-        <td>Define uma função que será executada ao clicar em alguma linha.<br>
-        Callback retorna os dados da linha selecionada.
-        </td>
-        <td align="center">Function<br>(Callback)</td>
-        <td align="center"></td>
-    </tr>
-    <tr>
-        <td>dblClick</td>
-        <td>Define uma função que será executada ao dar um duplo clique em alguma linha.<br>
-        Callback retorna os dados da linha selecionada.
-        </td>
-        <td align="center">Function<br>(Callback)</td>
-        <td align="center"></td>
-    </tr>
-    <tr>
-        <td>enter</td>
-        <td>Define uma função que será executada ao pressionar enter em alguma linha.<br>
-        Callback retorna os dados da linha selecionada.
-        </td>
-        <td align="center">Function<br>(Callback)</td>
-        <td align="center"></td>
-    </tr>
-    <tr>
-        <td>keySelectUp</td>
-        <td>Define um array com teclas que ao serem pressionadas (individualmente) irão selecionar uma linha acima.
-        </td>
-        <td align="center">Array of Integer</td>
-        <td align="center"></td>
-    </tr>
-    <tr>
-        <td>keySelectDown</td>
-        <td>Define um array com teclas que ao serem pressionadas (individualmente) irão selecionar uma linha abaixo.
-        </td>
-        <td align="center">Array of Integer</td>
-        <td align="center"></td>
-    </tr>
-</table>
-<br>
-<table>
-    <tr>
-        <td><strong>onKeyDown</strong></td>
-        <td>Armazena funções que executam determinada ação ao pressionar uma tecla desejada na linha do grid.<br>
-        As funções possuem dois parâmetros de callback:<br>
-        O <u>primeiro</u> retorna todos os campos e valores daquela linha.<br>
-        O <u>segundo</u> retorna o evento keydown do DOM.
-        </td>
-        <td align="center">Object</td>
-        <td align="center"></td>
-    </tr>
-    <tr>
-        <td colspan=4>
-        <pre>
-    const grid = new xGridV2.create({
-        onKeyDown: {
-            70: (ln,e) => {
-                alert('Letra F pressionada');
-            },
-            'ctrl+13': (ln,e) => {
-                alert('CTRL + Enter pressionado');
-            },
-        },
-    })</pre>
-        <blockquote>A chave do objeto deve ser o keyCode da tecla que deseja monitorar.</blockquote>
-        <blockquote>Pode combinar as palavras ctrl, alt e shift com um sinal de '+' .</blockquote>
-        </td>
-    </tr>
-</table>
-<br>
-<table>
-    <tr>
-        <td id="tdCreateCompare"><strong>Compare</strong></td>
-        <td>Armazena funções que serão utilizadas em uma ou mais colunas para editar seu conteúdo.<br>
-        As funções possuem um parâmetro de callback que retorna todas as colunas e seus valores, e uma propriedade value que retorna o valor da coluna que está sendo executada a função.
-        </td>
-        <td align="center">Object</td>
-        <td align="center"></td>
-    </tr>
-    <tr>
-        <td colspan=4>
-        <pre>
-    const grid = new xGridV2.create({
-        compare: {
-            'joinName': (r) => {
-                return r.firstName + r.lastName;
-            },
-        },
-        columns: {
-            'name' : {dataField: 'firstName', compare: 'joinName'},
-        }
-    })
-        </pre>
-        </td>
-    </tr>
-</table>
-<br>
-<table>
-    <tr>
-        <td><strong>Columns</strong></td>
-        <td>Define as colunas que serão apresentadas no grid e como será personalizado os dados daquela coluna.<br>
-        Caso não seja informado o componente irá considerar todas as colunas que vierem nos dados que serão adicionados ao grid.</td>
-        <td align="center">Object</td>
-        <td align="center"></td>
-    </tr>
-    <tr>
-        <td colspan=4>
-            <pre>           const grid = new xGridV2.create({
-                columns: {
-                    'First Name': { propriedades },
-                    'Last Name': { propriedades }
-                }
-            })
-            &nbsp;
-            columns: {Name: {dataField: 'NAME', width: '100%'},}</pre>
-            <blockquote>A chave das columns serão usadas como título das colunas no grid.</blockquote>
-            <table>
-                <tr>
-                    <th>Propriedade</th>
-                    <th>Descrição</th>
-                    <th>Tipo</th>
-                    <th>Default</th>
-                </tr>
-                <tr>
-                    <td>dataField</td>
-                    <td>Nome da chave que representa aquela coluna no objeto de dados.</td>
-                    <td align="center">String</td>
-                    <td align="center"></td>
-                </tr>
-                <tr>
-                    <td>width</td>
-                    <td>Tamanho da coluna em porcentagem. ex.: '15%'</td>
-                    <td align="center">String</td>
-                    <td align="center"></td>
-                </tr>
-                <tr>
-                    <td>class</td>
-                    <td>Adiciona a(s) classe(s) na coluna. ex.: 'classA classB'</td>
-                    <td align="center">String</td>
-                    <td align="center"></td>
-                </tr>
-                <tr>
-                    <td>style</td>
-                    <td>Adiciona um estilo na coluna. ex.: '{color: red; font-size: "16px"}'</td>
-                    <td align="center">String</td>
-                    <td align="center"></td>
-                </tr>
-                <tr>
-                    <td>center</td>
-                    <td>Centraliza o texto da coluna.</td>
-                    <td align="center">Boolean</td>
-                    <td align="center">False</td>
-                </tr>
-                <tr>
-                    <td>right</td>
-                    <td>Alinha o texto da coluna à direita.</td>
-                    <td align="center">Boolean</td>
-                    <td align="center">False</td>
-                </tr>
-                <tr>
-                    <td>render</td>
-                    <td>Recebe uma função com um parâmetro callback (valor da coluna), processa o valor e o return da função é mostrado.<br><pre>
-columns: {
-    'Data': {dataField: 'DATA', render: formatDateBR},
-        }</pre>
-                    </td>
-                    <td align="center">Function<br>(Callback)</td>
-                    <td align="center"></td>
-                </tr>
-                <tr>
-                    <td>compare</td>
-                    <td>Informa o nome da função fornecida em <a href="#tdCreateCompare">compare</a> do create que deseja aplicar a esta coluna.
-<pre>grid = new xGridV2.create({
-    columns: {'Name': {dataField: 'NAME', compare: 'reverse'},},
-    compare: {'reverse': (r)=>{
-        return r.value.split('').reverse().join('');
-    }}
-})</pre>
-                    </td>
-                    <td align="center">String</td>
-                    <td align="center"></td>
-                </tr>
-                <tr>
-                    <td>html</td>
-                    <td>Permite HTML na coluna (use com <code>compare</code> ou <code>render</code>). Ex.: thumbnails com <code>&lt;img&gt;</code>.</td>
-                    <td align="center">Boolean</td>
-                    <td align="center">false</td>
-                </tr>
-            </table>
-        </td>
-    </tr>
-</table>
-<br>
-<table>
-    <tr>
-        <td id="filter"><strong>Filter</strong></td>
-        <td>Define regras que serão utilizadas no filtro interno do grid quando executar o método filter.</td>
-        <td align="center">Object</td>
-        <td align="center"></td>
-    </tr>
-    <tr>
-        <td colspan=4>
-            <table>
-                <tr>
-                    <th>Propriedade</th>
-                    <th>Descrição</th>
-                    <th>Tipo</th>
-                    <th>Default</th>
-                </tr>
-                <tr>
-                    <pre>   grid = new xGridV2.create({
-            filter: {
-                filterBegin: false,
-                fieldByField: {conditional: 'OR'},
-                concat: {
-                    fields: [],
-                    conditional: 'OR'
-                }
-            },
-        })</pre>
-                    <td id="filterBegin">filterBegin</td>
-                    <td>O texto pesquisado tem que ser igual ao texto inicial da(s) coluna(s)</td>
-                    <td align="center">Boolean</td>
-                    <td align="center">False</td>
-                </tr>
-                <tr>
-                    <td>fields</td>
-                    <td>Array com o nome das colunas (dataField) em que deseja que a pesquisa seja realizada.<br>
-                    Se não for informado irá pesquisar em todas as colunas.
-                    </td>
-                    <td align="center">Array</td>
-                    <td align="center">[  ]</td>
-                </tr>
-                <tr>
-                    <td id="filterConditional">conditional</td>
-                    <td>Operador que determina se a pesquisa deve atender todas as colunas informadas ('AND') ou se deve atender pelo menos uma das colunas ('OR')<br>
-                    </td>
-                    <td align="center">String</td>
-                    <td align="center">'OR'</td>
-                </tr>  
-            </table>
-        </td>
-    </tr>
-</table>
-<br>
-<table>
-    <tr>
-        <td id="query"><strong>query</strong></td>
-        <td>Configura o componente para uma pesquisa com paginação.</td>
-        <td align="center">Object</td>
-        <td align="center"></td>
-    </tr>
-    <tr>
-        <td colspan=4>
-            <pre>
-grid = new xGridV2.create({
-    query: {
-        endScroll: 0.1,
-        execute: async (r) => {
-            let result = await fetch('https://www.googleapis.com/books/v1/volumes
-            ?q=' + r.param.desc + '&startIndex=' + r.offset + '&maxResults=' + r.param.maxItem )
-            .then(response => {
-                return response.json();
-            })
-            grid.querySourceAdd(result.items);
-        }
-    }
-})
-<br>
-grid.queryOpen({ desc: 'sherlock', maxItem: 20 })</pre>
-            <blockquote> ** Ao usar o query iniciar a busca dos dados com o método <a hreF="#queryOpen">queryOpen()</a> .</blockquote>
-            <blockquote>A função chamada em execute quando processada tem que adicionar os dados no grid através do método <a href="#querySourceAdd">querySourceAdd()</a> .</blockquote>
-            <blockquote>Quando não houver mais registros, chame <code>querySourceAdd([])</code> — o grid para de consultar o servidor no scroll.</blockquote>
-            <table>
-                <tr>
-                    <th>Propriedade</th>
-                    <th>Descrição</th>
-                    <th>Tipo</th>
-                    <th>Default</th>
-                </tr>
-                <tr>
-                    <td>endScroll</td>
-                    <td>Percentual correspondente a posição restante da barra de rolagem que buscará novos dados.</td>
-                    <td align="center">Object</td>
-                    <td align="center">0.1</td>
-                </tr>
-                <tr>
-                    <td>execute</td>
-                    <td>Função a ser executada para consultar novos dados, pode consumir um banco de dados, API, etc.<br><br>
-                    É executada sempre quando chegar no percentual da barra de rolagem determinada em endScroll.<br><br>
-                    A função possui um parâmetro callback que é um objeto contendo:<br>
-                    <u>offset</u>: A posição onde deve iniciar a pesquisa. O índice do primeiro item é 0.<br>
-                    <u>page</u>: A página onde será feita a pesquisa. O índice da primeira página é 1.<br>
-                    <u>param</u>: Objeto contendo informações adicionais para serem utilizadas na pesquisa.
-                    </td>
-                    <td align="center">Function<br>(Callback)</td>
-                    <td align="center">Undefined</td>
-                </tr>
-            </table>
-        </td>
-    </tr>
-</table>
-<br>
-<table>
-    <tr>
-        <td id="sideBySide"><strong>sideBySide</strong></td>
-        <td>Possibilita vincular as colunas do grid com os elementos do formulário (input, checkbox, textarea, etc..).</td>
-        <td align="center">Object</td>
-        <td align="center"></td>
-    </tr>
-    <tr>
-        <td colspan=4>
-            <pre>       const grid = new xGridV2({
-                sideBySide: {
-                    el: '#myForm'
-                }
-            })
-            <blockquote>O vínculo só é feito se o <strong>name</strong> dos elementos (input, etc..) for igual ao <strong>dataField</strong> de columns.</blockquote></pre>
-            <table>
-                <tr>
-                    <th>Propriedade</th>
-                    <th>Descrição</th>
-                    <th>Tipo</th>
-                    <th>Default</th>
-                </tr>
-                <tr>
-                    <td>el <strong>(Obrigatório)</strong></td>
-                    <td>Informe o id ou class do form ou div dos elementos de entrada.</td>
-                    <td align="center">String</td>
-                    <td align="center">Undefined</td>
-                </tr>
-                <tr>
-                    <td>vModel</td>
-                    <td>Objeto reativo (Vue 3: <code>reactive()</code>) sincronizado ao selecionar linha.
-                    <pre>
-// Vue 3 + script setup
-const fields = reactive({ name: '', cpf: '' })
-
-sideBySide: {
-  el: '#form',
-  vModel: fields,
-}
-                    </pre>
-                    </td>
-                    <td align="center">Object</td>
-                    <td align="center"></td>
-                </tr>
-                <tr>
-                    <td>vRefs</td>
-                    <td>Template refs do Vue 3 para <code>focusField</code> e <code>disableFieldsSideBySide</code>.
-                    <pre>
-const inputTitle = ref(null)
-
-vRefs: { title: { $el: inputTitle } }
-                    </pre>
-                    </td>
-                    <td align="center">Object</td>
-                    <td align="center"></td>
-                </tr>
-                <tr>
-                    <td>render</strong></td>
-                    <td>Recebe um objeto, sendo a chave do objeto o 'name' do elemento e o valor uma função callback que recebe o valor do elemento e retorna um valor modificado pela função.
-                     <pre>... sideBySide: {
-        el: '#myForm',
-        render: {
-            name: (value) => {return value.split('').reverse().join('')},
-            money: (value) => formatMoney
-        }
-    }, </pre>
-                    </td>
-                    <td align="center">Object</td>
-                    <td align="center"></td>
-                </tr>
-                <tr>
-                    <td>compare</strong></td>
-                    <td>Recebe um objeto, sendo a chave do objeto o 'name' do elemento e o valor o nome da função fornecida em <a href="#tdCreateCompare">compare</a> do create.
-<pre>grid = new xGridV2.create({
-    compare: {'joinName': (r)=>{
-        return r.firstName + ' ' + r.lastName;
-    }},
-    sideBySide: {
-        el: '#myForm',
-        compare: {
-            firstName: 'joinName',
-        }
-    }
-})</pre>
-                    </td>
-                    <td align="center">Object</td>
-                    <td align="center"></td>
-                </tr>
-                <tr>
-                    <td id="frame"><strong>frame</strong></td>
-                    <td>Possibilita a criação de botões que estarão vinculados com o formulário.</td>
-                    <td align="center">Object</td>
-                    <td align="center"></td>
-                </tr>
-                <tr>
-                    <td colspan=4>
-            <pre>
-            const grid = new xGridV2.create({
-                sideBySide:{
-                    frame: {
-                        el: '#divButtons',
-                        buttons: {
-                            ...
-                        }
-                    }
-                }
-            })</pre>
-                        <table>
-                            <tr>
-                                <th>Propriedade</th>
-                                <th>Descrição</th>
-                                <th>Tipo</th>
-                                <th>Default</th>
-                            </tr>
-                            <tr>
-                                <td>el<br>(Obrigatório)</td>
-                                <td>Id ou classe do elemento onde serão criados os botões.</td>
-                                <td align="center">String</td>
-                                <td align="center"></td>
-                            </tr>
-                            <tr>
-                                <td>class</td>
-                                <td>Informa uma classe para o container.</td>
-                                <td align="center">String</td>
-                                <td align="center"></td>
-                            </tr>
-                            <tr>
-                                <td>style</td>
-                                <td>Informa uma css para o container.</td>
-                                <td align="center">String</td>
-                                <td align="center"></td>
-                            </tr>
-                            <tr>
-                                <td>buttons</td>
-                                <td>Lista de objetos contendo os botões que serão criados.</td>
-                                <td align="center">Object</td>
-                                <td align="center"></td>
-                            </tr>
-                            <tr>
-                                <td colspan=4>
-                    <pre>
-                    frame: {
-                        el: '#divButtons',
-                        buttons: {
-                            insert: {
-                                html: 'Incluir',
-                                state: xGrid.state.insert,
-                                class: 'btnInsert',
-                                click: ()=>{ ... },
-                            },
-                            ...
-                        }
-                    }</pre>
-                    <blockquote>Ao clicar nos botões com state (insert, update), os fields são habilitados e os botões com state (update, cancel) são desabilitados. O contrário também se aplica.</blockquote>
-                                    <table>
-                                        <tr>
-                                            <th>Propriedade</th>
-                                            <th>Descrição</th>
-                                            <th>Tipo</th>
-                                            <th>Default</th>
-                                        </tr>
-                                        <tr>
-                                            <td>html</td>
-                                            <td>Texto que será exibido no botão.</td>
-                                            <td align="center">String</td>
-                                            <td align="center"></td>
-                                        </tr>
-                                        <tr>
-                                            <td>state</td>
-                                            <td>Propriedade para controlar qual o tipo do botão sendo utilizado.<br>
-                                            <blockquote>state.insert, state.update, state.delete, state.save e state.cancel</blockquote>
-                                            </td>
-                                            <td align="center">state</td>
-                                            <td align="center"></td>
-                                        </tr>
-                                        <tr>
-                                            <td>class</td>
-                                            <td>Fornece uma classe para o botão.</td>
-                                            <td align="center">String</td>
-                                            <td align="center"></td>
-                                        </tr>
-                                        <tr>
-                                            <td>style</td>
-                                            <td>Fornece uma estilo para o botão.</td>
-                                            <td align="center">String</td>
-                                            <td align="center"></td>
-                                        </tr>
-                                        <tr>
-                                            <td>click</td>
-                                            <td>Recebe uma função que será executada ao clicar no botão.
-                                            Possui um callback que retorna os dados da linha selecionada.</td>
-                                            <td align="center">Function<br>(callback)</td>
-                                            <td align="center"></td>
-                                        </tr>
-                                    </table>
-                                </td>
-                            </tr>
-                        </table>
-                    </td>
-                </tr>
-                <tr>
-                    <td id="duplicity"><strong>duplicity</strong></td>
-                    <td>Ao sair de um elemento verifica se o seu valor já está sendo utilizado em outro registro.</td>
-                    <td align="center">Object</td>
-                    <td align="center"></td>
-                </tr>
-                <tr>
-                    <td colspan=4>
-                        <pre> duplicity: {
-            dataField: ['id'],
-            execute: async (r) => {
-                let result = await fetch('https://www.googleapis.com/books/v1/volumes?
-                q=' + r.value + '&maxResults=1')
-                    .then(response => {
-                        return response.json();
-                    })
-                if (result.totalItems > 0) {
-                    grid.showMessageDuplicity('O campo ' +r.text+ ' está com valor duplicado!')
-                    grid.focusField(r.field);
-                }
-            }
-        },</pre>
-                        <table>
-                            <tr>
-                                <th>Propriedade</th>
-                                <th>Descrição</th>
-                                <th>Tipo</th>
-                                <th>Default</th>
-                            </tr>
-                            <tr>
-                                <td>dataField</td>
-                                <td>Array contendo os nomes dos fields que deseja verificar se há duplicidade.</td>
-                                <td align="center">Array of String</td>
-                                <td align="center"></td>
-                            </tr>
-                            <tr>
-                                <td>execute</td>
-                                <td>Função a ser executada para verificar se o dado está duplicado.<br>
-                                É executada sempre quando o elemento do formulário perde o foco.<br>
-                                Possui um parâmetro callback que retorna um objeto contendo:<br>
-                                <u>field</u>: Nome do dataField do campo.<br>
-                                <u>value</u>: Valor alterado no elemento.<br>
-                                <u>text</u>: Texto do elemento anterior ou placeholder.
-                                </td>
-                                <td align="center">Function <br>(callback)</td>
-                                <td align="center"></td>
-                            </tr>
-                        </table>
-                    </td>
-                </tr>
-            </table>
-        </td>
-    </tr>
-</table>
-
-## Métodos
-    
-Esses métodos serão utilizados no grid instanciado. Ex.:<br>
-```javascript
-    grid.deleteLine(1);
-```
-
-<table>
-    <tr>
-        <th>Método</th>
-        <th align="center">Parâmetro</th>
-        <th>Descrição</th>
-    <tr>
-    <tr>
-        <td>source</td>
-        <td align="center">source: Array of Object</td>
-        <td>Preenche o grid com os dados passados via parâmetro.</td>
-    </tr>
-    <tr>
-        <td>sourceAdd</td>
-        <td align="center">source: Array of Object</td>
-        <td>Insere os dados passados via parâmetro no grid.</td>
-    </tr>
-    <tr>
-        <td>dataSource</td>
-        <td align="center">nenhum</td>
-        <td>Retorna os dados da linha selecionada.<br>
-        Caso nenhuma linha tenha sido selecionada, retorna false.
-        </td>
-    </tr>
-    <tr>
-        <td>dataSource</td>
-        <td align="center">field: String</td>
-        <td>Retorna o valor da coluna informada por parâmetro na linha selecionada.</td>
-    </tr>
-    <tr>
-        <td>dataSource</td>
-        <td align="center">field: String<br>value: String</td>
-        <td>Altera o valor da coluna informada pelo valor passado, na linha selecionada.</td>
-    </tr>
-    <tr>
-        <td>data</td>
-        <td align="center">nenhum</td>
-        <td>Retorna todos os dados armazenados no grid.</td>
-    </tr>
-    <tr>
-        <td>getColumns</td>
-        <td align="center">nenhum</td>
-        <td>Retorna as informações da propriedade 'columns' do grid.</td>
-    </tr>
-    <tr>
-        <td>getCompare</td>
-        <td align="center">nenhum</td>
-        <td>Retorna as informações da propriedade 'compare' do grid.</td>
-    </tr>
-    <tr>
-        <td>focus</td>
-        <td align="center">numLine: Integer</td>
-        <td>Foca na linha informada. Primeira linha iniciada por 0.</td>
-    </tr>
-    <tr>
-        <td>disable</td>
-        <td align="center">callback: Function<br>(Optional)</td>
-        <td>Desabilita o grid, executa a função callback caso tenha sido passada.</td>
-    </tr>
-    <tr>
-        <td>enable</td>
-        <td align="center">callback: Function<br>(Optional)</td>
-        <td>Habilita o grid, executa a função callback caso tenha sido passada.</td>
-    </tr>
-    <tr>
-        <td>clear</td>
-        <td align="center">callback: Function<br>(Optional)</td>
-        <td>Apaga os dados do grid (visual). Os dados permanecem armazendados no grid. Executa a função callback caso tenha sido passada.</td>
-    </tr>
-    <tr>
-        <td>load</td>
-        <td align="center">nenhum</td>
-        <td>Mostra uma mensagem de loading no grid.</td>
-    </tr>
-    <tr>
-        <td>load</td>
-        <td align="center">text: String</td>
-        <td>Mostra a mensagem fornecida como um loading no grid.</td>
-    </tr>
-    <tr>
-        <td>load</td>
-        <td align="center">text: String,<br>
-            callback: Function
-        </td>
-        <td>Mostra a mensagem fornecida como um loading no grid. Executa a função callback fornecida.</td>
-    </tr>
-    <tr>
-        <td>closeLoad</td>
-        <td align="center">callback: Function<br>(Optional)</td>
-        <td>Oculta a mensagem de loading do grid. Executa a função callback caso tenha sido passada.</td>
-    </tr>
-    <tr>
-        <td>getIndex</td>
-        <td align="center">nenhum</td>
-        <td>Retorna o índice da linha atual. A primeira linha se inicia com 0.</td>
-    </tr>
-    <tr>
-        <td>deleteLine</td>
-        <td align="center">index: Integer <br>(Optional)</td>
-        <td>Deleta a linha informada, caso não informe a linha, será deletado a linha selecionada.<br>
-        Essa função tem como retorno os dados da linha deletada.
-        </td>
-    </tr>
-    <tr>
-        <td>insertLine</td>
-        <td align="center">param: Object</td>
-        <td>Insere uma linha com os dados passados no final do grid.
-        </td>
-    </tr>
-    <!-- <tr>
-        <td>insertLine</td>
-        <td align="center">param: <br>Object, <br>order: </td>
-        <td>
-        </td>
-    </tr>
-    <tr>
-        <td>insertLine</td>
-        <td align="center">
-        param: <br>
-        Object,<br>
-        order: <br>
-        type, <br>
-        callback: <br>
-        Function <br>
-        </td>
-        <td>
-        </td>
-    </tr> -->
-    <tr>
-        <td>sumDataField</td>
-        <td align="center">field: String</td>
-        <td>Retorna a soma total da coluna informada.
-        </td>
-    </tr>
-    <tr>
-        <td>queryOpen</td>
-        <td align="center">param: Object,<br>
-        callback: Function<br>
-        (Optional)
-        </td>
-        <td>Faz uma consulta inicial com base na propriedade <a href="#query">query</a>. As demais consultas são feitas com paginação através da query. Executa uma função callback caso tenha sido fornecida. (<a href="query">query</a>)</td>
-    </tr>
-    <tr>
-        <td>querySourceAdd</td>
-        <td align="center">source: Array of Object
-        </td>
-        <td>Adiciona os dados passados no grid.  (<a href="query">query</a>)</td>
-    </tr>
-    <tr>
-        <td>focusField</td>
-        <td align="center">name: String</td>
-        <td>Foca em um campo específico do formulário.  (<a href="#sideBySide">sideBySide</a>)</td>
-    </tr>
-    <tr>
-        <td>filter</td>
-        <td align="center">filter: String,<br>
-        callback: Function (Optional)
-        </td>
-        <td>Pesquisa e filtra no grid o texto passado. A pesquisa obedece a condição informada na propriedade <a href="#filter">filter</a>.<br>
-        Executa uma função callback caso tenha sido fornecida, essa função callback têm como parâmetro de retorno a quantidade de linhas encontradas. (<a href="filter">filter</a>)
-    </tr>
-    <tr>
-        <td>filter</td>
-        <td align="center">filter: Object,<br>
-        callback: Function (Optional)
-        </td>
-        <td>Pesquisa nas colunas informadas os respectivos valores informados. Ex.:<br>
-        <code>grid.filter({name: 'Robert' lastName: 'Drummond'})</code><br>
-         A pesquisa obedece a condição informada na propriedade <a href="#filter">filter</a>.<br>
-        Executa uma função callback caso tenha sido fornecida, essa função callback têm como parâmetro de retorno a quantidade de linhas encontradas. (<a href="filter">filter</a>)
-    </tr>
-    <tr>
-        <td>setFilterBegin</td>
-        <td align="center">filterBegin: Boolean</td>
-        <td>Altera a propriedade <a href="#filterBegin">filterBegin</a> do filter. (<a href="filter">filter</a>)
-    </tr>
-    <tr>
-        <td>setFilterConditional</td>
-        <td align="center">conditional: String</td>
-        <td>Altera a propriedade <a href="#filterConditional">conditional</a> do filter. (<a href="filter">filter</a>)
-    </tr>
-    <tr>
-        <td>disableBtnsSaveCancel</td>
-        <td align="center">disable: Boolean
-        </td>
-        <td>Desabilita/Habilita os botões salvar e cancelar de acordo com a informação passada. (<a href="#frame">frame</a>)
-        </td>
-    </tr>
-    <tr>
-        <td>disableFieldsSideBySide</td>
-        <td align="center">disable: Boolean
-        </td>
-        <td>Desabilita/Habilita os campos do formulário. (<a href="#sideBySide">sideBySide</a>)
-        </td>
-    </tr>
-    <tr>
-        <td>getElementSideBySideJson</td>
-        <td align="center">toUpperCase: Boolean,<br>
-        empty: Boolean
-        </td>
-        <td>Retorna os valores dos campos do formulário no formato JSON. (<a href="#sideBySide">sideBySide</a>)
-        </td>
-    </tr>
-    <tr>
-        <td>getDiffTwoJson</td>
-        <td align="center">toUpperCase: Boolean</td>
-        <td>Retorna um objeto contendo os valores antigos e novos dos campos alterados no formulário.<br>
-        <code> {objOld: [name: 'Robert'], objNew: [name: 'Roberty']}</code>
-        (<a href="#sideBySide">sideBySide</a>)
-        </td>
-    </tr>
-    <tr>
-        <td>clearElementSideBySide</td>
-        <td align="center">nenhum</td>
-        <td>Limpa os campos do formulário.
-        (<a href="#sideBySide">sideBySide</a>)
-        </td>
-    </tr>
-    <tr>
-        <td>print</td>
-        <td align="center">headHTML: String (Optional)
-        </td>
-        <td>Imprime os dados do grid. É possível passar um cabeçalho para impressão via parâmetro.
-        </td>
-    </tr>
-    <tr>
-        <td>getDuplicityAll</td>
-        <td align="center">nenhum</td>
-        <td>Chama a função execute de <a href="#duplicity">duplicity</a> dos fields informados. Essa função retorna uma Promise</td>
-    </tr>
-    <tr>
-        <td>showMessageDuplicity</td>
-        <td align="center">text: String</td>
-        <td>Mostra uma mensagem de alerta!</td>
-    </tr>
-    <tr>
-        <td>setKeySelectUp</td>
-        <td align="center">keyCode: Integer</td>
-        <td>Adiciona a opção de selecionar a linha acima com a tecla informada.</td>
-    </tr>
-    <tr>
-        <td>setKeySelectDown</td>
-        <td align="center">keyCode: Integer</td>
-        <td>Adiciona a opção de selecionar a linha abaixo com a tecla informada.</td>
-    </tr>
-</table>
-
-## Desenvolvedor
-
-[Francisco Alves](https://github.com/dffrancisco)
+ISC. Desenvolvido por [Francisco Alves](https://github.com/dffrancisco).

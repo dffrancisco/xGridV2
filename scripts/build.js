@@ -8,6 +8,13 @@ const distDir = path.join(root, "xGridV2");
 
 const common = {
   entryPoints: [path.join(root, "index.ts")],
+  // lido a cada build, para o `npm version` gravar a versão nova no bundle
+  define: {
+    __XGRID_VERSION__: JSON.stringify(
+      JSON.parse(fs.readFileSync(path.join(root, "package.json"), "utf8"))
+        .version,
+    ),
+  },
   bundle: true,
   target: "es2018",
   sourcemap: true,
