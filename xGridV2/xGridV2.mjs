@@ -1,6 +1,6 @@
 // index.ts
 var index_default = /* @__PURE__ */ (function xGridV2Module() {
-  const version = 2.3;
+  const version = true ? "2.4.1" : "dev";
   const state = {
     save: "save",
     insert: "insert",
@@ -717,12 +717,13 @@ var index_default = /* @__PURE__ */ (function xGridV2Module() {
       },
       deleteLine(index) {
         index = index == void 0 ? this.indexSelect : index;
-        if (!index) return;
-        let del = this.arg.source[index];
-        delete this.arg.source[index];
+        if (index === void 0 || index === null || index === "") return;
         let target = this.gridContent.querySelector(
           '[tabindex="' + index + '"]'
         );
+        if (!target) return;
+        let del = this.arg.source[index];
+        delete this.arg.source[index];
         if (target.nextSibling) target.nextSibling.focus();
         else if (target.previousSibling) target.previousSibling.focus();
         this.onEvent.removeEventListenerElement(target);

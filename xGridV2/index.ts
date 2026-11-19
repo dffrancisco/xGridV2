@@ -152,10 +152,14 @@ export interface ixGrid {
   };
 }
 
+declare const __XGRID_VERSION__: string;
+
 export default (function xGridV2Module() {
   // eslint-disable-next-line no-unused-vars
   // let xGridV2 = (function () {
-  const version = 2.3;
+  // o build (scripts/build.js) e os testes (vitest.config.ts) trocam __XGRID_VERSION__ pela versão do package.json
+  const version: string =
+    typeof __XGRID_VERSION__ !== "undefined" ? __XGRID_VERSION__ : "dev";
   const state = {
     save: "save",
     insert: "insert",
@@ -1091,14 +1095,16 @@ export default (function xGridV2Module() {
 
         index = index == undefined ? this.indexSelect : index;
 
-        if (!index) return;
+        // 0 é a primeira linha: só sai quando não há índice
+        if (index === undefined || index === null || index === "") return;
 
-        let del = this.arg.source[index];
-        delete this.arg.source[index];
-        //  let indexOld = index;
         let target = this.gridContent.querySelector(
           '[tabindex="' + index + '"]',
         );
+        if (!target) return;
+
+        let del = this.arg.source[index];
+        delete this.arg.source[index];
 
         if (target.nextSibling) target.nextSibling.focus();
         else if (target.previousSibling) target.previousSibling.focus();
