@@ -62,4 +62,37 @@ describe('xGridV2', () => {
     expect(ax.queryComplete).toBe(true)
     expect(ax.controlScroll).toBe(false)
   })
+
+  describe('seleção de texto no duplo clique', () => {
+    const mousedown = (target: Element, detail: number) => {
+      const ev = new MouseEvent('mousedown', { bubbles: true, cancelable: true, detail })
+      target.dispatchEvent(ev)
+      return ev
+    }
+
+    it('impede a seleção de palavra no duplo clique sobre a célula', () => {
+      const grid = new xGridV2.create({ el: '#grid', columns: { N: { dataField: 'n' } } })
+      grid.source([{ n: 'alpha' }])
+      const cell = document.querySelector('#grid .xGridV2-content [name="n"]')!
+      expect(mousedown(cell, 2).defaultPrevented).toBe(true)
+      expect(mousedown(cell, 3).defaultPrevented).toBe(true)
+    })
+
+    it('clique simples continua permitindo seleção por arraste', () => {
+      const grid = new xGridV2.create({ el: '#grid', columns: { N: { dataField: 'n' } } })
+      grid.source([{ n: 'alpha' }])
+      const cell = document.querySelector('#grid .xGridV2-content [name="n"]')!
+      expect(mousedown(cell, 1).defaultPrevented).toBe(false)
+    })
+
+    it('não interfere no duplo clique dentro de input na célula', () => {
+      const grid = new xGridV2.create({
+        el: '#grid',
+        columns: { N: { dataField: 'n', html: true } },
+      })
+      grid.source([{ n: '<input value="abc">' }])
+      const input = document.querySelector('#grid .xGridV2-content input')!
+      expect(mousedown(input, 2).defaultPrevented).toBe(false)
+    })
+  })
 })

@@ -409,6 +409,16 @@ export default (function xGridV2Module() {
         if (this.arg.query.execute)
           this.gridContent.addEventListener("scroll", this.eventListenerScroll);
 
+        // Impede que o duplo/triplo clique selecione a palavra/linha,
+        // mantendo a seleção de texto por arraste e o comportamento de campos.
+        this.gridContent.addEventListener("mousedown", (e: MouseEvent) => {
+          if (e.detail < 2) return;
+          const target = e.target as HTMLElement;
+          if (target.closest?.("input, textarea, select, [contenteditable]"))
+            return;
+          e.preventDefault();
+        });
+
         if (this.arg.dblClick)
           this.gridContent.addEventListener("dblclick", () => {
             this.arg.dblClick(this.sourceSelect);

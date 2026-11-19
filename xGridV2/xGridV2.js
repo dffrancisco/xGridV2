@@ -229,6 +229,14 @@ var xGridV2 = (() => {
           this.gridContent.classList.add("xGridV2-content");
           if (this.arg.query.execute)
             this.gridContent.addEventListener("scroll", this.eventListenerScroll);
+          this.gridContent.addEventListener("mousedown", (e) => {
+            var _a;
+            if (e.detail < 2) return;
+            const target = e.target;
+            if ((_a = target.closest) == null ? void 0 : _a.call(target, "input, textarea, select, [contenteditable]"))
+              return;
+            e.preventDefault();
+          });
           if (this.arg.dblClick)
             this.gridContent.addEventListener("dblclick", () => {
               this.arg.dblClick(this.sourceSelect);

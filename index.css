@@ -44,7 +44,7 @@
 .xGridV2-main .xGridV2-content {
   overflow-y: scroll;
   height: 100%;
-  user-select: none;
+  /* user-select: none; */
 }
 
 .xGridV2-main .xGridV2-content .xGridV2-row {
@@ -677,7 +677,7 @@
   border: 1px solid #8e8e9747;
   font-size: 12px;
   font-weight: 600;
-  font-family: "Roboto", Verdana, Arial, sans-serif;
+  /* font-family: "Roboto", Verdana, Arial, sans-serif; */
   background: #ffffff;
   margin: auto !important;
   border-radius: 5px;
@@ -688,7 +688,7 @@
   color: #8794a6;
   background: #ffffff;
   cursor: pointer;
-    font-size: 9px;
+  font-size: 9px;
   border-top-left-radius: 5px;
   border-top-right-radius: 5px;
 }
@@ -709,7 +709,7 @@
 .x-whiteV2 .xGridV2-content {
   background: #f8f8f8;
   height: calc(100% - 17px);
-    border-bottom-left-radius: 5px;
+  border-bottom-left-radius: 5px;
   border-bottom-right-radius: 5px;
 }
 
@@ -729,8 +729,8 @@
 }
 
 .x-whiteV2 .xGridV2-Selected {
-    background: rgba(0, 161, 236, 0.2) !important;
-    box-shadow: 0 0 0 1px #00aeff inset;
+  background: rgba(0, 161, 236, 0.2) !important;
+  box-shadow: 0 0 0 1px #00aeff inset;
   outline: 0;
   border-radius: 4px;
 }
@@ -790,7 +790,7 @@
   color: #00557f;
   border: 1px solid #006699;
   font-size: 10px;
-  font-family: Verdana, Arial, sans-serif;
+  /* font-family: Verdana, Arial, sans-serif; */
   font:
     normal 12px/150% Arial,
     Helvetica,
@@ -906,7 +906,7 @@
   border: 1px solid #3a4a55;
   font-size: 12px;
   font-weight: 600;
-  font-family: "Roboto", Verdana, Arial, sans-serif;
+  /* font-family: "Roboto", Verdana, Arial, sans-serif; */
   background: #26343f;
   margin: auto !important;
 }
@@ -1018,7 +1018,7 @@
   border: 1px solid #1d232c;
   font-size: 12px;
   font-weight: 600;
-  font-family: "Roboto", Verdana, Arial, sans-serif;
+  /* font-family: "Roboto", Verdana, Arial, sans-serif; */
   background: #2a3338;
 }
 
