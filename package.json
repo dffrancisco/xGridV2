@@ -2,8 +2,19 @@
   "name": "xgridv2",
   "version": "2.3.8",
   "description": "Grid robusto em JavaScript puro, sem dependências de runtime.",
-  "main": "xGridV2/xGridV2.js",
+  "main": "xGridV2/xGridV2.mjs",
+  "module": "xGridV2/xGridV2.mjs",
   "types": "xGridV2/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./xGridV2/index.d.ts",
+      "import": "./xGridV2/xGridV2.mjs",
+      "default": "./xGridV2/xGridV2.mjs"
+    },
+    "./index.css": "./xGridV2/index.css",
+    "./xGridV2.js": "./xGridV2/xGridV2.js",
+    "./package.json": "./package.json"
+  },
   "files": [
     "xGridV2"
   ],
